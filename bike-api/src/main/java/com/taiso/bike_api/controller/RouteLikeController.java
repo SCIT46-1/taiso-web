@@ -30,9 +30,23 @@ public class RouteLikeController {
             return new ResponseEntity<>("알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-        // } catch (DataIntegrityViolationException ex) {
-        //     // 이미 좋아요를 등록한 경우
-        //     return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
-        // } 
-        
+
+    // catch (DataIntegrityViolationException ex) {
+    //     // 이미 좋아요를 등록한 경우
+    //     return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    @DeleteMapping("/{routeId}/like")
+    public ResponseEntity<Object> removeLike(@PathVariable Long routeId, @RequestParam Long userId) {
+        try {
+            // 서비스에서 좋아요 취소 처리
+            routeLikeService.removeLike(routeId, userId);
+            // 좋아요 취소 성공 시 응답
+            return new ResponseEntity<>("좋아요가 취소되었습니다.", HttpStatus.OK);
+        } catch (RuntimeException ex) {
+            // 루트나 사용자 정보가 없을 경우
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception ex) {
+            // 예상치 못한 예외 처리
+            return new ResponseEntity<>("알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

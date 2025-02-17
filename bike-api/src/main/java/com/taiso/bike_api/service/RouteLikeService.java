@@ -26,16 +26,16 @@ public class RouteLikeService {
     @Autowired
     private UserRepository userRepository;
 
-    @Transactional
+    @Transactional(rollbackFor = {DataIntegrityViolationException.class, RuntimeException.class})
     public RouteLikeDTO addLike(Long routeId, Long userId) {
         // 1. RouteEntity 조회 (존재하지 않으면 예외 처리)
         RouteEntity route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RuntimeException("해당 루트를 찾을 수 없습니다."));
-
+        
         // 2. UserEntity 조회 (존재하지 않으면 예외 처리)
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 사용자 정보를 찾을 수 없습니다."));
-
+        
         // 3. 중복 좋아요 체크 (이미 좋아요가 등록된 경우 예외 처리)
         Optional<RouteLikeEntity> existingLike = routeLikeRepository.findByRouteAndUser(route, user);
         if (existingLike.isPresent()) {
@@ -60,5 +60,27 @@ public class RouteLikeService {
                 .userId(user.getUserId())
                 .likedAt(routeLikeEntity.getLikedAt())
                 .build();
+    }
+
+    @Transactional
+    public void removeLike(Long routeId, Long userId) {
+        // 1. RouteEntity 조회 (존재하지 않으면 예외 처리)
+        RouteEntity route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new RuntimeException("해당 루트를 찾을 수 없습니다."));
+        
+        // 2. UserEntity 조회 (존재하지 않으면 예외 처리)
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("해당 사용자 정보를 찾을 수 없습니다."));
+        
+        // 3. 기존 좋아요 정보 조회 (좋아요가 없으면 예외 처리)
+        RouteLikeEntity routeLikeEntity = routeLikeRepository.findByRouteAndUser(route, user)
+                .orElseThrow(() -> new RuntimeException("좋아요가 등록되어 있지 않습니다."));
+
+        // 4. 좋아요 취소
+        routeLikeRepository.delete(routeLikeEntity);
+
+        // 5. 좋아요 카운트 감소
+        route.setLikeCount(route.getLikeCount() - 1);
+        routeRepository.save(route);
     }
 }
