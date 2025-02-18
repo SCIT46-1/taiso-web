@@ -3,7 +3,6 @@ package com.taiso.bike_api.service;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -109,7 +107,7 @@ public RoutePostResponseDTO createRoute(RoutePostRequestDTO dto, MultipartFile f
 
     // Step 3: 네이버 정적 지도 API 호출 및 이미지 합성
     long step3Start = System.nanoTime();
-    byte[] staticMapImageBytes = generateStaticMapImageBytes(dto, gpxData);
+    byte[] staticMapImageBytes = generateStaticMapImageBytes( gpxData);
     long step3Time = System.nanoTime() - step3Start;
     System.out.println("Step 3 (generateStaticMapImageBytes): " + step3Time / 1_000_000.0 + " ms");
 
@@ -191,7 +189,7 @@ public RoutePostResponseDTO createRoute(RoutePostRequestDTO dto, MultipartFile f
      * 네이버 정적 지도 API를 호출하여 기본 지도 이미지에 GPX 경로를 합성한 후,
      * 이미지 바이트 배열을 반환합니다.
      */
-    private byte[] generateStaticMapImageBytes(RoutePostRequestDTO dto, GPXData gpxData) {
+    private byte[] generateStaticMapImageBytes(GPXData gpxData) {
     try {
         int baseWidth = 800;
         int baseHeight = 600;
@@ -322,21 +320,7 @@ public RoutePostResponseDTO createRoute(RoutePostRequestDTO dto, MultipartFile f
         return Math.max(0, Math.min(zoom, 19));
     }
 
-    /**
-     * Proj4j를 사용하여 WGS84 좌표를 Web Mercator 좌표로 변환 후,
-     * 지도 이미지상의 픽셀 좌표로 환산합니다.
-     */
-    private Point convertGeoToPixel(double lat, double lng,
-                                    int imageWidth, int imageHeight, int zoom, int scaleFactor,
-                                    CoordinateTransform transform, ProjCoordinate dstCenter) {
-        ProjCoordinate srcCoord = new ProjCoordinate(lng, lat);
-        ProjCoordinate dstCoord = new ProjCoordinate();
-        transform.transform(srcCoord, dstCoord);
-        double resolution = (156543.03392804062 / Math.pow(2, zoom)) / scaleFactor;
-        int pixelX = (int) Math.round(imageWidth / 2.0 + (dstCoord.x - dstCenter.x) / resolution);
-        int pixelY = (int) Math.round(imageHeight / 2.0 - (dstCoord.y - dstCenter.y) / resolution);
-        return new Point(pixelX, pixelY);
-    }
+
     
     /**
      * GPX 파일을 SAX 기반 스트리밍 파서를 사용하여 파싱합니다.
@@ -556,16 +540,14 @@ public RoutePostResponseDTO createRoute(RoutePostRequestDTO dto, MultipartFile f
      * SAX 파싱 과정에서 setter를 통해 값이 설정됩니다.
      */
     private static class GPXRoutePoint {
-        private BigDecimal latitude;
-        private BigDecimal longitude;
+        private final BigDecimal latitude;
+        private final BigDecimal longitude;
         private BigDecimal elevation;
-        private LocalDateTime time;
 
-        public GPXRoutePoint(BigDecimal latitude, BigDecimal longitude, BigDecimal elevation, LocalDateTime time) {
+        public GPXRoutePoint(BigDecimal latitude, BigDecimal longitude, BigDecimal elevation) {
             this.latitude = latitude;
             this.longitude = longitude;
             this.elevation = elevation;
-            this.time = time;
         }
 
         public BigDecimal getLatitude() {
@@ -580,16 +562,8 @@ public RoutePostResponseDTO createRoute(RoutePostRequestDTO dto, MultipartFile f
             return elevation;
         }
 
-        public LocalDateTime getTime() {
-            return time;
-        }
-
         public void setElevation(BigDecimal elevation) {
             this.elevation = elevation;
-        }
-
-        public void setTime(LocalDateTime time) {
-            this.time = time;
         }
     }
     
@@ -614,7 +588,7 @@ public RoutePostResponseDTO createRoute(RoutePostRequestDTO dto, MultipartFile f
                 String lonStr = attributes.getValue("lon");
                 BigDecimal lat = new BigDecimal(latStr);
                 BigDecimal lon = new BigDecimal(lonStr);
-                currentPoint = new GPXRoutePoint(lat, lon, BigDecimal.ZERO, LocalDateTime.now());
+                currentPoint = new GPXRoutePoint(lat, lon, BigDecimal.ZERO);
             }
         }
 
@@ -632,16 +606,7 @@ public RoutePostResponseDTO createRoute(RoutePostRequestDTO dto, MultipartFile f
                     } catch (NumberFormatException e) {
                         currentPoint.setElevation(BigDecimal.ZERO);
                     }
-                } else if ("time".equalsIgnoreCase(qName)) {
-                    String timeStr = content.toString().trim();
-                    if (timeStr.endsWith("Z")) {
-                        timeStr = timeStr.substring(0, timeStr.length() - 1);
-                    }
-                    try {
-                        currentPoint.setTime(LocalDateTime.parse(timeStr));
-                    } catch (Exception e) {
-                        // 파싱 실패 시 기본값 유지
-                    }
+ 
                 } else if ("trkpt".equalsIgnoreCase(qName)) {
                     points.add(currentPoint);
                     currentPoint = null;

@@ -67,7 +67,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 인증 없이 접근 가능한 URL (예: 인증 관련 엔드포인트, H2 콘솔)
                 //TODO: 루트 생성 권한 추가
-                .requestMatchers("/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/users/**", "/api/routes/**" ).permitAll()
+                .requestMatchers("/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/users/**").permitAll()
 
                 // 그 외 모든 요청은 인증 필요
                 .anyRequest().authenticated()

@@ -1,8 +1,14 @@
 package com.taiso.bike_api.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.Duration;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -14,11 +20,6 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import software.amazon.awssdk.services.s3.model.S3Object;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Duration;
-import java.util.UUID;
 
 @Service
 public class S3Service {
@@ -107,24 +108,22 @@ public class S3Service {
 
     // Method to generate pre-signed URL for a specific S3 object
     public String generatePresignedUrl(String objectKey, Duration duration) {
-        S3Presigner presigner = S3Presigner.builder()
-            .region(Region.of(awsRegion))
-            .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
-            .build();
+        try (S3Presigner presigner = S3Presigner.builder()
+                .region(Region.of(awsRegion))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
+                .build()) {
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(objectKey)
+                .build();
 
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-            .bucket(bucket)
-            .key(objectKey)
-            .build();
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(duration)
+                .getObjectRequest(getObjectRequest)
+                .build();
 
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-            .signatureDuration(duration)
-            .getObjectRequest(getObjectRequest)
-            .build();
-
-        String presignedUrl = presigner.presignGetObject(presignRequest).url().toString();
-        presigner.close();
-        return presignedUrl;
+            return presigner.presignGetObject(presignRequest).url().toString();
+        }
     }
 
 //    public String getFileUrl(String fileKey) {
