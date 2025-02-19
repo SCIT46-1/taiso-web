@@ -9,4 +9,6 @@ import com.taiso.bike_api.domain.ClubEntity;
 public interface ClubRepository extends JpaRepository<ClubEntity, Long> {
     Optional<ClubEntity> findByClubId(Long clubId);
     Optional<ClubEntity> findByClubName(String clubName);
+    Optional<ClubEntity> findById(Long clubId);
+
 }
