@@ -8,7 +8,8 @@ import com.taiso.bike_api.domain.LightningTagCategoryEntity;
 import com.taiso.bike_api.dto.ClubCreateRequestDTO;
 import com.taiso.bike_api.dto.ClubDetailResponseDTO;
 import com.taiso.bike_api.dto.ClubUpdateRequestDTO;
-
+import com.taiso.bike_api.dto.ClubInfoUpdateRequestDTO;
+import com.taiso.bike_api.dto.ClubInfoUpdateResponseDTO;
 import com.taiso.bike_api.dto.ClubMemberDTO;
 import com.taiso.bike_api.dto.ClubListItemDTO;
 
@@ -203,5 +204,41 @@ public class ClubService {
         
         // 6. 업데이트된 클럽 저장
         clubRepository.save(club);
+    }
+
+    // 클럽 소개글 수정
+    public ClubInfoUpdateResponseDTO updateClubInfo(Long clubId, ClubInfoUpdateRequestDTO requestDto, String adminEmail) {
+        // 1. 관리자 권한 확인
+        UserEntity adminUser = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new IllegalArgumentException("관리자 계정이 존재하지 않습니다."));
+        if (!adminUser.getRole().getRoleName().equalsIgnoreCase("ADMIN")) {
+            throw new IllegalArgumentException("관리자 권한이 필요합니다.");
+        }
+
+        // 2. 소개글 유효성 검사
+        String description = requestDto.getClubDescription();
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("소개글이 비어있습니다.");
+        }
+        int maxAllowedLength = 1000; // 허용 최대 길이 (예시)
+        if (description.length() > maxAllowedLength) {
+            throw new IllegalArgumentException("클럽 소개글이 허용된 길이를 초과했습니다.");
+        }
+
+        // 3. 클럽 존재 여부 확인
+        ClubEntity club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new IllegalArgumentException("클럽이 존재하지 않습니다."));
+
+        // 4. 클럽 소개글 업데이트
+        club.setClubDescription(description);
+        clubRepository.save(club);
+
+        // 5. 결과 응답 DTO 구성 (관리자 userId 포함)
+        return ClubInfoUpdateResponseDTO.builder()
+                .clubId(club.getClubId())
+                .clubDescription(club.getClubDescription())
+                .userId(adminUser.getUserId())
+                .message("소개글 수정이 완료되었습니다.")
+                .build();
     }
 }

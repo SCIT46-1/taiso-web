@@ -3,6 +3,9 @@ package com.taiso.bike_api.controller;
 import com.taiso.bike_api.dto.ApiResponseDto;
 import com.taiso.bike_api.dto.ClubCreateRequestDTO;
 import com.taiso.bike_api.dto.ClubUpdateRequestDTO;
+import com.taiso.bike_api.dto.ClubInfoUpdateRequestDTO;
+import com.taiso.bike_api.dto.ClubInfoUpdateResponseDTO;
+
 import com.taiso.bike_api.security.JwtTokenProvider;
 import com.taiso.bike_api.dto.ClubListItemDTO;
 import com.taiso.bike_api.service.ClubService;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/clubs")
@@ -130,4 +134,33 @@ public class ClubController {
             }
         }
     }
+
+    // 클럽 소개글 수정 (jwt 모범 답안 버젼?)
+    @PatchMapping("/{clubId}/info")
+    public ResponseEntity<?> updateClubInfo(
+        @PathVariable("clubId") Long clubId,
+        @RequestBody @Valid ClubInfoUpdateRequestDTO requestDto,
+        Authentication authentication) {
+
+    // Authentication 객체에서 관리자(어드민)의 이메일(혹은 ID) 추출
+    String email = authentication.getName();
+    
+    try {
+        ClubInfoUpdateResponseDTO responseDto = clubService.updateClubInfo(clubId, requestDto, email);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    } catch (IllegalArgumentException e) {
+        String errMsg = e.getMessage();
+        if ("소개글이 비어있습니다.".equals(errMsg)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponseDto(errMsg));
+        } else if ("클럽 소개글이 허용된 길이를 초과했습니다.".equals(errMsg)) {
+            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                    .body(new ApiResponseDto(errMsg));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponseDto(errMsg));
+        }
+    }
+}
+
 }

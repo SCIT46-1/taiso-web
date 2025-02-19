@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +46,23 @@ public class UserDetailController {
         this.userDetailMeUpdateService = userDetailMeUpdateService;
     }
 
-    // 내 디테일 정보 등록 (UserDetailMeTourokyService))
+    // 내 디테일 정보 등록 (모범 인증)
+    // @PostMapping("/details")
+    // public ResponseEntity<ApiResponseDto> registerUserDetails(
+    //     @RequestBody @Valid UserDetailRequestDTO requestDto, Authentication authentication) {
+    //         // Authentication 객체에서 이메일(사용자 식별자) 추출
+    //         String email = authentication.getName();
+    //         try {
+    //             userDetailMeTourokuService.registerUserDetails(requestDto, email);
+    //         } catch (IllegalArgumentException e) {
+    //             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+    //             .body(new ApiResponseDto(e.getMessage()));
+    //         }
+    //         return ResponseEntity.status(HttpStatus.CREATED)
+    //         .body(new ApiResponseDto("내 디테일 정보가 등록되었습니다."));
+    // }
+
+    // 내 디테일 정보 등록 (UserDetailMeTourokuService))
     @PostMapping("/details")
     public ResponseEntity<ApiResponseDto> registerUserDetails(
             @RequestBody @Valid UserDetailRequestDTO requestDto,
