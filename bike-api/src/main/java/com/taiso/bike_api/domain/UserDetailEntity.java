@@ -62,8 +62,8 @@ public class UserDetailEntity {
     @Column(name = "birth_date")
     private LocalDateTime birthDate;
 
-    @Column(name = "bio", length = 500)
-    private String bio;
+    @Column(name = "vio", length = 500)
+    private String vio;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", length = 10)
@@ -81,6 +81,9 @@ public class UserDetailEntity {
 
     @Column(name = "weight")
     private Integer weight;
+
+    @Column(name = "age")
+    private Integer age;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "user_tag",
