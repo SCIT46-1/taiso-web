@@ -2,6 +2,7 @@ package com.taiso.bike_api.controller;
 
 import com.taiso.bike_api.dto.ApiResponseDto;
 import com.taiso.bike_api.dto.ClubCreateRequestDTO;
+import com.taiso.bike_api.dto.ClubUpdateRequestDTO;
 import com.taiso.bike_api.security.JwtTokenProvider;
 import com.taiso.bike_api.dto.ClubListItemDTO;
 import com.taiso.bike_api.service.ClubService;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,5 +92,42 @@ public class ClubController {
         // 페이징 적용하여 클럽 리스트 조회
         Page<ClubListItemDTO> clubPage = clubService.getClubList(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(clubPage);
+    }
+
+    // 클럽 정보 수정
+    @PatchMapping("/{clubId}")
+    public ResponseEntity<ApiResponseDto> updateClub(
+            @PathVariable("clubId") Long clubId,
+            @RequestBody @Valid ClubUpdateRequestDTO updateDto,
+            HttpServletRequest request) {
+        
+        // JWT 토큰 추출
+        String token = request.getHeader("Authorization");
+        if (token == null || token.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponseDto("토큰이 존재하지 않습니다."));
+        }
+        // JWT 토큰 검증
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponseDto("만료되거나 올바르지 않은 토큰 입니다."));
+        }
+        // 토큰에서 관리자(어드민) 식별 (예: 이메일)
+        String adminEmail = jwtTokenProvider.getUsernameFromJWT(token);
+        
+        try {
+            clubService.updateClub(clubId, updateDto, adminEmail);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponseDto("클럽 수정이 완료되었습니다."));
+        } catch (IllegalArgumentException e) {
+            String errorMsg = e.getMessage();
+            if (errorMsg.equals("이미 존재하는 클럽명입니다.")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new ApiResponseDto(errorMsg));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ApiResponseDto(errorMsg));
+            }
+        }
     }
 }

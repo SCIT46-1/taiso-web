@@ -7,6 +7,8 @@ import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.domain.LightningTagCategoryEntity;
 import com.taiso.bike_api.dto.ClubCreateRequestDTO;
 import com.taiso.bike_api.dto.ClubDetailResponseDTO;
+import com.taiso.bike_api.dto.ClubUpdateRequestDTO;
+
 import com.taiso.bike_api.dto.ClubMemberDTO;
 import com.taiso.bike_api.dto.ClubListItemDTO;
 
@@ -150,5 +152,56 @@ public class ClubService {
                     .build();
         });
         return dtoPage;
+    }
+
+    // 클럽 정보 수정
+    public void updateClub(Long clubId, ClubUpdateRequestDTO updateDto, String adminEmail) {
+        // 1. 관리자 권한 확인
+        UserEntity adminUser = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new IllegalArgumentException("관리자 계정이 존재하지 않습니다."));
+        if (!adminUser.getRole().getRoleName().equalsIgnoreCase("ADMIN")) {
+            throw new IllegalArgumentException("관리자 권한이 필요합니다.");
+        }
+        
+        // 2. 클럽 존재 여부 확인
+        ClubEntity club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new IllegalArgumentException("클럽이 존재하지 않습니다."));
+        
+        // 3. 클럽명 중복 체크 (수정하려는 클럽명이 기존과 다르고, 이미 존재하는 경우)
+        if (updateDto.getClubName() != null && !updateDto.getClubName().equals(club.getClubName())) {
+            Optional<ClubEntity> clubWithName = clubRepository.findByClubName(updateDto.getClubName());
+            if (clubWithName.isPresent()) {
+                throw new IllegalArgumentException("이미 존재하는 클럽명입니다.");
+            }
+            club.setClubName(updateDto.getClubName());
+        }
+        
+        // 4. 나머지 필드 업데이트
+        if (updateDto.getClubProfileImage() != null) {
+            club.setClubProfileImageId(updateDto.getClubProfileImage());
+        }
+        if (updateDto.getClubShortDescription() != null) {
+            club.setClubShortDescription(updateDto.getClubShortDescription());
+        }
+        if (updateDto.getClubDescription() != null) {
+            club.setClubDescription(updateDto.getClubDescription());
+        }
+        if (updateDto.getMaxUser() != null) {
+            club.setMaxUser(updateDto.getMaxUser());
+        }
+        
+        // 5. 태그 업데이트: 요청된 태그 ID들을 이용하여 태그 엔티티 Set 구성
+        if (updateDto.getTags() != null) {
+            Set<LightningTagCategoryEntity> tagSet = new HashSet<>();
+            updateDto.getTags().forEach(tagId -> {
+                LightningTagCategoryEntity tagEntity = tagCategoryRepository.findById(tagId)
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 태그 ID: " + tagId));
+                tagSet.add(tagEntity);
+            });
+            club.setTags(tagSet);
+        }
+        
+        // 6. 업데이트된 클럽 저장
+        clubRepository.save(club);
     }
 }
