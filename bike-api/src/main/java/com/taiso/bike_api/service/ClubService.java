@@ -8,6 +8,7 @@ import com.taiso.bike_api.domain.LightningTagCategoryEntity;
 import com.taiso.bike_api.dto.ClubCreateRequestDTO;
 import com.taiso.bike_api.dto.ClubDetailResponseDTO;
 import com.taiso.bike_api.dto.ClubMemberDTO;
+import com.taiso.bike_api.dto.ClubListItemDTO;
 
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.ClubMemberRepository;
@@ -21,6 +22,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 
 @Service
 public class ClubService {
@@ -117,5 +122,33 @@ public class ClubService {
                 .currentScale(currentScale)
                 .users(memberDtos)
                 .build();
+    }
+
+    // 클럽 리스트 조회
+    public Page<ClubListItemDTO> getClubList(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<ClubEntity> clubPage = clubRepository.findAll(pageable);
+        
+        // 각 ClubEntity를 ClubListItemDto로 매핑
+        Page<ClubListItemDTO> dtoPage = clubPage.map(club -> {
+            // currentScale: 해당 클럽의 가입 인원 수
+            int currentScale = clubMemberRepository.countByClub(club).intValue();
+            
+            // tags: ClubEntity 내 tags( Set&lt;LightningTagCategoryEntity&gt; )에서 tagId를 추출
+            List<Long> tagIds = club.getTags().stream()
+                    .map(tag -> tag.getTagId())  // LightningTagCategoryEntity 에 tagId 필드가 있다고 가정
+                    .collect(Collectors.toList());
+            
+            return ClubListItemDTO.builder()
+                    .clubId(club.getClubId())
+                    .clubProfileImageId(club.getClubProfileImageId())
+                    .clubName(club.getClubName())
+                    .clubLeaderId(club.getClubLeader().getUserId())
+                    .clubShortDescription(club.getClubShortDescription())
+                    .currentScale(currentScale)
+                    .tags(tagIds)
+                    .build();
+        });
+        return dtoPage;
     }
 }

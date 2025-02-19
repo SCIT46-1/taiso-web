@@ -3,13 +3,17 @@ package com.taiso.bike_api.controller;
 import com.taiso.bike_api.dto.ApiResponseDto;
 import com.taiso.bike_api.dto.ClubCreateRequestDTO;
 import com.taiso.bike_api.security.JwtTokenProvider;
+import com.taiso.bike_api.dto.ClubListItemDTO;
 import com.taiso.bike_api.service.ClubService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +31,7 @@ public class ClubController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    // 클럽 생성
     @PostMapping
     public ResponseEntity<ApiResponseDto> createClub(
             @RequestBody @Valid ClubCreateRequestDTO requestDto,
@@ -61,5 +66,28 @@ public class ClubController {
                         .body(new ApiResponseDto(errorMsg));
             }
         }
+    }
+
+    // 클럽 리스트 조회
+    @GetMapping
+    public ResponseEntity<?> getClubList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+
+        // JWT 토큰 추출 및 검증
+        String token = request.getHeader("Authorization");
+        if (token == null || token.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponseDto("토큰이 없엉."));
+        }
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponseDto("만료되거나 올바르지 않은 토큰 입니다."));
+        }
+        
+        // 페이징 적용하여 클럽 리스트 조회
+        Page<ClubListItemDTO> clubPage = clubService.getClubList(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(clubPage);
     }
 }
