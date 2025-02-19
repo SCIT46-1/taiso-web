@@ -4,9 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
+import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.ClubMemberEntity;
 import com.taiso.bike_api.domain.UserEntity;
-import com.taiso.bike_api.domain.ClubEntity;
 
 @Repository
 public interface ClubMemberRepository extends JpaRepository<ClubMemberEntity, Long> {
