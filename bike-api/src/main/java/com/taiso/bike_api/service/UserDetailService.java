@@ -118,7 +118,7 @@ public class UserDetailService {
             userDetailResponseDTO = UserDetailResponseDTO.builder()
                     .userId(userDetail.getUserId())
                     .userNickname(userDetail.getUserNickname())
-                    .bio(userDetail.getBio())
+                    .vio(userDetail.getVio())
                     .profileImg(userDetail.getUserProfileImg())
                     .backgroundImg(userDetail.getUserBackgroundImg())
                     .build();
