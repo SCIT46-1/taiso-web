@@ -17,7 +17,7 @@ public class UserDetailResponseDTO {
 
     private Long userId;
     private String userNickname;
-    private String bio;
+    private String vio;
     private String profileImg;
     private String backgroundImg;
     private String level;
