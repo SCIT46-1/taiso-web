@@ -58,7 +58,7 @@ public class RouteEntity {
     private Long userId;
 
     @Column(name = "like_count", columnDefinition = "BIGINT default 0", nullable = false)
-    private Long likeCount;
+    private Integer likeCount;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

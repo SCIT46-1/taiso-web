@@ -1,6 +1,8 @@
 package com.taiso.bike_api.controller;
 
 import com.taiso.bike_api.dto.BookmarkRouteResponseDTO;
+import com.taiso.bike_api.dto.BookmarkRouteListResponseDTO;
+
 import com.taiso.bike_api.service.BookmarkRouteService;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,4 +46,26 @@ public class BookmarkRouteController {
             }
         }
     }
+
+
+    // 북마크 루트 조회
+    @GetMapping
+    public ResponseEntity<?> getBookmarkRoutes(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "토큰이 존재하지 않습니다."));
+        }
+
+        String reviewerEmail = authentication.getName();
+        try {
+            BookmarkRouteListResponseDTO responseDTO = bookmarkRouteService.getBookmarkRoutes(reviewerEmail);
+            // 스펙에 따라 201 CREATED 응답 사용 (GET은 일반적으로 200 OK이지만 스펙대로 작성)
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", e.getMessage()));
+        }
+    }
+
+
 }
