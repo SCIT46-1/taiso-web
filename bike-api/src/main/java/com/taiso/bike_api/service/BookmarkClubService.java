@@ -6,10 +6,12 @@ import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.BookmarkClubDTO;
 import com.taiso.bike_api.dto.BookmarkClubListResponseDTO;
+import com.taiso.bike_api.dto.BookmarkClubResponseDTO;
 import com.taiso.bike_api.repository.BookmarkRepository;
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.UserRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,41 @@ public class BookmarkClubService {
         this.userRepository = userRepository;
         this.clubRepository = clubRepository;
     }
+
+
+    // 북마크 클럽 등록
+    public BookmarkClubResponseDTO createBookmarkClub(Long clubId, String reviewerEmail) {
+        // 1. 현재 북마크 등록자(사용자) 조회
+        UserEntity user = userRepository.findByEmail(reviewerEmail)
+                .orElseThrow(() -> new IllegalArgumentException("토큰이 존재하지 않습니다."));
+
+        // 2. 대상 클럽 존재 여부 확인
+        ClubEntity club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new IllegalArgumentException("대상 클럽을 찾을 수 없습니다."));
+
+        // 3. 이미 북마크한 클럽인지 확인
+        Optional<BookmarkEntity> existing = bookmarkRepository.findByUserAndTargetTypeAndTargetId(user, BookmarkType.CLUB, clubId);
+        if (existing.isPresent()) {
+            throw new IllegalArgumentException("이미 북마크한 클럽입니다.");
+        }
+
+        // 4. 북마크 엔티티 생성 및 저장
+        BookmarkEntity bookmark = BookmarkEntity.builder()
+                .user(user)
+                .targetType(BookmarkType.CLUB)
+                .targetId(clubId)
+                .build();
+        bookmarkRepository.save(bookmark);
+
+        // 5. 응답 DTO 구성
+        return BookmarkClubResponseDTO.builder()
+                .bookmarkId(bookmark.getBookmarkId())
+                .userId(user.getUserId())
+                .clubId(club.getClubId())
+                .createdAt(bookmark.getCreatedAt())
+                .build();
+    }
+
 
     // 북마크 클럽 조회
     public BookmarkClubListResponseDTO getBookmarkedClubs(String reviewerEmail) {
