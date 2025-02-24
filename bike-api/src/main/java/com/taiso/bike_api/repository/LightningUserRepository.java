@@ -1,5 +1,6 @@
 package com.taiso.bike_api.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,7 @@ public interface LightningUserRepository extends JpaRepository<LightningUserEnti
 			UserEntity userEntityException);
 
 	Optional<LightningUserEntity> findByLightning_LightningIdAndUser_UserId(Long lightningId, Long userId);
+
+	List<LightningUserEntity> findByLightning_LightningId(Long lightningId);
+
 }
