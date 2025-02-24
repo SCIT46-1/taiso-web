@@ -67,4 +67,23 @@ public class BookmarkLightningController {
                     .body(Collections.singletonMap("message", e.getMessage()));
         }
     }
+
+    // 북마크 번개 취소
+    @DeleteMapping("/{lightningId}")
+    public ResponseEntity<?> cancelBookmarkLightning(@PathVariable("lightningId") Long lightningId,
+                                                     Authentication authentication) {
+        // Authentication 객체에서 현재 사용자의 이메일 추출
+        String reviewerEmail = authentication.getName();
+        try {
+            bookmarkLightningService.cancelBookmarkLightning(lightningId, reviewerEmail);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(Collections.singletonMap("message", "북마크를 삭제했습니다."));
+        } catch (IllegalArgumentException e) {
+            String errorMsg = e.getMessage();
+            // "토큰이 존재하지 않습니다."와 "만료되거나 올바르지 않은 토큰 입니다."는 SecurityFilterChain에서 처리되므로 여기선 주로 404로 처리
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", errorMsg));
+        }
+    }
+
 }

@@ -7,10 +7,10 @@ import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.BookmarkLightningDTO;
 import com.taiso.bike_api.dto.BookmarkLightningResponseDTO;
 import com.taiso.bike_api.dto.BookmarkLightningListResponseDTO;
-
 import com.taiso.bike_api.repository.BookmarkRepository;
 import com.taiso.bike_api.repository.LightningRepository;
 import com.taiso.bike_api.repository.UserRepository;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -102,6 +102,22 @@ public class BookmarkLightningService {
                 .userId(user.getUserId())
                 .bookmarkedLightnings(dtoList)
                 .build();
+    }
+
+    // 북마크 번개 취소
+    public void cancelBookmarkLightning(Long lightningId, String reviewerEmail) {
+        // 현재 북마크 등록자(사용자) 조회
+        UserEntity user = userRepository.findByEmail(reviewerEmail)
+                .orElseThrow(() -> new IllegalArgumentException("토큰이 존재하지 않습니다."));
+
+        // 북마크한 번개가 존재하는지 확인 (타깃 타입이 LIGHTNING)
+        Optional<BookmarkEntity> bookmarkOpt = bookmarkRepository.findByUserAndTargetTypeAndTargetId(user, BookmarkType.LIGHTNING, lightningId);
+        if (!bookmarkOpt.isPresent()) {
+            throw new IllegalArgumentException("북마크한 게시글이 아닙니다.");
+        }
+
+        // 북마크 삭제
+        bookmarkRepository.delete(bookmarkOpt.get());
     }
 
 }
