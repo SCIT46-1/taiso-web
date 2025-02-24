@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> {
     Optional<BookmarkEntity> findByUserAndTargetTypeAndTargetId(UserEntity user, BookmarkType targetType, Long targetId);
+
     // 특정 대상 회원(타깃 유저)에 대해 북마크된 횟수를 반환
     Long countByTargetTypeAndTargetId(BookmarkType targetType, Long targetId);
 
