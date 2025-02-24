@@ -106,4 +106,25 @@ public class BookmarkService {
                 .bookmarkedUsers(bookmarkedUsers)
                 .build();
     }
+
+    // 북마크 회원 취소
+    public void cancelBookmark(Long targetUserId, String reviewerEmail) {
+        // 현재 북마크 등록자(사용자) 조회
+        UserEntity user = userRepository.findByEmail(reviewerEmail)
+                .orElseThrow(() -> new IllegalArgumentException("토큰이 존재하지 않습니다."));
+
+        // 타깃 회원 존재 여부 확인
+        UserEntity targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("북마크 해당 유저가 존재하지 않습니다."));
+
+        // 해당 사용자가 타깃 회원을 북마크한 기록 조회
+        Optional<BookmarkEntity> bookmarkOpt = bookmarkRepository.findByUserAndTargetTypeAndTargetId(user, BookmarkType.USER, targetUserId);
+        if (!bookmarkOpt.isPresent()) {
+            throw new IllegalArgumentException("북마크한 회원이 아닙니다.");
+        }
+
+        // 북마크 삭제
+        bookmarkRepository.delete(bookmarkOpt.get());
+    }
+
 }

@@ -1,10 +1,11 @@
 package com.taiso.bike_api.controller;
 
+import java.util.Collections;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.taiso.bike_api.dto.BookmarkResponseDTO;
 import com.taiso.bike_api.dto.BookmarkUserListResponseDTO;
 import com.taiso.bike_api.service.BookmarkService;
-import java.util.Collections;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -59,6 +60,31 @@ public class BookmarkController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Collections.singletonMap("message", e.getMessage()));
+        }
+    }
+
+    // API-614-1_북마크 회원 취소
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<?> cancelBookmark(@PathVariable("userId") Long targetUserId,
+                                            Authentication authentication) {
+        // Authentication 객체에서 현재 사용자의 이메일(식별자) 추출
+        String reviewerEmail = authentication.getName();
+        try {
+            bookmarkService.cancelBookmark(targetUserId, reviewerEmail);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(Collections.singletonMap("message", "북마크를 삭제했습니다."));
+        } catch (IllegalArgumentException e) {
+            String errorMsg = e.getMessage();
+            if ("북마크 해당 유저가 존재하지 않습니다.".equals(errorMsg)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Collections.singletonMap("message", errorMsg));
+            } else if ("북마크한 회원이 아닙니다.".equals(errorMsg)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Collections.singletonMap("message", errorMsg));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Collections.singletonMap("message", errorMsg));
+            }
         }
     }
 }
