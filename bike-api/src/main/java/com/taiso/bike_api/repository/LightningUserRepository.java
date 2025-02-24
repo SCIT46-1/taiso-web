@@ -8,9 +8,11 @@ import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.LightningUserEntity;
 import com.taiso.bike_api.domain.UserEntity;
 
+@Repository
 public interface LightningUserRepository extends JpaRepository<LightningUserEntity, Long> {
 
-	void save(LightningEntity lightningEntity);
+	// void save(LightningEntity lightningEntity);
+	// 충돌로 인한 임시 주석 처리 ㅋ
 
 	Optional<LightningUserEntity> findByLightningAndUser(LightningEntity lightningEntityException,
 			UserEntity userEntityException);
