@@ -1,6 +1,7 @@
 package com.taiso.bike_api.controller;
 
 import com.taiso.bike_api.dto.BookmarkResponseDTO;
+import com.taiso.bike_api.dto.BookmarkUserListResponseDTO;
 import com.taiso.bike_api.service.BookmarkService;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,21 @@ public class BookmarkController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Collections.singletonMap("message", errorMsg));
             }
+        }
+    }
+
+    // 북마크 회원 조회
+    @GetMapping
+    public ResponseEntity<?> getBookmarkedUsers(Authentication authentication) {
+        // Authentication 객체에서 현재 사용자의 이메일 추출
+        String reviewerEmail = authentication.getName();
+        try {
+            BookmarkUserListResponseDTO responseDTO = bookmarkService.getBookmarkedUsers(reviewerEmail);
+            // 사양에 따르면 201 CREATED 응답 (비록 GET은 일반적으로 200 OK지만 스펙에 따름)
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 }
