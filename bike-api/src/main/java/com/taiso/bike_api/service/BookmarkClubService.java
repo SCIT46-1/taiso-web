@@ -95,4 +95,21 @@ public class BookmarkClubService {
                 .bookmarkClub(bookmarkClubList)
                 .build();
     }
+
+    // 북마크 클럽 취소
+    public void cancelBookmarkClub(Long clubId, String reviewerEmail) {
+        // 현재 북마크 등록자(사용자) 조회
+        UserEntity user = userRepository.findByEmail(reviewerEmail)
+                .orElseThrow(() -> new IllegalArgumentException("토큰이 존재하지 않습니다."));
+
+        // 북마크 대상이 CLUB인 북마크가 존재하는지 확인
+        Optional<BookmarkEntity> bookmarkOpt = bookmarkRepository.findByUserAndTargetTypeAndTargetId(user, BookmarkType.CLUB, clubId);
+        if (!bookmarkOpt.isPresent()) {
+            throw new IllegalArgumentException("북마크한 게시글이 아닙니다.");
+        }
+
+        // 북마크 삭제
+        bookmarkRepository.delete(bookmarkOpt.get());
+    }
+
 }

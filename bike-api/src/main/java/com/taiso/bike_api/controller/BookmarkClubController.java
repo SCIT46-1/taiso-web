@@ -61,4 +61,27 @@ public class BookmarkClubController {
                     .body(Collections.singletonMap("message", e.getMessage()));
         }
     }
+
+    // 북마크 클럽 취소
+    @DeleteMapping("/{clubId}")
+    public ResponseEntity<?> cancelBookmarkClub(@PathVariable("clubId") Long clubId,
+                                                Authentication authentication) {
+        // Authentication 객체에서 현재 사용자의 이메일(식별자) 추출
+        String reviewerEmail = authentication.getName();
+        try {
+            bookmarkClubService.cancelBookmarkClub(clubId, reviewerEmail);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(Collections.singletonMap("message", "북마크를 삭제했습니다."));
+        } catch (IllegalArgumentException e) {
+            String errorMsg = e.getMessage();
+            // "북마크한 게시글이 아닙니다."는 404 Not Found로 반환
+            if ("북마크한 게시글이 아닙니다.".equals(errorMsg)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Collections.singletonMap("message", errorMsg));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Collections.singletonMap("message", errorMsg));
+            }
+        }
+    }
 }
