@@ -67,5 +67,25 @@ public class BookmarkRouteController {
         }
     }
 
-
+    // 북마크 루트 삭제
+    @DeleteMapping("/{routeId}")
+    public ResponseEntity<?> cancelBookmarkRoute(@PathVariable("routeId") Long routeId,
+                                                 Authentication authentication) {
+        // Authentication 객체에서 현재 사용자의 이메일(식별자) 추출
+        String reviewerEmail = authentication.getName();
+        try {
+            bookmarkRouteService.cancelBookmarkRoute(routeId, reviewerEmail);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(Collections.singletonMap("message", "북마크를 삭제했습니다."));
+        } catch (IllegalArgumentException e) {
+            String errorMsg = e.getMessage();
+            if ("북마크한 게시글이 아닙니다.".equals(errorMsg)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Collections.singletonMap("message", errorMsg));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Collections.singletonMap("message", errorMsg));
+            }
+        }
+    }
 }
