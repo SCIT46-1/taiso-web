@@ -29,7 +29,7 @@ public class UserController {
     @Autowired
     private UserDetailService userDetailService;
 
-    @PostMapping("/me/details")
+    @PostMapping("/me/page")
     @Operation(summary = "내 페이지 정보 수정", description = "상세 프로필 페이지 정보 수정")
     public ResponseEntity<UserDetailResponseDTO> updateUserDetail(@RequestPart(value = "userDetailData") UserDetailRequestDTO userDetailRequestDTO
                                                                 , @RequestPart(value = "profileImg", required = false) MultipartFile profileImg

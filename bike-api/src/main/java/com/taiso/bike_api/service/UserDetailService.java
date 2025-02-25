@@ -114,7 +114,8 @@ public class UserDetailService {
         UserDetailEntity userDetail = temp.get();
 
         UserDetailResponseDTO userDetailResponseDTO = null;
-            //Entity -> DTO 로 builder
+        //Entity -> DTO 로 builder
+            //TODO: 유저 태그관련 확인 필요
             userDetailResponseDTO = UserDetailResponseDTO.builder()
                     .userId(userDetail.getUserId())
                     .userNickname(userDetail.getUserNickname())

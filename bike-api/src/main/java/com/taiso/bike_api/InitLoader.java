@@ -79,7 +79,7 @@ public class InitLoader implements CommandLineRunner {
         // UserDetailEntity 저장
         UserDetailEntity userDetail = UserDetailEntity.builder()
                 .userNickname("무면허라이더")
-                .bio("처음뵙겠습니다.")
+                .vio("처음뵙겠습니다.")
                 .FTP(134)
                 .gender(UserDetailEntity.Gender.valueOf("여자"))
                 .level(UserDetailEntity.Level.valueOf("초보자"))

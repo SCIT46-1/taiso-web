@@ -1,30 +1,38 @@
 package com.taiso.bike_api.controller;
 
-import com.taiso.bike_api.dto.UserDetailRequestDTO;
-import com.taiso.bike_api.dto.UserDetailResponseDTO;
-import com.taiso.bike_api.dto.UserDetailUpdateDTO;
-import com.taiso.bike_api.service.*;
-import jakarta.validation.Valid;
+import java.util.Collections;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
+import com.taiso.bike_api.dto.UserDetailRequestDTO;
+import com.taiso.bike_api.dto.UserDetailResponseDTO;
+import com.taiso.bike_api.dto.UserDetailUpdateDTO;
+import com.taiso.bike_api.service.UserDetailMeShowService;
+import com.taiso.bike_api.service.UserDetailMeTourokuService;
+import com.taiso.bike_api.service.UserDetailMeUpdateService;
+
+import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/users/me")
+@RequestMapping("/api/users/me")
 public class UserDetailController {
 
     @Autowired
     UserDetailMeTourokuService userDetailMeTourokuService;
+
+    @Autowired
     UserDetailMeShowService userDetailMeShowService;
+
+    @Autowired
     UserDetailMeUpdateService userDetailMeUpdateService;
 
     // 내 디테일 정보 등록 (UserDetailMeTourokuService))

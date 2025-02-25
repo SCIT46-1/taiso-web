@@ -1,13 +1,14 @@
 package com.taiso.bike_api.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.domain.UserDetailEntity.Gender;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.UserDetailRequestDTO;
 import com.taiso.bike_api.repository.UserDetailRepository;
 import com.taiso.bike_api.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class UserDetailMeTourokuService {
@@ -42,6 +43,8 @@ public class UserDetailMeTourokuService {
             throw new IllegalArgumentException("입력한 gender 값이 올바르지 않습니다.");
         }
 
+        userDetail.setFullName(requestDto.getFullName());
+        userDetail.setVio(requestDto.getVio());
         userDetail.setAge(requestDto.getAge());
         userDetail.setHeight(requestDto.getHeight());
         userDetail.setWeight(requestDto.getWeight());
@@ -50,6 +53,7 @@ public class UserDetailMeTourokuService {
         userDetail.setBirthDate(requestDto.getBirthDate());
 
         // 추가 필드 (예: bio, profileImg, backgroundImg 등)는 필요 시 설정
+        // TODO: 유저 태그관련 확인 필요
 
         // UserDetailEntity를 데이터베이스에 저장
         userDetailRepository.save(userDetail);

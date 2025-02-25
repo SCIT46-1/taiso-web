@@ -1,33 +1,33 @@
 package com.taiso.bike_api.service;
 
-import com.taiso.bike_api.domain.ClubEntity;
-import com.taiso.bike_api.domain.ClubMemberEntity;
-import com.taiso.bike_api.domain.UserEntity;
-import com.taiso.bike_api.domain.UserDetailEntity;
-import com.taiso.bike_api.domain.LightningTagCategoryEntity;
-import com.taiso.bike_api.dto.ClubCreateRequestDTO;
-import com.taiso.bike_api.dto.ClubDetailResponseDTO;
-import com.taiso.bike_api.dto.ClubUpdateRequestDTO;
-import com.taiso.bike_api.dto.ClubInfoUpdateRequestDTO;
-import com.taiso.bike_api.dto.ClubInfoUpdateResponseDTO;
-import com.taiso.bike_api.dto.ClubMemberDTO;
-import com.taiso.bike_api.dto.ClubListItemDTO;
-
-import com.taiso.bike_api.repository.ClubRepository;
-import com.taiso.bike_api.repository.ClubMemberRepository;
-import com.taiso.bike_api.repository.UserRepository;
-import com.taiso.bike_api.repository.UserDetailRepository;
-import com.taiso.bike_api.repository.LightningTagCategoryRepository;
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
+import com.taiso.bike_api.domain.ClubEntity;
+import com.taiso.bike_api.domain.ClubMemberEntity;
+import com.taiso.bike_api.domain.LightningTagCategoryEntity;
+import com.taiso.bike_api.domain.UserDetailEntity;
+import com.taiso.bike_api.domain.UserEntity;
+import com.taiso.bike_api.dto.ClubCreateRequestDTO;
+import com.taiso.bike_api.dto.ClubDetailResponseDTO;
+import com.taiso.bike_api.dto.ClubInfoUpdateRequestDTO;
+import com.taiso.bike_api.dto.ClubInfoUpdateResponseDTO;
+import com.taiso.bike_api.dto.ClubListItemDTO;
+import com.taiso.bike_api.dto.ClubMemberDTO;
+import com.taiso.bike_api.dto.ClubUpdateRequestDTO;
+import com.taiso.bike_api.repository.ClubMemberRepository;
+import com.taiso.bike_api.repository.ClubRepository;
+import com.taiso.bike_api.repository.LightningTagCategoryRepository;
+import com.taiso.bike_api.repository.UserDetailRepository;
+import com.taiso.bike_api.repository.UserRepository;
 
 
 @Service
@@ -73,6 +73,7 @@ public class ClubService {
                 tagSet.add(tagEntity);
             });
         }
+        System.out.println("club: " + requestDto);
         
         // 4. ClubEntity 생성 및 초기화
         ClubEntity club = ClubEntity.builder()
