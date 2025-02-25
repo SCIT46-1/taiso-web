@@ -125,8 +125,10 @@ public class S3Service {
             return presigner.presignGetObject(presignRequest).url().toString();
         }
     }
-
-    // public String getFileUrl(String fileKey) {
-    // return "https://" + bucket + ".s3.amazonaws.com/" + fileKey;
-    // }
+    public String getFileUrl(String key) {
+        // 가상 호스팅 스타일 URL (예: https://bucket.s3.region.amazonaws.com/key)
+        return "https://" + bucket + ".s3." + awsRegion + ".amazonaws.com/" + key;
+    }
+    
 }
+

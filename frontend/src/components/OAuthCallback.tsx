@@ -19,6 +19,7 @@ const OAuthCallback: React.FC = () => {
       authService.kakaoLogin(code).then((result) => {
         setUser({
           email: result.userEmail,
+          userId: result.userId,
         });
         navigate("/");
       });

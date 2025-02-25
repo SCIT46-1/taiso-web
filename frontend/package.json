@@ -10,11 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/navermaps": "^3.7.9",
     "axios": "^1.7.9",
     "daisyui": "^4.12.23",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.5",
+    "recharts": "^2.15.1",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

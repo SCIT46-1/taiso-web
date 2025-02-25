@@ -14,10 +14,11 @@ public class WebConfig implements WebMvcConfigurer {
         // 모든 경로에 대해 CORS 설정
         registry.addMapping("/**")
                 // 허용할 오리진 설정
-                .allowedOrigins("http://localhost:3000") // 필요에 따라 프로덕션 도메인 추가
+                .allowedOrigins("http://localhost:3000") // TODO: 프로덕션 도메인 추가
                 // 허용할 HTTP 메서드 설정
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 // 인증 정보 허용 여부 설정
+                .allowedHeaders("*")
                 .allowCredentials(true);
     }
 }

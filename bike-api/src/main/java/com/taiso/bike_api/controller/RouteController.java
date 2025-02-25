@@ -16,19 +16,12 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.dto.RouteDetailResponseDTO;
 import com.taiso.bike_api.dto.RouteLikePostResponseDTO;
 import com.taiso.bike_api.dto.RouteListResponseDTO;
 import com.taiso.bike_api.dto.RoutePostRequestDTO;
 import com.taiso.bike_api.dto.RoutePostResponseDTO;
-import com.taiso.bike_api.exception.RouteLikeNotFoundException;
-import com.taiso.bike_api.exception.RouteNotFoundException;
-import com.taiso.bike_api.repository.RouteLikeRepository;
-import com.taiso.bike_api.repository.RouteRepository;
-import com.taiso.bike_api.repository.UserRepository;
 import com.taiso.bike_api.service.RouteCreateService;
-import com.taiso.bike_api.service.RouteDeleteService;
 import com.taiso.bike_api.service.RouteService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,16 +40,17 @@ public class RouteController {
     @Autowired
     private RouteCreateService routeCreateService;
 
-    @Autowired
-    private RouteDeleteService routeDeleteService;
 
+    // 루트 디테일 조회
     @GetMapping("/{routeId}")
     @Operation(summary = "루트 디테일 조회", description = "루트 디테일 조회하는 API")
-    public ResponseEntity<RouteDetailResponseDTO> getRoute(@PathVariable Long routeId) {
-        RouteDetailResponseDTO route = routeService.getRouteById(routeId);
+    public ResponseEntity<RouteDetailResponseDTO> getRoute(@PathVariable Long routeId, Authentication authentication) {
+        RouteDetailResponseDTO route = routeService.getRouteById(routeId, authentication.getName());
         return ResponseEntity.status(HttpStatus.OK).body(route);
     }
 
+
+    // 루트 생성
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "루트 생성", description = "루트를 생성하는 API")
     public ResponseEntity<RoutePostResponseDTO> createRoute(
@@ -81,7 +75,7 @@ public class RouteController {
     		){
 
 		// service -> 좋아요 저장
-		routeService.PostRouteLike(authentication, routeId);
+		routeService.postRouteLike(authentication, routeId);
 		
     	return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
@@ -96,7 +90,7 @@ public class RouteController {
     		) {
     	
     	// service -> 삭제 기능
-    	routeService.RouteLikeDelete(routeId, authentication);
+    	routeService.deleteRouteLike(authentication, routeId);
     	
     	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
@@ -107,33 +101,36 @@ public class RouteController {
         @PathVariable("routeId") Long routeId
         , @AuthenticationPrincipal String userEmail) {
 
-        routeDeleteService.deleteRoute(routeId, userEmail);
+        routeService.deleteRoute(routeId, userEmail);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 
     }
 
+
+    // 루트 리스트 조회
     @GetMapping("/")
-    @Operation(summary = "루트 리스트 조회", description = "루트를 페이징하여 리스트로 불러오는 API")
-    public ResponseEntity<RouteListResponseDTO> getUsers(
+    @Operation(summary = "루트 리스트 조회", description = "루트를 페이징, 필터 처리하여 리스트로 불러오는 API")
+    public ResponseEntity<RouteListResponseDTO> getRouteList(
                                                     //필터정보 null 가능
+                                                    @RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "8") int size,
                                                     @RequestParam(defaultValue = "") String sort,
                                                     @RequestParam(defaultValue = "") String distanceType,
                                                     @RequestParam(defaultValue = "") String altitudeType,
                                                     @RequestParam(defaultValue = "") String roadType,
-                                                    @RequestParam(defaultValue = "") String[] Tag) {
-
-        // 여기서 page, size의 변수값 수정으로 페이징 컨트롤 가능
-        int page = 1;
-        int size = 10;
+            @RequestParam(defaultValue = "") String[] Tag) {
 
         // 루트 데이터들을 페이징된 형태로 불러옴
-        RouteListResponseDTO routeListResponseDTO = routeService.getRouteList(page, size);
+        RouteListResponseDTO routeListResponseDTO = routeService.getRouteList(page, size, sort, distanceType,
+                altitudeType, roadType, Tag);
 
-        log.info("보내기 직전 : {}",routeListResponseDTO);
+        log.info("보내기 직전 : {}", routeListResponseDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(routeListResponseDTO);
     }
+    
+    
 }
 
 

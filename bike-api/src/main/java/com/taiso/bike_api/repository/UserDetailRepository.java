@@ -1,9 +1,14 @@
 package com.taiso.bike_api.repository;
 
-import com.taiso.bike_api.domain.UserDetailEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
-@Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.taiso.bike_api.domain.UserDetailEntity;
+import com.taiso.bike_api.domain.UserEntity;
+
 public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Long> {
+
+    Optional<UserDetailEntity> findByUser(UserEntity user);
+    
 }

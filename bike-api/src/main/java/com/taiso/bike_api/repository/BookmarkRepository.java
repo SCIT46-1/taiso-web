@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.taiso.bike_api.domain.BookmarkEntity;
 
 @Repository
-public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> {}
+public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> {
+
+}

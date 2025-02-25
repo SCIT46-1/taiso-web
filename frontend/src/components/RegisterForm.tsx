@@ -64,7 +64,7 @@ function RegisterForm() {
 
     try {
       const response: RegisterResponse = await authService.register(payload);
-      setUser({ email: response.email });
+      setUser({ email: response.email, userId: response.userId });
       navigate("/");
     } catch (error: any) {
       if (error.response && error.response.status === 409) {

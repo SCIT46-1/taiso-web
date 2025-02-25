@@ -12,5 +12,5 @@ public interface RouteLikeRepository extends JpaRepository<RouteLikeEntity, Long
 	Optional<RouteLikeEntity> findByUser_UserIdAndRoute_RouteId(Long userId, Long routeId);
 
 	boolean existsByUser_UserIdAndRoute_RouteId(Long userId, Long routeId);
-
+	
 }

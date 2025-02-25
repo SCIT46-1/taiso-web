@@ -1,4 +1,4 @@
-import { post } from "../api/request";
+import { post, get, del } from "../api/request";
 
 export interface RoutePostRequest {
   routeData: string;
@@ -7,6 +7,58 @@ export interface RoutePostRequest {
 
 export interface RoutePostResponse {
   message: string;
+}
+
+export interface RouteDetailResponse {
+  routeId: number;
+  routeImgId: string;
+  userId: number;
+  routeName: string;
+  description: string;
+  likeCount: number;
+  originalFilePath: string;
+  tag: string[];
+  distance: number;
+  altitude: number;
+  distanceType: string;
+  altitudeType: string;
+  roadType: string;
+  createdAt: string;
+  fileName: string;
+  fileType: string;
+  routePoint: {
+    route_point_id: string;
+    sequence: number;
+    latitude: number;
+    longitude: number;
+    elevation: number;
+  }[];
+  liked: boolean;
+}
+
+export interface RouteListPageResponse {
+  content: RouteListResponse[];
+
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+}
+
+export interface RouteListResponse {
+  routeId: number;
+  routeImgId: string;
+  userId: number;
+  routeName: string;
+  likeCount: number;
+  tag: string[];
+  distance: number;
+  altitude: number;
+  distanceType: string;
+  altitudeType: string;
+  roadType: string;
+  createdAt: string;
 }
 
 const createRoute = async (
@@ -34,6 +86,45 @@ const createRoute = async (
   return await post<RoutePostResponse>("/routes", formData);
 };
 
+const getRouteDetail = async (
+  routeId: number
+): Promise<RouteDetailResponse> => {
+  return await get(`/routes/${routeId}`);
+};
+
+const getRouteList = async (
+  page: number,
+  size: number,
+  sort: string,
+  distanceType: string,
+  altitudeType: string,
+  roadType: string,
+  tag: string[]
+): Promise<RouteListPageResponse> => {
+  return await get(
+    `/routes/?page=${page}&size=${size}&sort=${sort}&distanceType=${distanceType}&altitudeType=${altitudeType}&roadType=${roadType}&tag=${tag}`
+  );
+};
+
+const likeRoute = async (routeId: number): Promise<RoutePostResponse> => {
+  return await post(`/routes/${routeId}/like`);
+};
+
+const unlikeRoute = async (routeId: number): Promise<RoutePostResponse> => {
+  return await del(`/routes/${routeId}/like`);
+};
+
+const deleteRoute = async (routeId: number): Promise<RoutePostResponse> => {
+  return await del(`/routes/${routeId}`);
+};
+
 export default {
   createRoute,
+  getRouteDetail,
+  getRouteList,
+  likeRoute,
+  unlikeRoute,
+  deleteRoute,
 };
+
+//

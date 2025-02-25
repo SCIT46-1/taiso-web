@@ -11,6 +11,8 @@ import RoutePostPage from "./pages/route/RoutePostPage";
 import OAuthCallback from "./components/OAuthCallback";
 import RoutePage from "./pages/RoutePage";
 import ClubPage from "./pages/ClubPage";
+import RouteDetailPage from "./pages/route/RouteDetailPage";
+import NotFoundErrorPage from "./pages/error/NotFoundErrorPage";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +40,7 @@ const router = createBrowserRouter([
             children: [
               { path: "", element: <RoutePage /> },
               { path: "post", element: <RoutePostPage /> },
+              { path: ":routeId", element: <RouteDetailPage /> },
             ],
           },
           {
@@ -48,6 +51,10 @@ const router = createBrowserRouter([
         ],
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFoundErrorPage />,
   },
 ]);
 

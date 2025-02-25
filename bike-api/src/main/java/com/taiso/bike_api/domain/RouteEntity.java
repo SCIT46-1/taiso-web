@@ -47,7 +47,7 @@ public class RouteEntity {
     @Column(name = "route_name", nullable = false, length = 255)
     private String routeName;
 
-    @Column(name = "description", length = 1000)
+    @Column(name = "description", length = 1000, nullable = false)
     private String description;
 
     @Column(name = "route_img_id", length = 1000)
@@ -57,7 +57,7 @@ public class RouteEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "like_count", columnDefinition = "BIGINT default 0")
+    @Column(name = "like_count", columnDefinition = "BIGINT default 0", nullable = false)
     private Long likeCount;
 
     @CreationTimestamp
@@ -90,14 +90,14 @@ public class RouteEntity {
     @Column(name = "road_type", nullable = false, length = 20)
     private RoadType roadType;
 
-    @Column(name = "original_file_path", length = 255)
+    @Column(name = "original_file_path", length = 1000)
     private String originalFilePath;
 
-    @Column(name = "file_name", length = 255)
+    @Column(name = "file_name", length = 255, nullable = false)
     private String fileName;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "file_type", length = 10)
+    @Column(name = "file_type", length = 10, nullable = false)
     private FileType fileType;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -128,19 +128,21 @@ public class RouteEntity {
     }
 
     public enum AltitudeType {
-        낮음,
-        중간,
-        높음
+        평지,
+        힐리,
+        클라이밍,
+        마운틴
     }
 
     public enum RoadType {
-        평지,
-        산길,
-        고속도로
+        자전거도로,
+        공도,
+        산길
     }
 
     public enum FileType {
         GPX,
         TCX
     }
+
 }

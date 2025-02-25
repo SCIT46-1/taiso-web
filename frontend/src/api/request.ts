@@ -31,7 +31,7 @@ export const patch = async <T>(url: string, data?: any): Promise<T> => {
   return response.data;
 };
 
-export const del = async <T>(url: string, params?: any): Promise<T> => {
-  const response = await axiosClient.delete<T>(url, { params });
+export const del = async <T>(url: string): Promise<T> => {
+  const response = await axiosClient.delete<T>(url);
   return response.data;
 };

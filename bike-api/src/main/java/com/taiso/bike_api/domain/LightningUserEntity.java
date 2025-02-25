@@ -44,7 +44,7 @@ public class LightningUserEntity {
 
     @CreationTimestamp
     @Column(name = "joined_at", nullable = false, updatable = false)
-    private LocalDateTime joined_at;
+    private LocalDateTime joinedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -69,4 +69,5 @@ public class LightningUserEntity {
         번개생성자,
         참여자
     }
+    
 }

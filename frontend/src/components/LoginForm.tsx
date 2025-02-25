@@ -41,7 +41,7 @@ function LoginForm() {
       setLoading(true);
       const response: LoginResponse = await authService.login(payload);
       console.log(response);
-      setUser({ email: response.userEmail });
+      setUser({ email: response.userEmail, userId: response.userId });
       navigate("/");
     } catch (error) {
       setError("이메일 또는 비밀번호를 다시 확인해 주세요!");
