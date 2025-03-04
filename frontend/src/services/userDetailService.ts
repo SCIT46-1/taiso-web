@@ -74,7 +74,7 @@ export interface UserDetailResponse {
 const getUserDetail = async (
     userId: number,
 ): Promise<UserDetailResponse> => {
-    return await get(`/me/details/${userId}`);
+    return await get(`/users/${userId}`);
 };
 
 export default {
