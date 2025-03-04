@@ -681,3 +681,4 @@ function LightningDetailPage() {
 }
 
 export default LightningDetailPage;
+

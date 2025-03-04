@@ -91,7 +91,7 @@ function Navbar() {
           <ul className="menu mb-4 mt-4">
             <>
               <li>
-                <Link to={`/user/${user?.userId}`}>내 페이지</Link>
+                <Link to={`/users/${user?.userId}`}>내 페이지</Link>
               </li>
               <li>
                 <Link to="/settings">계정 정보</Link>

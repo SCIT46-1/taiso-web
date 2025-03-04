@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,11 +18,13 @@ import org.springframework.web.client.RestTemplate;
 import com.taiso.bike_api.config.KakaoProperties;
 import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.dto.KakaoUserInfoDTO;
+import com.taiso.bike_api.dto.UserInfoGetResponseDTO;
 import com.taiso.bike_api.dto.UserPasswordUpdateRequestDTO;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.KakaoAuthResultDTO;
 import com.taiso.bike_api.dto.KakaoUserInfoDTO;
 import com.taiso.bike_api.exception.KakaoAuthenticationException;
+import com.taiso.bike_api.exception.NotPermissionException;
 import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.exception.WrongPasswordException;
 import com.taiso.bike_api.repository.UserDetailRepository;
@@ -171,6 +174,22 @@ public class AuthService {
         // 새 비밀번호로 세팅
         user.setPassword(passwordEncoder.encode(requestDTO.getNewPwd()));
 
+    }
+
+    public UserInfoGetResponseDTO getUserInfo(Authentication authentication) {
+        // Authentication이 null이거나 권한이 없을 경우의 예외처리
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new NotPermissionException("인증정보가 존재하지 않습니다.");
+        }
+
+        // 유저가 존재하지 않을 경우의 예외처리
+        UserEntity user = userRepository.findByEmail(authentication.getName())
+        .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+
+        // UserInfoGetResponseDTO 빌드
+        return UserInfoGetResponseDTO.builder()
+                                     .userEmail(user.getEmail())
+                                     .build();
     }
 
 }

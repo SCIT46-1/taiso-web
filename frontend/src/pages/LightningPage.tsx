@@ -110,6 +110,7 @@ function LightningPage() {
     setSearchParams,
   ]);
 
+
   return (
     <div className="min-h-screen flex flex-col w-full">
       <MainNavbar />

@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 // 데이터 불러오기
-import lightningService, {
-  Lightning,
-  LightningListResponse,
-} from "../services/lightningService";
+import lightningService, { Lightning } from "../services/lightningService";
 // 이미지 요청 관련
 import ImageWithSkeleton from "./ImageWithSkeleton";
 

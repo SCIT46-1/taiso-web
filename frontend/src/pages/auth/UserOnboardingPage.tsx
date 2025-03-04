@@ -2,7 +2,6 @@ import { useState } from "react";
 
 function UserOnboardingPage() {
   const [step, setStep] = useState(1);
-  const [nickname, setNickname] = useState("");
 
   return (
     <div className="flex flex-col items-center justify-center max-w-screen-sm mx-auto gap-4">

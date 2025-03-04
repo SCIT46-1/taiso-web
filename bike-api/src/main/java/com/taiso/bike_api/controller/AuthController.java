@@ -23,6 +23,7 @@ import com.taiso.bike_api.dto.LoginRequestDTO;
 import com.taiso.bike_api.dto.LoginResponseDTO;
 import com.taiso.bike_api.dto.RegisterRequestDTO;
 import com.taiso.bike_api.dto.RegisterResponseDTO;
+import com.taiso.bike_api.dto.UserInfoGetResponseDTO;
 import com.taiso.bike_api.dto.UserPasswordUpdateRequestDTO;
 import com.taiso.bike_api.security.JwtTokenProvider;
 import com.taiso.bike_api.service.AuthService;
@@ -205,6 +206,13 @@ public class AuthController {
         response.addCookie(jwtCookie);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @GetMapping("/me/account")
+    @Operation(summary = "로그인 상태 확인", description = "JWT 쿠키를 확인하여 로그인 여부 및 사용자 정보를 반환")
+    public ResponseEntity<UserInfoGetResponseDTO> getUserInfo(Authentication authentication) {
+        UserInfoGetResponseDTO responseDTO = authService.getUserInfo(authentication);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
 }

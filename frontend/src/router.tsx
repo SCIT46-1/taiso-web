@@ -51,7 +51,7 @@ const router = createBrowserRouter([
         children: [{ path: "", element: <ClubPage /> }],
       },
       {
-        path: "user",
+        path: "users",
         children: [{ path: ":userId", element: <UserDetailPage /> }],
       },
       // 인증 후에만 접근 가능한 post 관련 페이지들
