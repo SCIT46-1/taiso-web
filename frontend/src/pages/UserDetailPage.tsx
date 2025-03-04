@@ -1,30 +1,35 @@
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import userDetailService, { UserDetailResponse } from "../services/userDetailService";
 import { useEffect, useState } from "react";
+import { useAuthStore } from "../stores/useAuthStore";
+
 
 function UserDetailPage() {
-    const { userId } = useParams();
-    const [userDetail, setUserDetail] = useState<UserDetailResponse | null>(
-      null
+  const { userId } = useParams();
+  const [userDetail, setUserDetail] = useState<UserDetailResponse | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuthStore();
+
+  console.log(isLoading, user);
+
+  useEffect(() => {
+    const fetchUserDetail = async () => {
+      setIsLoading(true);
+      const userDetailData = await userDetailService.getUserDetail(
+        Number(userId)
       );
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-      const fetchUserDetail = async () => {
-        setIsLoading(true);
-        const userDetailData = await userDetailService.getUserDetail(
-          Number(userId)
-        );
-        setUserDetail(userDetailData);
-        setIsLoading(false);
-      };
-      fetchUserDetail();
-    }, [userId]);
+      setUserDetail(userDetailData);
+      setIsLoading(false);
+    };
+    fetchUserDetail();
+  }, [userId]);
 
 
-    if (isLoading) {
-      return <div>Loading...</div>;
-    }
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="md:w-full max-w-screen-md rounded-xl w-[90%] mt-2 border-base-300 border-[1px] shadow-xl">
@@ -44,9 +49,10 @@ function UserDetailPage() {
         <div className="flex gap-2 mb-2">
           <div className="text-2xl font-bold mb-2">{userDetail?.level}</div>
           <div className="text-2xl font-bold mb-2">{userDetail?.gender}</div>
-          {userDetail?.tags.map((tag, index) => (
-            <div className="badge badge-primary badge-outline">{tag}</div>
+          {(userDetail?.tags ?? []).map((tag) => (
+            <div key={tag} className="badge badge-primary badge-outline">{tag}</div>
           ))}
+
         </div>
         <div>
           {userDetail?.bio}

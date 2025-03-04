@@ -72,7 +72,7 @@ export interface UserDetailResponse {
 }
 
 const getUserDetail = async (
-    userId: number,
+    userId: number
 ): Promise<UserDetailResponse> => {
     return await get(`/users/${userId}`);
 };
