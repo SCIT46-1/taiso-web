@@ -10,11 +10,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.taiso.bike_api.domain.ClubEntity;
+import com.taiso.bike_api.domain.ClubMemberEntity;
 import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.LightningUserEntity;
 import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.domain.UserEntity;
+import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
+import com.taiso.bike_api.domain.ClubMemberEntity.Role;
+import com.taiso.bike_api.repository.ClubMemberRepository;
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.LightningUserRepository;
 import com.taiso.bike_api.repository.RouteRepository;
@@ -48,9 +52,12 @@ public class InitLoader implements CommandLineRunner {
     
     @Autowired
     private RouteRepository routeRepository;
-    
+
     @Autowired
     private ClubRepository clubRepository;
+
+    @Autowired
+    private ClubMemberRepository clubMemberRepository;
     
     @Override
     @Transactional
@@ -97,7 +104,7 @@ public class InitLoader implements CommandLineRunner {
         lightningUserRepository.save(lightning1);
         
         
-        // 클럽 예시 생성
+     // 클럽 예시1 생성
         ClubEntity club = ClubEntity.builder()
                 .clubProfileImageId(null)
                 .clubName("잠수교폭주족")
@@ -107,6 +114,83 @@ public class InitLoader implements CommandLineRunner {
                 .maxUser(20)
                 .build();
         clubRepository.save(club);
+        
+        // 클럽 예시2 생성 - maxUser Test
+        ClubEntity club2 = ClubEntity.builder()
+               .clubProfileImageId(null)
+               .clubName("2번 클럽")
+               .clubLeader(user1)
+               .clubShortDescription("적당히 자전거 타기")
+               .clubDescription("마음껏 자유롭게 자전거 참여하기")
+               .maxUser(2)
+               .build();
+        clubRepository.save(club2);
+
+        // 클럽 예시3 생성 - 클럽 수락 Test
+        ClubEntity club3 = ClubEntity.builder()
+               .clubProfileImageId(null)
+               .clubName("3번 클럽")
+               .clubLeader(user1)
+               .clubShortDescription("열심히 자전거 타자")
+               .clubDescription("3번째 클럽 자전거 타기 설명")
+               .maxUser(8)
+               .build();
+        clubRepository.save(club3);
+           
+              
+        // 1번 클럽 참여 유저 예시 생성
+        ClubMemberEntity clubMember1 = ClubMemberEntity.builder()
+        		.user(user2)
+        		.club(club)
+        		.role(Role.멤버)
+        		.participantStatus(ParticipantStatus.승인)
+        		.build();
+        clubMemberRepository.save(clubMember1);
+        
+        // 2번 클럽 참여 유저1 예시 생성
+        ClubMemberEntity clubMember2user1 = ClubMemberEntity.builder()
+        		.user(user2)
+        		.club(club2)
+        		.role(Role.멤버)
+        		.participantStatus(ParticipantStatus.승인)
+        		.build();
+        clubMemberRepository.save(clubMember2user1);
+
+        // 2번 클럽 참여 유저2 예시 생성
+        ClubMemberEntity clubMember2user2 = ClubMemberEntity.builder()
+        		.user(user3)
+        		.club(club2)
+        		.role(Role.멤버)
+        		.participantStatus(ParticipantStatus.승인)
+        		.build();
+        clubMemberRepository.save(clubMember2user2);
+
+        // 3번 클럽 참여 유저1 예시 생성
+        ClubMemberEntity clubMember3user1 = ClubMemberEntity.builder()
+        		.user(user1)
+        		.club(club3)
+        		.role(Role.클럽장)
+        		.participantStatus(ParticipantStatus.승인)
+        		.build();
+        clubMemberRepository.save(clubMember3user1);
+
+        // 3번 클럽 참여 유저2 예시 생성
+        ClubMemberEntity clubMember3user2 = ClubMemberEntity.builder()
+        		.user(user2)
+        		.club(club3)
+        		.role(Role.멤버)
+        		.participantStatus(ParticipantStatus.신청대기)
+        		.build();
+        clubMemberRepository.save(clubMember3user2);
+
+        // 3번 클럽 참여 유저3 예시 생성
+        ClubMemberEntity clubMember3user3 = ClubMemberEntity.builder()
+        		.user(user3)
+        		.club(club3)
+        		.role(Role.멤버)
+        		.participantStatus(ParticipantStatus.신청대기)
+        		.build();
+        clubMemberRepository.save(clubMember3user3);
         
         
         // 번개 이벤트 2: 수락형 예시
