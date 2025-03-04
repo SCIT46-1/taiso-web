@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 
 import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.ClubMemberEntity;
+import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
+import com.taiso.bike_api.domain.ClubMemberEntity.Role;
 import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.LightningUserEntity;
 import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.domain.UserEntity;
-import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
-import com.taiso.bike_api.domain.ClubMemberEntity.Role;
 import com.taiso.bike_api.repository.ClubMemberRepository;
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.LightningUserRepository;
@@ -160,6 +160,11 @@ public class InitLoader implements CommandLineRunner {
         
         // 번개 이벤트 생성
         
+        // route 정보 조회 (번개 이벤트 중 club 연관 이벤트에 사용)
+        RouteEntity route = routeRepository.findById(1L).orElse(null);
+
+
+
         // 번개 이벤트 1: 참가형 예시 (club 정보와 무관한 이벤트)
         LightningEntity lightning1 = createLightningEvent(
                 1L,
@@ -172,7 +177,7 @@ public class InitLoader implements CommandLineRunner {
                 new BigDecimal("37.5665"),
                 new BigDecimal("126.9780"),
                 LightningEntity.Gender.자유,
-                LightningEntity.Level.초보,
+                LightningEntity.Level.초급,
                 LightningEntity.RecruitType.참가형,
                 LightningEntity.BikeType.로드,
                 LightningEntity.Region.서울,
@@ -180,7 +185,7 @@ public class InitLoader implements CommandLineRunner {
                 "서울특별시 중구",
                 false,
                 null,
-                null
+                route
         );
         lightningUserRepository.save(lightning1);
         LightningUserEntity creatorLightningUser1 = LightningUserEntity.builder()
@@ -191,8 +196,6 @@ public class InitLoader implements CommandLineRunner {
                 .build();
         lightningUserRepository.save(creatorLightningUser1);
 
-        // route 정보 조회 (번개 이벤트 중 club 연관 이벤트에 사용)
-        RouteEntity route = routeRepository.findById(1L).orElse(null);
 
         // 번개 이벤트 2: 수락형 예시 (club 이벤트)
         LightningEntity lightning2 = createLightningEvent(
@@ -206,7 +209,7 @@ public class InitLoader implements CommandLineRunner {
                 new BigDecimal("35.1796"),
                 new BigDecimal("129.0756"),
                 LightningEntity.Gender.자유,
-                LightningEntity.Level.초보,
+                LightningEntity.Level.초급,
                 LightningEntity.RecruitType.수락형,
                 LightningEntity.BikeType.로드,
                 LightningEntity.Region.서울,
@@ -252,7 +255,7 @@ public class InitLoader implements CommandLineRunner {
                 "서울특별시 삼성역",
                 false,
                 null,
-                null
+                route
         );
         lightningUserRepository.save(lightning3);
         LightningUserEntity creatorLightningUser3 = LightningUserEntity.builder()
