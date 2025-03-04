@@ -101,7 +101,7 @@ interface Creator {
   creatorProfileImg: string | null;
 }
 
-interface Member {
+export interface Member {
   lightningUserId: number;
   memberNickname: string;
   memberProfileImg: string | null;

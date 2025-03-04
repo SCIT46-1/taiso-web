@@ -122,9 +122,7 @@ public class LightningMemberService {
             if (lightningEntity.getStatus() == LightningStatus.마감) {
                 // 번개 상태를 모집으로 변경
                 lightningEntity.setStatus(LightningStatus.모집);
-            } else {
-                throw new LightningStatusMismatchException("번개 상태가 마감이 아닙니다.");
-            }
+            } 
         } else {
             throw new LightningMemberNotFoundException("번개가 인원이 다 차서 모집으로 변경할 수 가 없습니다.");
         }
@@ -156,6 +154,12 @@ public class LightningMemberService {
         // 유저 아이디로 유저 찾기
         UserEntity userEntity = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+
+        //유저가 번개 생성자일 경우 예외 처리
+        if (userEntity.getUserId().equals(lightningEntity.getCreatorId())) {
+            throw new LightningCreatorMismatchException("번개 생성자는 번개를 나갈 수 없습니다.");
+        }
 
         // 번개Id와 유저Id로 member에서 조회
         LightningUserEntity lightningUser = lightningUserRepository

@@ -286,7 +286,7 @@ public class LightningService {
 
         // 현재 참여자 수 계산
         for (ResponseComponentDTO lightning : lightningDTO) {
-            int currentParticipants = lightningUserRepository.countByLightning_LightningId(lightning.getLightningId());
+            int currentParticipants = lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightning.getLightningId());
             lightning.setCurrentParticipants(currentParticipants);
         }
 

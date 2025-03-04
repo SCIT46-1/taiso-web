@@ -69,8 +69,9 @@ public class InitLoader implements CommandLineRunner {
 
             UserEntity user3 = createUser("test3@test.com", "asdf1234!");
             createUserDetail(user3, "따릉이폭주", "달립니다.", 121, "남자", "고수",
-                            LocalDate.now(), "최성현", "010-4321-1234", 200, 65);
-
+            LocalDate.now(), "최성현", "010-4321-1234", 200, 65);
+            
+            RouteEntity route = routeRepository.findById(1L).orElse(null);
             // 번개 이벤트 1: 참가형 예시
             LightningEntity lightning1 = createLightningEvent(
                             1L,
@@ -91,7 +92,7 @@ public class InitLoader implements CommandLineRunner {
                             "서울특별시 중구",
                             false,
                             null,
-                            null);
+                            route);
             lightningUserRepository.save(lightning1);
 
             //번개 이벤트 1에 대한 번개 참가 유저 생성
@@ -116,7 +117,6 @@ public class InitLoader implements CommandLineRunner {
 
             // 번개 이벤트 2: 수락형 예시
             // route 데이터 조회 (존재하지 않을 경우 null 처리)
-            RouteEntity route = routeRepository.findById(1L).orElse(null);
 
             LightningEntity lightning2 = createLightningEvent(
                             1L,
