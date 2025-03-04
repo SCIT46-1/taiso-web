@@ -186,6 +186,16 @@ const leaveLightning = async (lightningId: number): Promise<void> => {
   return await patch(`/lightnings/${lightningId}/exit`);
 };
 
+// 번개 마감
+const closeLightning = async (lightningId: number): Promise<void> => {
+  return await patch(`/lightnings/${lightningId}/close`);
+};
+
+// 번개 종료
+const endLightning = async (lightningId: number): Promise<void> => {
+  return await patch(`/lightnings/${lightningId}/end`);
+};
+
 export default {
   createLightning,
   getLightningList,
@@ -195,4 +205,6 @@ export default {
   leaveLightning,
   acceptLightning,
   rejectLightning,
+  closeLightning,
+  endLightning,
 };

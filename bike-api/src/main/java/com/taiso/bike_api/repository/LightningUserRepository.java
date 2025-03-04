@@ -48,4 +48,7 @@ public interface LightningUserRepository extends JpaRepository<LightningUserEnti
     @Query("SELECT COUNT(lu) FROM LightningUserEntity lu WHERE lu.lightning.lightningId = :lightningId AND lu.participantStatus IN ('승인', '완료')")
     int countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(@Param("lightningId") Long lightningId);
 
+
+    //유저아이디랑 번개아이디로 참여자 조회
+    Optional<LightningUserEntity> findByUser_UserIdAndLightning_LightningId(Long userId, Long lightningId);
 }

@@ -77,7 +77,7 @@ public class InitLoader implements CommandLineRunner {
                             1L,
                             "예시 번개 타이틀",
                             "이 번개는 예시를 위한 설명입니다.",
-                            LocalDateTime.now().plusDays(1),
+                            LocalDateTime.now().plusDays(-2),
                             120,
                             LightningEntity.LightningStatus.모집,
                             20,

@@ -3,6 +3,7 @@ package com.taiso.bike_api.config;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,7 +42,8 @@ public class SecurityConfig {
     @Autowired
     private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-
+    @Value("${app.cors.allowed-origins}")
+    private String[] allowedOrigins;
     
     /**
      * SecurityFilterChain 빈을 등록하여 스프링 시큐리티 설정을 구성합니다.
@@ -119,7 +121,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // TODO: 프로덕션 도메인 추가
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);

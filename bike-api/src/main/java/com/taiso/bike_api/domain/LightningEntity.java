@@ -134,7 +134,7 @@ public class LightningEntity {
     
     // ENUM 정의
     public enum LightningStatus {
-        모집, 마감, 종료, 취소
+        모집, 마감, 강제마감, 종료, 취소
     }
 
     public enum Gender {

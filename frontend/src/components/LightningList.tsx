@@ -137,6 +137,12 @@ function LightningList({
             마감
           </button>
         );
+      case "강제마감":
+        return (
+          <button className="btn btn-outline btn-error sm:w-[150px] no-animation">
+            마감
+          </button>
+        );
       case "종료":
       default:
         return (

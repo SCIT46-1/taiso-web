@@ -116,6 +116,14 @@ public class LightningMemberController {
     }
     
     
-
-    
+	// 번개 종료
+	@Operation(summary = "번개 종료", description = "번개 종료 API")
+	@PatchMapping("/{lightningId}/end")
+	public ResponseEntity<JoinParticipantsPostResponseDTO> lightningEnd(
+			@PathVariable(name = "lightningId") Long lightningId,
+			Authentication authentication) {
+		lightningMemberService.lightningEnd(lightningId, authentication);
+		return ResponseEntity.status(HttpStatus.CREATED).body(null);
+	}
+	
 }
