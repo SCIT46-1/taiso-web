@@ -103,7 +103,7 @@ const getRouteList = async (
   tags: string[]
 ): Promise<RouteListPageResponse> => {
   return await get(
-    `/routes/?page=${page}&size=${size}&sort=${sort}&region=${region}&distanceType=${distanceType}&altitudeType=${altitudeType}&roadType=${roadType}&tag=${tags}`
+    `/routes?page=${page}&size=${size}&sort=${sort}&region=${region}&distanceType=${distanceType}&altitudeType=${altitudeType}&roadType=${roadType}&tag=${tags}`
   );
 };
 
