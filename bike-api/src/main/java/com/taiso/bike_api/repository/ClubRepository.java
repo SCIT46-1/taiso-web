@@ -5,5 +5,10 @@ import org.springframework.stereotype.Repository;
 
 import com.taiso.bike_api.domain.ClubEntity;
 
+import java.util.Optional;
+
 @Repository
-public interface ClubRepository extends JpaRepository<ClubEntity, Long> {}
+public interface ClubRepository extends JpaRepository<ClubEntity, Long> {
+
+    Optional<ClubEntity> findByClubName(String clubName);
+}

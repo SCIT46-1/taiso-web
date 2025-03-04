@@ -365,13 +365,19 @@ public class GlobalExceptionHandler {
                 ex.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
- 
 
 	// 6. 클럽 참가 신청자의 상태가 '신청대기'인지 확인 (아니면 승인/거절 불가)
     @ExceptionHandler(ClubStatusMismatchException.class)
     public ResponseEntity<ErrorResponseDTO> handleClubStatusMismatchException(ClubStatusMismatchException ex, HttpServletRequest request) {
         ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    // 이미 존재하는 클럽명 예외 처리
+    @ExceptionHandler(ClubAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubAlreadyExistsException(ClubAlreadyExistsException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
     
     
