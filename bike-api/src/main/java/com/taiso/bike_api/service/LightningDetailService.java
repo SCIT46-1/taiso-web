@@ -1,19 +1,42 @@
 package com.taiso.bike_api.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.taiso.bike_api.domain.*;
-import com.taiso.bike_api.dto.*;
-import com.taiso.bike_api.exception.UserNotFoundException;
-import com.taiso.bike_api.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.taiso.bike_api.domain.ClubEntity;
+import com.taiso.bike_api.domain.LightningEntity;
+import com.taiso.bike_api.domain.LightningTagCategoryEntity;
+import com.taiso.bike_api.domain.LightningUserEntity;
+import com.taiso.bike_api.domain.RouteEntity;
+import com.taiso.bike_api.domain.RoutePointEntity;
+import com.taiso.bike_api.domain.UserDetailEntity;
+import com.taiso.bike_api.dto.LightningDetailClubDTO;
+import com.taiso.bike_api.dto.LightningDetailCreatorDTO;
+import com.taiso.bike_api.dto.LightningDetailGetResponseDTO;
+import com.taiso.bike_api.dto.LightningDetailMemberDTO;
+import com.taiso.bike_api.dto.LightningDetailRouteDTO;
+import com.taiso.bike_api.dto.LightningDetailUpdateGetResponseDTO;
+import com.taiso.bike_api.dto.LightningDetailUpdateRequestDTO;
+import com.taiso.bike_api.dto.RoutePointDTO;
 import com.taiso.bike_api.exception.LightningFullMemberException;
 import com.taiso.bike_api.exception.LightningNotFoundException;
 import com.taiso.bike_api.exception.NotPermissionException;
+import com.taiso.bike_api.exception.UserNotFoundException;
+import com.taiso.bike_api.repository.ClubRepository;
+import com.taiso.bike_api.repository.LightningDetailRepository;
+import com.taiso.bike_api.repository.LightningTagCategoryRepository;
+import com.taiso.bike_api.repository.LightningUserRepository;
+import com.taiso.bike_api.repository.UserDetailRepository;
+import com.taiso.bike_api.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -220,6 +243,10 @@ public class LightningDetailService {
             log.info("DTO 빌드 후 클럽이름 : {}", clubDTO.getClubName());
         }
 
+
+        // 현재 참여자 수 조회
+        Integer currentMemberCount = lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(temp.getLightningId());
+
         // 번개 참여자 빌드
         List<LightningDetailMemberDTO> memberDTOs = new ArrayList<>();
         log.info("번개 아이디 : {}", temp.getLightningId());
@@ -238,7 +265,7 @@ public class LightningDetailService {
                 log.info("멤버의 디테일 : {}", member.toString());
                 //빌드
                 LightningDetailMemberDTO build = LightningDetailMemberDTO.builder()
-                        .lightningUserId(entity.getLightningUserId())
+                        .lightningUserId(entity.getUser().getUserId())
                         .participantStatus(entity.getParticipantStatus().name())
                         .role(entity.getRole().name())
                         .memberNickname(member.getUserNickname())
@@ -261,6 +288,7 @@ public class LightningDetailService {
                 .updatedAt(temp.getUpdatedAt())
                 .status(temp.getStatus().name())
                 .capacity(temp.getCapacity())
+                .currentMemberCount(currentMemberCount)
                 .latitude(temp.getLatitude())
                 .longitude(temp.getLongitude())
                 .gender(temp.getGender().name())

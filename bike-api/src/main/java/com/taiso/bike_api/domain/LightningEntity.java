@@ -134,7 +134,7 @@ public class LightningEntity {
     
     // ENUM 정의
     public enum LightningStatus {
-        모집, 마감, 종료, 취소
+        모집, 마감, 강제마감, 종료, 취소
     }
 
     public enum Gender {
@@ -142,7 +142,7 @@ public class LightningEntity {
     }
 
     public enum Level {
-        초보, 중급, 고급, 자유
+        입문, 초급, 중급, 고급
     }
 
     public enum RecruitType {
@@ -150,10 +150,10 @@ public class LightningEntity {
     }
 
     public enum BikeType {
-        로드, 따릉이, 하이브리드, 자유
+        로드, MTB, 하이브리드, 기타
     }
 
     public enum Region {
-        서울, 경기, 대구, 강원
+        서울, 경기, 인천, 강원, 충청, 전라, 경상, 제주
     }
 }

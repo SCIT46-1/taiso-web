@@ -66,20 +66,101 @@ public class InitLoader implements CommandLineRunner {
         UserEntity user1 = createUser("test@test.com", "asdf1234!");
         createUserDetail(user1, "무면허라이더", "처음뵙겠습니다.", 120, "여자", "초보자",
                 LocalDate.now(), "권혜연", "010-5529-7835", 158, 48);
-        
+
         UserEntity user2 = createUser("test2@test.com", "asdf1234!");
         createUserDetail(user2, "수달", "자기소개를 입력해주세요.", 140, "남자", "초보자",
                 LocalDate.now(), "송종근", "010-1102-4567", 158, 48);
         // user2에 대해 추가 회원 상세 데이터 (예: 다른 닉네임)
         createUserDetail(user2, "Speed", "나는 열정적인 라이더입니다.", 120, "남자", "입문자",
                 LocalDate.now(), "김철수", "010-9876-5432", 199, 55);
-        
+
         UserEntity user3 = createUser("test3@test.com", "asdf1234!");
         createUserDetail(user3, "따릉이폭주", "달립니다.", 121, "남자", "고수",
                 LocalDate.now(), "최성현", "010-4321-1234", 200, 65);
+
+        // 클럽 생성
+        ClubEntity club1 = ClubEntity.builder()
+                .clubProfileImageId(null)
+                .clubName("잠수교폭주족")
+                .clubLeader(user1)
+                .clubShortDescription("지구 끝까지 달리자")
+                .clubDescription("활동 참여 분기 1회 이하는 강퇴 합니다.")
+                .maxUser(20)
+                .build();
+        clubRepository.save(club1);
+
+        ClubEntity club2 = ClubEntity.builder()
+                .clubProfileImageId(null)
+                .clubName("2번 클럽")
+                .clubLeader(user1)
+                .clubShortDescription("적당히 자전거 타기")
+                .clubDescription("마음껏 자유롭게 자전거 참여하기")
+                .maxUser(2)
+                .build();
+        clubRepository.save(club2);
+
+        ClubEntity club3 = ClubEntity.builder()
+                .clubProfileImageId(null)
+                .clubName("3번 클럽")
+                .clubLeader(user1)
+                .clubShortDescription("열심히 자전거 타자")
+                .clubDescription("3번째 클럽 자전거 타기 설명")
+                .maxUser(8)
+                .build();
+        clubRepository.save(club3);
+           
+        // 클럽 멤버 생성
+        ClubMemberEntity clubMember1 = ClubMemberEntity.builder()
+                .user(user2)
+                .club(club1)
+                .role(Role.멤버)
+                .participantStatus(ParticipantStatus.승인)
+                .build();
+        clubMemberRepository.save(clubMember1);
         
+        ClubMemberEntity clubMember2user1 = ClubMemberEntity.builder()
+                .user(user2)
+                .club(club2)
+                .role(Role.멤버)
+                .participantStatus(ParticipantStatus.승인)
+                .build();
+        clubMemberRepository.save(clubMember2user1);
+
+        ClubMemberEntity clubMember2user2 = ClubMemberEntity.builder()
+                .user(user3)
+                .club(club2)
+                .role(Role.멤버)
+                .participantStatus(ParticipantStatus.승인)
+                .build();
+        clubMemberRepository.save(clubMember2user2);
+
+        ClubMemberEntity clubMember3user1 = ClubMemberEntity.builder()
+                .user(user1)
+                .club(club3)
+                .role(Role.클럽장)
+                .participantStatus(ParticipantStatus.승인)
+                .build();
+        clubMemberRepository.save(clubMember3user1);
+
+        ClubMemberEntity clubMember3user2 = ClubMemberEntity.builder()
+                .user(user2)
+                .club(club3)
+                .role(Role.멤버)
+                .participantStatus(ParticipantStatus.신청대기)
+                .build();
+        clubMemberRepository.save(clubMember3user2);
+
+        ClubMemberEntity clubMember3user3 = ClubMemberEntity.builder()
+                .user(user3)
+                .club(club3)
+                .role(Role.멤버)
+                .participantStatus(ParticipantStatus.신청대기)
+                .build();
+        clubMemberRepository.save(clubMember3user3);
         
-        // 번개 이벤트 1: 참가형 예시
+        // 번개 이벤트 생성
+        
+        // 번개 이벤트 1: 참가형 예시 (club 정보와 무관한 이벤트)
         LightningEntity lightning1 = createLightningEvent(
                 1L,
                 "예시 번개 타이틀",
@@ -102,101 +183,18 @@ public class InitLoader implements CommandLineRunner {
                 null
         );
         lightningUserRepository.save(lightning1);
-        
-        
-     // 클럽 예시1 생성
-        ClubEntity club = ClubEntity.builder()
-                .clubProfileImageId(null)
-                .clubName("잠수교폭주족")
-                .clubLeader(user1)
-                .clubShortDescription("지구 끝까지 달리자")
-                .clubDescription("활동 참여 분기 1회 이하는 강퇴 합니다.")
-                .maxUser(20)
+        LightningUserEntity creatorLightningUser1 = LightningUserEntity.builder()
+                .participantStatus(LightningUserEntity.ParticipantStatus.완료)
+                .role(LightningUserEntity.Role.번개생성자)
+                .lightning(lightning1)
+                .user(user1)
                 .build();
-        clubRepository.save(club);
-        
-        // 클럽 예시2 생성 - maxUser Test
-        ClubEntity club2 = ClubEntity.builder()
-               .clubProfileImageId(null)
-               .clubName("2번 클럽")
-               .clubLeader(user1)
-               .clubShortDescription("적당히 자전거 타기")
-               .clubDescription("마음껏 자유롭게 자전거 참여하기")
-               .maxUser(2)
-               .build();
-        clubRepository.save(club2);
+        lightningUserRepository.save(creatorLightningUser1);
 
-        // 클럽 예시3 생성 - 클럽 수락 Test
-        ClubEntity club3 = ClubEntity.builder()
-               .clubProfileImageId(null)
-               .clubName("3번 클럽")
-               .clubLeader(user1)
-               .clubShortDescription("열심히 자전거 타자")
-               .clubDescription("3번째 클럽 자전거 타기 설명")
-               .maxUser(8)
-               .build();
-        clubRepository.save(club3);
-           
-              
-        // 1번 클럽 참여 유저 예시 생성
-        ClubMemberEntity clubMember1 = ClubMemberEntity.builder()
-        		.user(user2)
-        		.club(club)
-        		.role(Role.멤버)
-        		.participantStatus(ParticipantStatus.승인)
-        		.build();
-        clubMemberRepository.save(clubMember1);
-        
-        // 2번 클럽 참여 유저1 예시 생성
-        ClubMemberEntity clubMember2user1 = ClubMemberEntity.builder()
-        		.user(user2)
-        		.club(club2)
-        		.role(Role.멤버)
-        		.participantStatus(ParticipantStatus.승인)
-        		.build();
-        clubMemberRepository.save(clubMember2user1);
-
-        // 2번 클럽 참여 유저2 예시 생성
-        ClubMemberEntity clubMember2user2 = ClubMemberEntity.builder()
-        		.user(user3)
-        		.club(club2)
-        		.role(Role.멤버)
-        		.participantStatus(ParticipantStatus.승인)
-        		.build();
-        clubMemberRepository.save(clubMember2user2);
-
-        // 3번 클럽 참여 유저1 예시 생성
-        ClubMemberEntity clubMember3user1 = ClubMemberEntity.builder()
-        		.user(user1)
-        		.club(club3)
-        		.role(Role.클럽장)
-        		.participantStatus(ParticipantStatus.승인)
-        		.build();
-        clubMemberRepository.save(clubMember3user1);
-
-        // 3번 클럽 참여 유저2 예시 생성
-        ClubMemberEntity clubMember3user2 = ClubMemberEntity.builder()
-        		.user(user2)
-        		.club(club3)
-        		.role(Role.멤버)
-        		.participantStatus(ParticipantStatus.신청대기)
-        		.build();
-        clubMemberRepository.save(clubMember3user2);
-
-        // 3번 클럽 참여 유저3 예시 생성
-        ClubMemberEntity clubMember3user3 = ClubMemberEntity.builder()
-        		.user(user3)
-        		.club(club3)
-        		.role(Role.멤버)
-        		.participantStatus(ParticipantStatus.신청대기)
-        		.build();
-        clubMemberRepository.save(clubMember3user3);
-        
-        
-        // 번개 이벤트 2: 수락형 예시
-        // route 데이터 조회 (존재하지 않을 경우 null 처리)
+        // route 정보 조회 (번개 이벤트 중 club 연관 이벤트에 사용)
         RouteEntity route = routeRepository.findById(1L).orElse(null);
-        
+
+        // 번개 이벤트 2: 수락형 예시 (club 이벤트)
         LightningEntity lightning2 = createLightningEvent(
                 1L,
                 "새로운 번개 이벤트",
@@ -219,16 +217,13 @@ public class InitLoader implements CommandLineRunner {
                 route
         );
         lightningUserRepository.save(lightning2);
-        
-        // 번개 이벤트 2에 대한 번개 참가 유저 생성
-        LightningUserEntity creatorLightningUser = LightningUserEntity.builder()
+        LightningUserEntity creatorLightningUser2 = LightningUserEntity.builder()
                 .participantStatus(LightningUserEntity.ParticipantStatus.완료)
                 .role(LightningUserEntity.Role.번개생성자)
                 .lightning(lightning2)
                 .user(user1)
                 .build();
-        lightningUserRepository.save(creatorLightningUser);
-        
+        lightningUserRepository.save(creatorLightningUser2);
         LightningUserEntity participantLightningUser = LightningUserEntity.builder()
                 .participantStatus(LightningUserEntity.ParticipantStatus.신청대기)
                 .role(LightningUserEntity.Role.참여자)
@@ -236,8 +231,7 @@ public class InitLoader implements CommandLineRunner {
                 .user(user2)
                 .build();
         lightningUserRepository.save(participantLightningUser);
-        
-        
+
         // 번개 이벤트 3: 종료 상태 예시
         LightningEntity lightning3 = createLightningEvent(
                 1L,
@@ -261,27 +255,123 @@ public class InitLoader implements CommandLineRunner {
                 null
         );
         lightningUserRepository.save(lightning3);
-        
-        // 번개 이벤트 3에 대한 참가 유저 생성
-        lightningUserRepository.save(LightningUserEntity.builder()
+        LightningUserEntity creatorLightningUser3 = LightningUserEntity.builder()
                 .participantStatus(LightningUserEntity.ParticipantStatus.완료)
                 .role(LightningUserEntity.Role.번개생성자)
                 .lightning(lightning3)
                 .user(user1)
-                .build());
-        lightningUserRepository.save(LightningUserEntity.builder()
+                .build();
+        lightningUserRepository.save(creatorLightningUser3);
+        LightningUserEntity participantLightningUser3_2 = LightningUserEntity.builder()
                 .participantStatus(LightningUserEntity.ParticipantStatus.완료)
                 .role(LightningUserEntity.Role.참여자)
                 .lightning(lightning3)
                 .user(user2)
-                .build());
-        lightningUserRepository.save(LightningUserEntity.builder()
+                .build();
+        lightningUserRepository.save(participantLightningUser3_2);
+        LightningUserEntity participantLightningUser3_3 = LightningUserEntity.builder()
                 .participantStatus(LightningUserEntity.ParticipantStatus.완료)
                 .role(LightningUserEntity.Role.참여자)
                 .lightning(lightning3)
                 .user(user3)
-                .build());
-    }
+                .build();
+        lightningUserRepository.save(participantLightningUser3_3);
+        
+        // 추가 예시 번개 이벤트 생성 (feature/3.4-lightning)
+        
+        // 번개 이벤트 4
+        LightningEntity lightning4 = createLightningEvent(
+                1L,
+                "예시 번개 타이틀",
+                "이 번개는 예시를 위한 설명입니다.",
+                LocalDateTime.now().plusDays(0),
+                120,
+                LightningEntity.LightningStatus.모집,
+                20,
+                new BigDecimal("37.5665"),
+                new BigDecimal("126.9780"),
+                LightningEntity.Gender.자유,
+                LightningEntity.Level.고급,
+                LightningEntity.RecruitType.참가형,
+                LightningEntity.BikeType.로드,
+                LightningEntity.Region.서울,
+                10L,
+                "서울특별시 중구",
+                false,
+                null,
+                route
+        );
+        lightningUserRepository.save(lightning4);
+        LightningUserEntity creatorLightningUser4 = LightningUserEntity.builder()
+                .participantStatus(LightningUserEntity.ParticipantStatus.완료)
+                .role(LightningUserEntity.Role.번개생성자)
+                .lightning(lightning4)
+                .user(user1)
+                .build();
+        lightningUserRepository.save(creatorLightningUser4);
+
+        // 번개 이벤트 5
+        LightningEntity lightning5 = createLightningEvent(
+                1L,
+                "예시 번개 타이틀",
+                "이 번개는 예시를 위한 설명입니다.",
+                LocalDateTime.now().plusDays(0),
+                120,
+                LightningEntity.LightningStatus.모집,
+                20,
+                new BigDecimal("37.5665"),
+                new BigDecimal("126.9780"),
+                LightningEntity.Gender.남,
+                LightningEntity.Level.입문,
+                LightningEntity.RecruitType.참가형,
+                LightningEntity.BikeType.MTB,
+                LightningEntity.Region.전라,
+                10L,
+                "서울특별시 중구",
+                false,
+                null,
+                route
+        );
+        lightningUserRepository.save(lightning5);
+        LightningUserEntity creatorLightningUser5 = LightningUserEntity.builder()
+                .participantStatus(LightningUserEntity.ParticipantStatus.완료)
+                .role(LightningUserEntity.Role.번개생성자)
+                .lightning(lightning5)
+                .user(user1)
+                .build();
+        lightningUserRepository.save(creatorLightningUser5);
+
+        // 번개 이벤트 6
+        LightningEntity lightning6 = createLightningEvent(
+                1L,
+                "예시 번개 타이틀",
+                "이 번개는 예시를 위한 설명입니다.",
+                LocalDateTime.now(),
+                120,
+                LightningEntity.LightningStatus.모집,
+                20,
+                new BigDecimal("37.5665"),
+                new BigDecimal("126.9780"),
+                LightningEntity.Gender.자유,
+                LightningEntity.Level.중급,
+                LightningEntity.RecruitType.참가형,
+                LightningEntity.BikeType.로드,
+                LightningEntity.Region.서울,
+                10L,
+                "서울특별시 중구",
+                false,
+                null,
+                route
+        );
+        lightningUserRepository.save(lightning6);
+        LightningUserEntity creatorLightningUser6 = LightningUserEntity.builder()
+                .participantStatus(LightningUserEntity.ParticipantStatus.완료)
+                .role(LightningUserEntity.Role.번개생성자)
+                .lightning(lightning6)
+                .user(user1)
+                .build();
+        lightningUserRepository.save(creatorLightningUser6);
+    }                        
     
     private UserEntity createUser(String email, String password) {
         UserEntity user = UserEntity.builder()
@@ -318,8 +408,6 @@ public class InitLoader implements CommandLineRunner {
         }
     }
     
-
-
     private LightningEntity createLightningEvent(Long creatorId, String title, String description,
                                                  LocalDateTime eventDate, int duration,
                                                  LightningEntity.LightningStatus status, int capacity,

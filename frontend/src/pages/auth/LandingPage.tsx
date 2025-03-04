@@ -1,9 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function LandingPage() {
+  const location = useLocation();
+  console.log("Landing page state:", location.state);
+  const fromPath = location.state?.from || "/";
+
+  const encodedRedirectPath = encodeURIComponent(fromPath);
   const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${
     import.meta.env.VITE_KAKAO_CLIENT_ID
-  }&redirect_uri=http://localhost:3000/oauth/callback&response_type=code`;
+  }&redirect_uri=http://localhost:3000/oauth/callback&response_type=code&state=${encodedRedirectPath}`;
 
   const handleKakaoLogin = () => {
     window.location.href = KAKAO_AUTH_URL;
@@ -23,13 +28,13 @@ function LandingPage() {
         >
           카카오 로그인하기
         </div>
-        <Link to="/auth/login">
+        <Link to="/auth/login" state={{ from: fromPath }}>
           <div className="btn no-animation w-[20rem] font-bold">
             로그인 하기
           </div>
         </Link>
         <div className="text-sm divider ">아직 아이디가 없으신가요?</div>
-        <Link to="/auth/register">
+        <Link to="/auth/register" state={{ from: fromPath }}>
           <div className="btn no-animation w-[20rem] font-bold">
             회원가입 하기
           </div>

@@ -1,9 +1,12 @@
 package com.taiso.bike_api.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -94,15 +97,40 @@ public class LightningMemberService {
             throw new LightningStatusMismatchException("종료된 번개에 참여할 수 없습니다.");
         } else if (lightningEntity.getStatus() == LightningStatus.취소) {
             throw new LightningStatusMismatchException("취소된 번개에 참여할 수 없습니다.");
+        } else if (lightningEntity.getStatus() == LightningStatus.강제마감) {
+            throw new LightningStatusMismatchException("강제 마감된 번개에 참여할 수 없습니다.");
         }
     }
 
     // 인원 다 찼을 때 마감
     @Transactional
     public void autoClose(Long lightningId) {
+        // 번개 아이디로 엔티티 가져오기 
         LightningEntity lightningEntity = lightningRepository.findById(lightningId)
-                .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));		
-        lightningEntity.setStatus(LightningStatus.마감);
+                .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));
+        // 번개 인원이 다 찼는지 확인
+        int currentParticipants = lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightningId);
+        if (currentParticipants >= lightningEntity.getCapacity()) {
+            // 번개 상태를 마감으로 변경
+            lightningEntity.setStatus(LightningStatus.마감);
+        }
+    }
+
+    // 마감 번개를 모집으로 변경
+    @Transactional
+    public void autoOpen(Long lightningId) {
+        LightningEntity lightningEntity = lightningRepository.findById(lightningId)
+                .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));
+        //번개 인원이 남아 있는지 확인
+        int currentParticipants = lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightningId);
+        if (currentParticipants < lightningEntity.getCapacity()) {
+            if (lightningEntity.getStatus() == LightningStatus.마감) {
+                // 번개 상태를 모집으로 변경
+                lightningEntity.setStatus(LightningStatus.모집);
+            } 
+        } else {
+            throw new LightningMemberNotFoundException("번개가 인원이 다 차거나 강제 마감으로 변경할 수 가 없습니다.");
+        }
     }
 
     // 번개 강제 마감
@@ -118,7 +146,7 @@ public class LightningMemberService {
         if (!userEntity.getUserId().equals(lightningEntity.getCreatorId())) {
             throw new LightningCreatorMismatchException("유저와 번개 생성자가 같지 않음");
         }
-        lightningEntity.setStatus(LightningStatus.마감);
+        lightningEntity.setStatus(LightningStatus.강제마감);
     }
 
     // 스스로 번개 나가기
@@ -131,6 +159,12 @@ public class LightningMemberService {
         // 유저 아이디로 유저 찾기
         UserEntity userEntity = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+
+        //유저가 번개 생성자일 경우 예외 처리
+        if (userEntity.getUserId().equals(lightningEntity.getCreatorId())) {
+            throw new LightningCreatorMismatchException("번개 생성자는 번개를 나갈 수 없습니다.");
+        }
 
         // 번개Id와 유저Id로 member에서 조회
         LightningUserEntity lightningUser = lightningUserRepository
@@ -162,18 +196,20 @@ public class LightningMemberService {
         if (!userEntity.getUserId().equals(lightningEntity.getCreatorId())) {
             throw new LightningCreatorMismatchException("유저와 번개 생성자가 같지 않음");
         }
-        
+
+
         // 4. 승인 대상 참가 신청자 조회 (존재하지 않으면 404)
-        LightningUserEntity joinUserEntity = lightningUserRepository.findById(joinRequestId)
+        LightningUserEntity joinUserEntity = lightningUserRepository.findByUser_UserIdAndLightning_LightningId(joinRequestId, lightningId)
                 .orElseThrow(() -> new UserNotFoundException("참가 사용자를 찾을 수 없습니다."));
-        
+
         // 5. 해당 참가 신청자의 번개 이벤트가 요청한 번개 이벤트와 일치하는지 확인
         if (!joinUserEntity.getLightning().getLightningId().equals(lightningEntity.getLightningId())) {
             throw new LightningUserMismatchException("번개와 참가 신청하는 유저가 일치하지 않음");
         }
-        
+        System.out.println(joinUserEntity.getParticipantStatus());
+        System.out.println(LightningUserEntity.ParticipantStatus.신청대기);
         // 6. 참가 신청자의 상태가 '신청대기'인지 확인 (아니면 승인/거절 불가)
-        if (joinUserEntity.getParticipantStatus() != ParticipantStatus.신청대기) {
+        if (joinUserEntity.getParticipantStatus() != LightningUserEntity.ParticipantStatus.신청대기) {
             throw new LightningUserStatusNotPendingException("신청대기 상태가 아닌 경우");
         }
         
@@ -199,7 +235,7 @@ public class LightningMemberService {
         }
         
         // 4. 승인 대상 참가 신청자 조회 (존재하지 않으면 404)
-        LightningUserEntity joinUserEntity = lightningUserRepository.findById(joinRequestId)
+        LightningUserEntity joinUserEntity = lightningUserRepository.findByUser_UserIdAndLightning_LightningId(joinRequestId, lightningId)
                 .orElseThrow(() -> new UserNotFoundException("참가 사용자를 찾을 수 없습니다."));
         
         // 5. 해당 참가 신청자의 번개 이벤트가 요청한 번개 이벤트와 일치하는지 확인
@@ -248,5 +284,75 @@ public class LightningMemberService {
             lightningUser.setParticipantStatus(LightningUserEntity.ParticipantStatus.탈퇴);
             lightningUserRepository.save(lightningUser);
         }
+    }
+
+    /**
+     * 이벤트 종료 자동화 메서드
+     * 매일 새벽 1시에 실행
+     * 이벤트 날짜 + 지속시간 + 2일이 지난 모든 '모집' 또는 '마감' 상태의 이벤트를 '종료'로 변경
+     */
+    @Scheduled(cron = "0 0 3 * * ?") // 매일 새벽 3시에 실행
+    @Transactional
+    public void autoCompleteExpiredEvents() {
+        LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(2);
+
+        // 모집 또는 마감 상태이며 (이벤트 날짜 + 지속시간)이 하루 이상 지난 번개 이벤트 조회
+        List<LightningEntity> expiredEvents = lightningRepository.findByStatusInAndEventDateBefore(
+                List.of(LightningStatus.모집, LightningStatus.마감),
+                oneDayAgo
+        );
+        
+        for (LightningEntity event : expiredEvents) {
+            // 이벤트 시간 + 지속시간이 지났는지 확인
+            LocalDateTime eventEndTime = event.getEventDate().plusMinutes(event.getDuration());
+            if (eventEndTime.plusDays(1).isBefore(LocalDateTime.now())) {
+                event.setStatus(LightningStatus.종료);
+            }
+        }
+    }
+
+    /**
+     * 이벤트 시작 10분 전 자동 마감 메서드
+     * 5분마다 실행으로 변경하여 DB 부하 감소
+     */
+    @Scheduled(cron = "0 */5 * * * ?") // 5분마다 실행으로 변경
+    @Transactional
+    public void autoCloseEventsBeforeStart() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime tenMinutesLater = now.plusMinutes(10);
+        
+        // 수정: 직접 쿼리를 실행하는 대신 개별 엔티티를 조회하고 업데이트
+        List<LightningEntity> upcomingEvents = lightningRepository.findByStatusAndEventDateBetween(
+                LightningStatus.모집, now, tenMinutesLater);
+        
+        int updatedCount = 0;
+        for (LightningEntity event : upcomingEvents) {
+            event.setStatus(LightningStatus.강제마감);
+            updatedCount++;
+        }
+        
+        // 로깅 추가 (업데이트된 경우만)
+        if (updatedCount > 0) {
+            System.out.println("자동 마감 처리된 이벤트 수: " + updatedCount);
+        }
+    }
+    
+    // 번개 종료
+    @Transactional
+    public void lightningEnd(Long lightningId, Authentication authentication) {
+        // 번개 생성자와 인증된 유저가 같은지 확인
+        UserEntity userEntity = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+        LightningEntity lightningEntity = lightningRepository.findById(lightningId)
+                .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));
+
+        //번개가 마감인지 확인
+        if (lightningEntity.getStatus() != LightningStatus.마감 || lightningEntity.getStatus() != LightningStatus.강제마감) {
+            throw new LightningStatusMismatchException("마감된 번개가 아닙니다.");
+        }
+        if (!userEntity.getUserId().equals(lightningEntity.getCreatorId())) {
+            throw new LightningCreatorMismatchException("유저와 번개 생성자가 같지 않음");
+        }
+        lightningEntity.setStatus(LightningStatus.종료);
     }
 }

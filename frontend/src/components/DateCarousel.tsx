@@ -16,13 +16,20 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
    *    -> 과거 날짜는 표시하지 않도록 음수가 되지 않게 처리
    */
   const [offset, setOffset] = useState<number>(0);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(getTodayInKorea());
 
   const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
 
+  // 한국 타임존(Asia/Seoul) 기준의 현재 날짜를 반환하는 함수
+  function getTodayInKorea(): Date {
+    return new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+    );
+  }
+
   /** range만큼 날짜 배열을 생성하되, offset으로 시작점을 조절 */
   const getDates = (): Date[] => {
-    const today = new Date();
+    const today = getTodayInKorea();
     const dates: Date[] = [];
     for (let i = 0; i < range; i++) {
       const newDate = new Date(today);
@@ -41,12 +48,6 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
   const handleNext = () => {
     setOffset((prev) => prev + 1);
   };
-
-  // /** 날짜가 오늘인지 판별 */
-  // const isToday = (date: Date): boolean => {
-  //   const today = new Date();
-  //   return date.toDateString() === today.toDateString();
-  // };
 
   /** 요일이 토/일인지 판별 */
   const isWeekend = (date: Date): boolean => {

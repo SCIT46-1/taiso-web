@@ -16,7 +16,6 @@ spring:
   config:
     activate:
       on-profile: dev
- 
 
   datasource:
     driverClassName: org.h2.Driver
@@ -58,3 +57,10 @@ logging:
   level:
     "[root]": INFO
     "[org.springframework]": INFO
+
+naver:
+  api:
+    key:
+      id: 8hvd3r358o
+      key: PBi1PFpwL0H9PJgM2boBh3hHG7jAO0v8WzwXPgo8
+

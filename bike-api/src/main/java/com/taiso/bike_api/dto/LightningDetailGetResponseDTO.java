@@ -34,6 +34,8 @@ public class LightningDetailGetResponseDTO {
     private String status;
     private Integer capacity;
 
+    private Integer currentMemberCount;
+
     private BigDecimal latitude;
     private BigDecimal longitude;
 

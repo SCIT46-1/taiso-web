@@ -10,12 +10,12 @@ interface RoutePoint {
 
 interface KakaoMapRouteProps {
   routePoints: RoutePoint[];
-  selectedPoint: RoutePoint | null;
+  selectedPoint?: RoutePoint | null;
 }
 
 const KakaoMapRoute: React.FC<KakaoMapRouteProps> = ({
   routePoints,
-  selectedPoint,
+  selectedPoint = null,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);

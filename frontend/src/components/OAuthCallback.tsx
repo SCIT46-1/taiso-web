@@ -13,18 +13,35 @@ const OAuthCallback: React.FC = () => {
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const code = query.get("code");
+    // state 파라미터 가져오기 및 디코딩
+    const encodedRedirectPath = query.get("state");
+    console.log("OAuthCallback - Encoded redirect path:", encodedRedirectPath);
 
-    // state 값 검증 (CSRF 방지를 위해 실제 환경에서는 비교 로직 필요)
+    // state가 있으면 디코딩, 없으면 기본 경로 사용
+    const redirectPath = encodedRedirectPath
+      ? decodeURIComponent(encodedRedirectPath)
+      : "/";
+
+    console.log("OAuthCallback - Decoded redirect path:", redirectPath);
+
     if (code) {
-      authService.kakaoLogin(code).then((result) => {
-        setUser({
-          email: result.userEmail,
-          userId: result.userId,
+      console.log("OAuthCallback - Kakao login with code:", code);
+      authService
+        .kakaoLogin(code)
+        .then((result) => {
+          console.log("OAuthCallback - Kakao login successful");
+          setUser({
+            email: result.userEmail,
+            userId: result.userId,
+          });
+          console.log("OAuthCallback - Redirecting to:", redirectPath);
+          navigate(redirectPath);
+        })
+        .catch((error) => {
+          console.error("OAuthCallback - Kakao login error:", error);
         });
-        navigate("/");
-      });
     }
-  }, [location, navigate]);
+  }, [location, navigate, setUser]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
