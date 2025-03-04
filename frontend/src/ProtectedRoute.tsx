@@ -1,7 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "./stores/useAuthStore";
 import authService from "./services/authService";
-import Navbar from "./components/Navbar";
 
 function ProtectedRoute() {
   // 인증 확인

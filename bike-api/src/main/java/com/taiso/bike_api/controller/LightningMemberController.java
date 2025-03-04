@@ -4,7 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.taiso.bike_api.dto.JoinParticipantsPostResponseDTO;
 import com.taiso.bike_api.service.LightningMemberService;
@@ -30,6 +34,7 @@ public class LightningMemberController {
 			) {
 		
 		lightningMemberService.JoinParticipants(lightningId, authentication);
+		lightningMemberService.autoClose(lightningId);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(null);
 	}
@@ -64,6 +69,7 @@ public class LightningMemberController {
 			Authentication authentication) {
 
 		lightningMemberService.exitLightning(lightningId,authentication);
+		lightningMemberService.autoOpen(lightningId);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(null);
 	}
@@ -89,7 +95,8 @@ public class LightningMemberController {
     		) {
     	// 번개 아이디, 참가 신청 아이디, 관리자 아이디
     	lightningMemberService.JoinRequests(lightningId, userId, authentication);
-
+		lightningMemberService.autoClose(lightningId);
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
     
@@ -103,7 +110,7 @@ public class LightningMemberController {
     		) {
     	// 번개 아이디, 참가 신청 아이디, 관리자 아이디
     	lightningMemberService.JoinRejection(lightningId, userId, authentication);
-    	
+    	lightningMemberService.autoOpen(lightningId);
     	// 탈퇴 처리로 변경 완료
 		return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }

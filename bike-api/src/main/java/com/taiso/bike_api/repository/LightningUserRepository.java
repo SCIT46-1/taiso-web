@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.LightningUserEntity;
@@ -38,5 +40,12 @@ public interface LightningUserRepository extends JpaRepository<LightningUserEnti
     List<LightningUserEntity> findByLightningAndParticipantStatusIn(LightningEntity lightning,
             ArrayList<ParticipantStatus> arrayList);
 
+
+    //번개 id 로 현재 승인, 완료된 참여자 수를 조회하는 메서드
+    int countByLightning_LightningIdAndParticipantStatusIn(Long lightningId, List<ParticipantStatus> status);
+
+    //승인 및 완료 상태의 참여자만 직접 카운트하는 메서드
+    @Query("SELECT COUNT(lu) FROM LightningUserEntity lu WHERE lu.lightning.lightningId = :lightningId AND lu.participantStatus IN ('승인', '완료')")
+    int countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(@Param("lightningId") Long lightningId);
 
 }

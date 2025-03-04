@@ -7,7 +7,7 @@ import lightningService, {
 } from "../../services/lightningService";
 
 // 옵션 상수들
-const GENDER_OPTIONS = ["자유", "남성", "여성"];
+const GENDER_OPTIONS = ["자유", "남", "여"];
 const LEVEL_OPTIONS = ["초보", "중급", "고급", "자유"];
 const RECRUIT_TYPE_OPTIONS = ["참가형", "수락형"];
 const BIKE_TYPE_OPTIONS = ["로드", "따릉이", "하이브리드", "자유"];

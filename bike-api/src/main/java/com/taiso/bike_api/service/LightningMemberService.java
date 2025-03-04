@@ -100,9 +100,34 @@ public class LightningMemberService {
     // 인원 다 찼을 때 마감
     @Transactional
     public void autoClose(Long lightningId) {
+        // 번개 아이디로 엔티티 가져오기 
         LightningEntity lightningEntity = lightningRepository.findById(lightningId)
-                .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));		
-        lightningEntity.setStatus(LightningStatus.마감);
+                .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));
+        // 번개 인원이 다 찼는지 확인
+        int currentParticipants = lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightningId);
+        if (currentParticipants >= lightningEntity.getCapacity()) {
+            // 번개 상태를 마감으로 변경
+            lightningEntity.setStatus(LightningStatus.마감);
+        }
+    }
+
+    // 마감 번개를 모집으로 변경
+    @Transactional
+    public void autoOpen(Long lightningId) {
+        LightningEntity lightningEntity = lightningRepository.findById(lightningId)
+                .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));
+        //번개 인원이 남아 있는지 확인
+        int currentParticipants = lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightningId);
+        if (currentParticipants < lightningEntity.getCapacity()) {
+            if (lightningEntity.getStatus() == LightningStatus.마감) {
+                // 번개 상태를 모집으로 변경
+                lightningEntity.setStatus(LightningStatus.모집);
+            } else {
+                throw new LightningStatusMismatchException("번개 상태가 마감이 아닙니다.");
+            }
+        } else {
+            throw new LightningMemberNotFoundException("번개가 인원이 다 차서 모집으로 변경할 수 가 없습니다.");
+        }
     }
 
     // 번개 강제 마감
@@ -249,4 +274,6 @@ public class LightningMemberService {
             lightningUserRepository.save(lightningUser);
         }
     }
+
+
 }

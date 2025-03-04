@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import MainNavbar from "../components/MainNavbar";
 import LightningList from "../components/LightningList";
@@ -37,7 +37,7 @@ const availableTags: string[] = [
 
 function LightningPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const sort: string = searchParams.get("sort") || "eventDate";
+  const initialSort = searchParams.get("sort") || "eventDate";
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   // 일반 태그 (다중 선택)
@@ -59,104 +59,77 @@ function LightningPage() {
     searchParams.get("region")
   );
 
-  // 일반 태그 토글 함수
+  // 태그 모달 열림 상태
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+
+  // 일반 태그 토글 (상태만 업데이트)
   const toggleAvailableTag = (tag: string): void => {
-    let newTags;
     if (selectedAvailableTags.includes(tag)) {
-      newTags = selectedAvailableTags.filter((t) => t !== tag);
+      setSelectedAvailableTags(selectedAvailableTags.filter((t) => t !== tag));
     } else {
-      newTags = [...selectedAvailableTags, tag];
+      setSelectedAvailableTags([...selectedAvailableTags, tag]);
     }
-    setSelectedAvailableTags(newTags);
-    updateSearchParams({ tags: newTags.length > 0 ? newTags.join(",") : null });
   };
 
-  // 단일 선택 토글 함수들
+  // 단일 선택 토글 (상태만 업데이트)
   const toggleGenderTag = (tag: string): void => {
-    const newGender = selectedGender === tag ? null : tag;
-    setSelectedGender(newGender);
-    updateSearchParams({ gender: newGender });
+    setSelectedGender(selectedGender === tag ? null : tag);
   };
 
   const toggleBikeTypeTag = (tag: string): void => {
-    const newBikeType = selectedBikeType === tag ? null : tag;
-    setSelectedBikeType(newBikeType);
-    updateSearchParams({ bikeType: newBikeType });
+    setSelectedBikeType(selectedBikeType === tag ? null : tag);
   };
 
   const toggleLevelTag = (tag: string): void => {
-    const newLevel = selectedLevel === tag ? null : tag;
-    setSelectedLevel(newLevel);
-    updateSearchParams({ level: newLevel });
+    setSelectedLevel(selectedLevel === tag ? null : tag);
   };
 
   const toggleLocationTag = (tag: string): void => {
-    const newLocation = selectedLocation === tag ? null : tag;
-    setSelectedLocation(newLocation);
-    updateSearchParams({ region: newLocation });
+    setSelectedLocation(selectedLocation === tag ? null : tag);
   };
 
-  // 검색 파라미터 업데이트 함수
-  const updateSearchParams = (updates: Record<string, string | null>): void => {
-    const newParams = new URLSearchParams(searchParams.toString());
-
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === null || value === "") {
-        newParams.delete(key);
-      } else {
-        newParams.set(key, value);
-      }
-    });
-
+  // 필터 상태 변경 시 URL 파라미터를 한 번에 업데이트
+  useEffect(() => {
+    const newParams = new URLSearchParams();
+    newParams.set("sort", initialSort);
+    if (selectedGender) newParams.set("gender", selectedGender);
+    if (selectedBikeType) newParams.set("bikeType", selectedBikeType);
+    if (selectedLevel) newParams.set("level", selectedLevel);
+    if (selectedLocation) newParams.set("region", selectedLocation);
+    if (selectedAvailableTags.length > 0) {
+      newParams.set("tags", selectedAvailableTags.join(","));
+    }
     setSearchParams(newParams);
-  };
-
-  // 정렬 링크 생성 함수
-  const getSortLink = (newSort: string): string => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("sort", newSort);
-    return `/lightning?${params.toString()}`;
-  };
+  }, [
+    selectedGender,
+    selectedBikeType,
+    selectedLevel,
+    selectedLocation,
+    selectedAvailableTags,
+    initialSort,
+    setSearchParams,
+  ]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col w-full">
       <MainNavbar />
       <DateCarousel onDateChange={(date) => setSelectedDate(date)} />
 
       <div className="flex-1 w-full mx-auto px-4 sm:px-6">
         {/* 필터 드롭다운 섹션 */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
-          {/* 태그 드롭다운 (다중 선택) */}
-          <div className="dropdown dropdown-hover">
-            <div tabIndex={0} role="button" className="btn btn-sm m-1">
-              태그
-              {selectedAvailableTags.length > 0 && (
-                <span className="badge badge-sm badge-primary ml-1">
-                  {selectedAvailableTags.length}
-                </span>
-              )}
-            </div>
-            <ul
-              tabIndex={0}
-              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 max-h-96 overflow-y-auto"
-            >
-              {availableTags.map((tag) => (
-                <li key={tag}>
-                  <a
-                    onClick={() => toggleAvailableTag(tag)}
-                    className={
-                      selectedAvailableTags.includes(tag) ? "active" : ""
-                    }
-                  >
-                    {tag}
-                    {selectedAvailableTags.includes(tag) && (
-                      <span className="badge badge-primary badge-sm">✓</span>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="flex flex-wrap gap-2 ml-14 mt-4">
+          {/* 태그 선택 버튼 (모달 오픈) */}
+          <button
+            className="btn btn-sm m-1"
+            onClick={() => setIsTagModalOpen(true)}
+          >
+            태그
+            {selectedAvailableTags.length > 0 && (
+              <span className="badge badge-sm badge-primary ml-1">
+                {selectedAvailableTags.length}
+              </span>
+            )}
+          </button>
 
           {/* 성별 드롭다운 (단일 선택) */}
           <div className="dropdown dropdown-hover">
@@ -285,7 +258,7 @@ function LightningPage() {
           selectedBikeType ||
           selectedLevel ||
           selectedLocation) && (
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mt-4 ml-14">
             {selectedAvailableTags.map((tag) => (
               <span key={tag} className="badge badge-primary gap-1">
                 {tag}
@@ -337,7 +310,6 @@ function LightningPage() {
                   setSelectedBikeType(null);
                   setSelectedLevel(null);
                   setSelectedLocation(null);
-                  setSearchParams(new URLSearchParams({ sort }));
                 }}
               >
                 전체 초기화
@@ -347,7 +319,7 @@ function LightningPage() {
         )}
 
         <div className="fixed bottom-8 right-10 z-50">
-          {/*번개 생성 버튼*/}
+          {/* 번개 생성 버튼 */}
           <Link to="/lightning/post" className="btn btn-primary btn-circle">
             <svg
               data-slot="icon"
@@ -364,7 +336,7 @@ function LightningPage() {
 
         {/* LightningList에 필터 옵션 전달 */}
         <LightningList
-          sort={sort}
+          sort={initialSort}
           gender={searchParams.get("gender") || ""}
           bikeType={searchParams.get("bikeType") || ""}
           level={searchParams.get("level") || ""}
@@ -373,6 +345,38 @@ function LightningPage() {
           selectedDate={selectedDate}
         />
       </div>
+
+      {/* 태그 모달 */}
+      {isTagModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">태그 선택</h3>
+            <div className="py-4">
+              <div className="flex flex-wrap gap-2">
+                {availableTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => toggleAvailableTag(tag)}
+                    className={`btn btn-sm ${
+                      selectedAvailableTags.includes(tag)
+                        ? "btn-primary"
+                        : "btn-outline"
+                    }`}
+                  >
+                    {tag}
+                    {selectedAvailableTags.includes(tag) && " ✓"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="modal-action">
+              <button className="btn" onClick={() => setIsTagModalOpen(false)}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

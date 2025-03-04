@@ -76,7 +76,7 @@ public class SecurityConfig {
                 // 인증 없이 접근 가능한 URL (예: 인증 관련 엔드포인트, H2 콘솔)
                 //TODO: 권한 관련 수정 필요
                         .requestMatchers("/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**",
-                                "/api/auth/kakao", "/api/lightnings/", "/api/routes/**", "/api/lightnings/{lightningId}")
+                                "/api/auth/kakao", "/api/lightnings/", "/api/routes/**", "/api/lightnings/{lightningId}", "/api/lightnings")
                         .permitAll()
 
                 // 그 외 모든 요청은 인증 필요
@@ -120,7 +120,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // TODO: 프로덕션 도메인 추가
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

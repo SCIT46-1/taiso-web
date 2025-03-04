@@ -59,7 +59,9 @@ function LightningList({
       }, 300);
 
       //날짜 포메팅하고 일 까지만 반환
-      const formattedDate = selectedDate.toISOString().split("T")[0];
+      const formattedDate = selectedDate.toLocaleDateString("en-CA", {
+        timeZone: "Asia/Seoul",
+      });
       console.log(formattedDate);
       const data = await lightningService.getLightningList(
         page,
@@ -200,9 +202,9 @@ function LightningList({
                         >
                           <path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z"></path>
                         </svg>
-                        {lightning.capacity}/{lightning.capacity}명
+                        {lightning.currentParticipants}/{lightning.capacity}명
                       </div>
-                      <div className="flex flex-wrap gap-1 mt-2">
+                      <div className="flex flex-wrap gap-1 mt-2 max-w-[400px]">
                         <div className="badge badge-primary badge-outline">
                           {lightning.gender}
                         </div>
