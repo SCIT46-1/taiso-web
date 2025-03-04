@@ -6,7 +6,9 @@ import authService, {
 import { useAuthStore } from "../stores/useAuthStore";
 import { useNavigate } from "react-router";
 
-function RegisterForm() {
+function RegisterForm({ redirectPath = "/" }) {
+  // 디버깅 로그 추가
+  console.log("RegisterForm - Redirect path:", redirectPath);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [passwordConfirm, setPasswordConfirm] = useState<string>("");
@@ -67,6 +69,9 @@ function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // 디버깅 로그 추가
+    console.log("RegisterForm - Submit with redirect to:", redirectPath);
+
     // 기존 에러 초기화
     setEmailError("");
     setPasswordError("");
@@ -95,7 +100,12 @@ function RegisterForm() {
       setLoading(true);
       const response: RegisterResponse = await authService.register(payload);
       setUser({ email: response.email, userId: response.userId });
-      navigate("/");
+      // 리다이렉트 전 로그 추가
+      console.log(
+        "RegisterForm - Registration successful, redirecting to:",
+        redirectPath
+      );
+      navigate(redirectPath);
     } catch (err: any) {
       console.error(err);
       if (err.response && err.response.status === 409) {

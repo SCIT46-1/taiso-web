@@ -64,6 +64,7 @@ export interface LightningPostResponse {
 }
 
 export interface LightningDetailGetResponse {
+  currentMemberCount: number;
   address: string;
   bikeType: string;
   capacity: number;

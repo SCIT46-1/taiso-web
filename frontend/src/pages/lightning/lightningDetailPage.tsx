@@ -3,7 +3,6 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useAuthStore } from "../../stores/useAuthStore";
 import lightningService, {
   LightningDetailGetResponse,
-  Member,
 } from "../../services/lightningService";
 import KakaoMapRoute from "../../components/KakaoMap";
 import KakaolocationMap from "../../components/KakaolocationMap";
@@ -214,7 +213,7 @@ function LightningDetailPage() {
   }
 
   return (
-    <div className="w-screen grid grid-cols-[2fr,1fr] gap-4 max-w-screen-lg">
+    <div className="w-screen grid grid-cols-[2fr,1fr] gap-4 max-w-screen-lg mb-10">
       {/* 상단 지도 영역 */}
 
       <div className="col-span-2 ">
@@ -293,18 +292,35 @@ function LightningDetailPage() {
           />
         </div>
         <div className="mb-4">번개 참여자 목록</div>
+        <div>
+          {" "}
+          {lightningDetail?.currentMemberCount} / {lightningDetail?.capacity}{" "}
+        </div>
         <div className="mb-4">
-          참여 완료까지{" "}
+          마감까지{" "}
           {lightningDetail?.capacity &&
-            lightningDetail.member &&
-            lightningDetail.capacity - lightningDetail.member.length}{" "}
+            lightningDetail.currentMemberCount &&
+            lightningDetail.capacity - lightningDetail.currentMemberCount}{" "}
           명
         </div>
-        {!user && <div>로그인 후 이용해주세요</div>}
+        {!user && (
+          <div
+            className="btn btn-primary"
+            onClick={() =>
+              navigate("/auth/landing", {
+                state: { from: `/lightning/${lightningId}` },
+              })
+            }
+          >
+            로그인 하고 번개 참여하기!
+          </div>
+        )}
+        <div> {lightningDetail?.status} </div>
         {user &&
           !isCreator &&
           !currentMemberStatus &&
-          lightningDetail?.recruitType === "참가형" && (
+          lightningDetail?.recruitType === "참가형" &&
+          lightningDetail?.status === "모집" && (
             <button
               className="btn mb-4"
               onClick={() => showModal("join-modal")}
@@ -315,7 +331,8 @@ function LightningDetailPage() {
         {lightningDetail?.recruitType === "수락형" &&
           user &&
           !isCreator &&
-          !currentMemberStatus && (
+          !currentMemberStatus &&
+          lightningDetail?.status === "모집" && (
             <button
               className="btn mb-4"
               onClick={() => showModal("accept-modal")}
@@ -325,7 +342,8 @@ function LightningDetailPage() {
           )}
         {user &&
           !isCreator &&
-          currentMemberStatus?.participantStatus === "완료" && (
+          currentMemberStatus?.participantStatus === "완료" &&
+          lightningDetail?.status === "모집" && (
             <button
               className="btn mb-4"
               onClick={() => showModal("leave-modal")}
@@ -333,6 +351,7 @@ function LightningDetailPage() {
               번개 나가기
             </button>
           )}
+
         <div className="w-full">
           {lightningDetail?.member
             .filter(
@@ -347,7 +366,23 @@ function LightningDetailPage() {
               >
                 <UserImage profileImage={member.memberProfileImg as string} />
                 <div>{member.memberNickname}</div>
-                <div>{member.role}</div>
+                {member.role === "번개생성자" && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    className="lucide lucide-crown"
+                  >
+                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
+                    <path d="M5 21h14" />
+                  </svg>
+                )}
               </div>
             ))}
         </div>

@@ -243,6 +243,10 @@ public class LightningDetailService {
             log.info("DTO 빌드 후 클럽이름 : {}", clubDTO.getClubName());
         }
 
+
+        // 현재 참여자 수 조회
+        Integer currentMemberCount = lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(temp.getLightningId());
+
         // 번개 참여자 빌드
         List<LightningDetailMemberDTO> memberDTOs = new ArrayList<>();
         log.info("번개 아이디 : {}", temp.getLightningId());
@@ -284,6 +288,7 @@ public class LightningDetailService {
                 .updatedAt(temp.getUpdatedAt())
                 .status(temp.getStatus().name())
                 .capacity(temp.getCapacity())
+                .currentMemberCount(currentMemberCount)
                 .latitude(temp.getLatitude())
                 .longitude(temp.getLongitude())
                 .gender(temp.getGender().name())
