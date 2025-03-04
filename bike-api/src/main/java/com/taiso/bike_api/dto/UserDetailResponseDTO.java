@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @Builder
@@ -22,5 +24,5 @@ public class UserDetailResponseDTO {
     private String backgroundImg;
     private String level;
     private String gender;
-
+    private Set<String> tags;
 }
