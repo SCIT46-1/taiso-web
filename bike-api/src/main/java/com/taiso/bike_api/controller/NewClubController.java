@@ -33,10 +33,24 @@ public class NewClubController {
         log.info("로직 시작 : {}", requestDTO.toString());
         log.info("clubProfileImage : {}",clubProfileImage.getOriginalFilename());
 
-        newClubService.createLightning(requestDTO, authentication, clubProfileImage);
+        newClubService.createClub(requestDTO, authentication, clubProfileImage);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
+
+    @Operation(summary = "클럽 삭제", description = "오직 리더만 클럽을 삭제하는 API")
+    @DeleteMapping("/{clubId}")
+    public ResponseEntity<ClubCreateResponseDTO> deleteClub(
+            @PathVariable(name = "clubId") Long clubId
+            , Authentication authentication) {
+
+        log.info("로직 시작시 들어온 clubId : {}", clubId);
+
+        newClubService.deleteClub(clubId, authentication);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
 
 
 }

@@ -4,10 +4,7 @@ import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.LightningTagCategoryEntity;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.ClubCreateRequestDTO;
-import com.taiso.bike_api.exception.ClubAlreadyExistsException;
-import com.taiso.bike_api.exception.InvalidFileExtensionException;
-import com.taiso.bike_api.exception.TagsNotFoundException;
-import com.taiso.bike_api.exception.UserNotFoundException;
+import com.taiso.bike_api.exception.*;
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.LightningTagCategoryRepository;
 import com.taiso.bike_api.repository.UserRepository;
@@ -40,7 +37,7 @@ public class NewClubService {
     S3Service s3Service;
 
     // 클럽 생성
-    public void createLightning(ClubCreateRequestDTO requestDTO, Authentication authentication, MultipartFile clubProfileImage) {
+    public void createClub(ClubCreateRequestDTO requestDTO, Authentication authentication, MultipartFile clubProfileImage) {
 
         // 클럽명 중복 체크
         Optional<ClubEntity> existingClub = clubRepository.findByClubName(requestDTO.getClubName());
@@ -51,7 +48,7 @@ public class NewClubService {
         // 현재 사용자 조회
         UserEntity clubCreator = userRepository.findByEmail(authentication.getName())
                 // 사용자 찾을 수 없음 -> 404
-                .orElseThrow(() -> new UserNotFoundException("현재 리뷰 입력 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("현재 사용자를 찾을 수 없습니다."));
 
         // 태그 담기
         Set<LightningTagCategoryEntity> tags = requestDTO.getTags().stream()
@@ -90,5 +87,33 @@ public class NewClubService {
                 .build();
 
         clubRepository.save(club);
+    }
+
+    // 클럽 삭제 (클럽 리더만)
+    public void deleteClub(Long clubId, Authentication authentication) {
+
+        // 현재 사용자 조회
+        UserEntity user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("현재 사용자를 찾을 수 없습니다."));
+
+        // 클럽 존재 확인
+        Optional<ClubEntity> existingClub = clubRepository.findById(clubId);
+        log.info("삭제하려는 클럽 : {}", existingClub.get().getClubName());
+        if (existingClub.isEmpty()) {
+            throw new ClubNotFoundException("존재하지 않는 클럽 입니다.");
+        }
+        ClubEntity club = existingClub.get();
+
+        // 클럽 멤버 확인 필요할까..?
+
+        //클럽 리더 & 현재 사용자 일치 확인
+        log.info("현재 사용자 : {}", user.getUserId());
+        log.info("등록되어있던 클럽의 리더 : {}", club.getClubLeader().getUserId());
+        if(user != club.getClubLeader()) {
+            throw new ClubMemberMismatchException("클럽 삭제 권한이 없습니다.");
+        }
+
+        clubRepository.delete(club);
+
     }
 }
