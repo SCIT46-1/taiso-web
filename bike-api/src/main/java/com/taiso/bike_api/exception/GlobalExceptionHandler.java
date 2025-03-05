@@ -328,14 +328,6 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
-    
-    // 클럽 미존재 예외 처리
-    @ExceptionHandler(ClubNotFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleClubNotFoundException(ClubNotFoundException ex, HttpServletRequest request) {
-        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(
-                ex.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
 
     // 이미 참여한 클럽 예외 처리
     @ExceptionHandler(ClubMemberAlreadyExistsException.class)
