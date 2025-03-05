@@ -47,7 +47,7 @@ public class ClubDetailGetResponseDTO {
                                        .createdAt(entity.getCreatedAt())
                                        .maxUser(entity.getMaxUser())
                                        .currentScale(entity.getUsers().size())
-                                       .users(entity.getUsers().stream().map(user -> ClubDetailGetResponseUserDTO.toDTO(user)).collect(Collectors.toList()))
+                                       .users(entity.getUsers().stream().map(user -> ClubDetailGetResponseUserDTO.toDTO(user.getUser())).collect(Collectors.toList()))
                                        .tags(entity.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
                                        .build();
     }
