@@ -1,6 +1,5 @@
 package com.taiso.bike_api.dto;
 
-import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.domain.UserEntity;
 
 import lombok.AllArgsConstructor;

@@ -10,14 +10,12 @@ import com.taiso.bike_api.repository.ClubMemberRepository;
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.LightningTagCategoryRepository;
 import com.taiso.bike_api.repository.UserRepository;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;

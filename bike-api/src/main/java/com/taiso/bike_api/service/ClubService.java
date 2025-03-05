@@ -1,11 +1,13 @@
 package com.taiso.bike_api.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.dto.ClubDetailGetResponseDTO;
+import com.taiso.bike_api.dto.ClubsGetResponseDTO;
 import com.taiso.bike_api.exception.ClubNotFoundException;
 import com.taiso.bike_api.repository.ClubRepository;
 
@@ -24,6 +26,14 @@ public class ClubService {
         // responseDTO 빌드
         return ClubDetailGetResponseDTO.toDTO(club);
         
+    }
+
+    public List<ClubsGetResponseDTO> getClubs() {
+        // 클럽 리스트 조회
+        List<ClubEntity> clubs = clubRepository.findAll();
+
+        // responseDTO 리스트 빌드
+        return clubs.stream().map(ClubsGetResponseDTO::toDTO).toList();
     }
 
 }

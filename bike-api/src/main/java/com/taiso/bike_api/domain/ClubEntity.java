@@ -101,12 +101,9 @@ public class ClubEntity {
     @Builder.Default
     private Set<LightningTagCategoryEntity> tags = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "club_user",
-            joinColumns = @JoinColumn(name = "club_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "club")
     @Builder.Default
-    private List<UserEntity> users = new ArrayList<>();
+    private List<ClubMemberEntity> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
