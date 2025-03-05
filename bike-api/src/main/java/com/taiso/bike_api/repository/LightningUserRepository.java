@@ -39,10 +39,6 @@ public interface LightningUserRepository extends JpaRepository<LightningUserEnti
     List<LightningUserEntity> findByLightningAndParticipantStatusIn(LightningEntity lightning,
             ArrayList<ParticipantStatus> arrayList);
 
-    List<LightningUserEntity> findByUserAndParticipantStatusAndLightning_LightningStatusOrderByLightning_EventDateDesc(
-            UserEntity user, List<ParticipantStatus> pStatus, List<LightningStatus> status);
-
-
     //번개 id 로 현재 승인, 완료된 참여자 수를 조회하는 메서드
     int countByLightning_LightningIdAndParticipantStatusIn(Long lightningId, List<ParticipantStatus> status);
 

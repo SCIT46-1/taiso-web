@@ -110,5 +110,5 @@ public class ClubEntity {
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<ClubBoardEntity> boards = new ArrayList<>();
+    private List<ClubBoardEntity> posts = new ArrayList<>();
 }

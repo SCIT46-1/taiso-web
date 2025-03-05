@@ -2,6 +2,7 @@ package com.taiso.bike_api.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.dto.ClubDetailGetResponseDTO;
@@ -21,6 +22,7 @@ public class ClubService {
             .orElseThrow(() -> new ClubNotFoundException("클럽이 존재하지 않습니다."));
 
         // responseDTO 빌드
+        return ClubDetailGetResponseDTO.toDTO(club);
         
     }
 
