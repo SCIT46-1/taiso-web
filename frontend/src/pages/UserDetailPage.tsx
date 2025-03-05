@@ -2,7 +2,30 @@ import { useParams } from "react-router";
 import userDetailService, { UserDetailResponse } from "../services/userDetailService";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
+import ReviewList from "../components/ReviewList";
 
+// // 모달설정
+// interface ModalProps {
+//   id: string;
+//   title: string;
+//   children: React.ReactNode;
+//   actions: React.ReactNode;
+// }
+
+// function Modal({ id, title, children, actions }: ModalProps) {
+//   return (
+//     <dialog id={id} className="modal">
+//       <div className="modal-box">
+//         <h3 className="font-bold text-lg">{title}</h3>
+//         <div className="py-4">{children}</div>
+//         <div className="modal-action">{actions}</div>
+//       </div>
+//       <form method="dialog" className="modal-backdrop">
+//         <button>close</button>
+//       </form>
+//     </dialog>
+//   );
+// }
 
 function UserDetailPage() {
   const { userId } = useParams();
@@ -47,13 +70,25 @@ function UserDetailPage() {
       </div>
       <div className="flex flex-col sm:ml-12 ml-6 mt-14 w-[85%]">
         <div className="flex gap-2 mb-2">
-          <div className="text-2xl font-bold mb-2">{userDetail?.level}</div>
-          <div className="text-2xl font-bold mb-2">{userDetail?.gender}</div>
-          {(userDetail?.tags ?? []).map((tag) => (
-            <div key={tag} className="badge badge-primary badge-outline">{tag}</div>
-          ))}
-
+          <div className="text-2xl font-bold mb-2">{userDetail?.userNickname}</div>
+          <div>
+            <div className="badge badge-primary badge-outline">{userDetail?.level}</div>
+            <div className="badge badge-primary badge-outline">{userDetail?.gender}</div>
+            {(userDetail?.tags ?? []).map((tag) => (
+              <div key={tag} className="badge badge-primary badge-outline">{tag}</div>
+            ))}
+          </div>
         </div>
+
+        {/* {user?.userId == userDetail?.userId (
+            <button
+              className="btn w-full no-animation btn-primary"
+              onClick={() => showModal("join-modal")}
+            >
+              프로필수정
+            </button>
+          )} */}
+
         <div>
           {userDetail?.bio}
         </div>
@@ -87,47 +122,9 @@ function UserDetailPage() {
         </div>
       </div>
       {/* 리뷰*/}
-      <div className="flex flex-col gap-2 mt-4 sm:ml-12 ml-4">
-        <div className="chat chat-start">
-          <div className="chat-image avatar">
-            <div className="w-10 rounded-full">
-              <img
-                alt="Tailwind CSS chat bubble component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              />
-            </div>
-          </div>
-          <div className="chat-bubble">
-            It was said that you would, destroy the Sith, not join them.
-          </div>
-        </div>
-        <div className="chat chat-start">
-          <div className="chat-image avatar">
-            <div className="w-10 rounded-full">
-              <img
-                alt="Tailwind CSS chat bubble component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              />
-            </div>
-          </div>
-          <div className="chat-bubble">
-            It was said that you would, destroy the Sith, not join them.
-          </div>
-        </div>
-        <div className="chat chat-start">
-          <div className="chat-image avatar">
-            <div className="w-10 rounded-full">
-              <img
-                alt="Tailwind CSS chat bubble component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              />
-            </div>
-          </div>
-          <div className="chat-bubble">
-            It was said that you would, destroy the Sith, not join them.
-          </div>
-        </div>
-      </div>
+      <ReviewList
+        userId={Number(userId)}
+      />
     </div>
   );
 }

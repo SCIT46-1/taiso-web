@@ -94,6 +94,7 @@ export interface MyLightningResponse {
   status: string;
 }
 
+//유저 페이지 디테일 조회
 const getUserDetail = async (userId: number): Promise<UserDetailResponse> => {
   return await get(`/users/${userId}`);
 };
