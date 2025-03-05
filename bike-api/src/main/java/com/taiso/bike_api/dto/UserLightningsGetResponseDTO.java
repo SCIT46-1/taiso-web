@@ -1,7 +1,5 @@
 package com.taiso.bike_api.dto;
 
-
-import java.util.List;
 import java.util.Set;
 
 import com.taiso.bike_api.domain.LightningUserEntity.ParticipantStatus;

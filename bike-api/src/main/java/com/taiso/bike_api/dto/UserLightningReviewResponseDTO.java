@@ -2,8 +2,6 @@ package com.taiso.bike_api.dto;
 
 import java.time.LocalDateTime;
 
-import com.taiso.bike_api.domain.LightningEntity;
-import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.domain.UserReviewEntity.ReviewTag;
 
 import lombok.AllArgsConstructor;

@@ -1,7 +1,9 @@
 package com.taiso.bike_api.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -97,4 +100,15 @@ public class ClubEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @Builder.Default
     private Set<LightningTagCategoryEntity> tags = new HashSet<>();
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "club_user",
+            joinColumns = @JoinColumn(name = "club_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @Builder.Default
+    private List<UserEntity> users = new ArrayList<>();
+
+    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ClubBoardEntity> posts = new ArrayList<>();
 }
