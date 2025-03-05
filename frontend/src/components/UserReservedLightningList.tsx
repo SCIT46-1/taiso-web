@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MyLightningResponse } from "../services/userDetailService";
-import ImageWithSkeleton from "./ImageWithSkeleton";
 
 interface UserReservedLightningListProps {
   reservationLightning: MyLightningResponse[];
