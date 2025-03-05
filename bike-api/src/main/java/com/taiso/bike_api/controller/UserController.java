@@ -76,7 +76,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userDetailResponseDTO);
     }
 
+
     @GetMapping("/me/lightnings")
+    @Operation(summary = "내 예약 번개 리스트", description = "내가 예약한 번개 리스트 조회")
     public ResponseEntity<List<UserLightningsGetResponseDTO>> getUserLightnings(
         @RequestParam(name = "status") List<ParticipantStatus> status
         , @AuthenticationPrincipal String userEmail) {

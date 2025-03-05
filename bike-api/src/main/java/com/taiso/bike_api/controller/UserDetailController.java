@@ -1,5 +1,8 @@
 package com.taiso.bike_api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +26,13 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/users")
 @Slf4j
+@Tag(name = "회원 정보 컨트롤러", description = "회원정보 디테일 관련 API")
 public class UserDetailController {
 
     @Autowired
     private UserDetailService2 userDetailService2;
 
+    @Operation(summary = "내 회원 디테일 등록", description = "내 회원 디테일 등록 API")
     @PostMapping("/me/details")
     public ResponseEntity<Void> postMethodName(
         @RequestBody UserDetailPostRequestDTO requestDTO
@@ -36,11 +41,13 @@ public class UserDetailController {
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
+    @Operation(summary = "내 회원 디테일 수정 화면 조회", description = "내 회원 디테일 수정 화면 API")
     @GetMapping("/me/details")
     public ResponseEntity<UserDetailGetResponseDTO> getMethodName(@AuthenticationPrincipal String userEmail) {
         return ResponseEntity.status(HttpStatus.OK).body(userDetailService2.getUserDetail(userEmail));
     }
-    
+
+    @Operation(summary = "내 회원 디테일 수정", description = "내 회원 디테일 수정 API")
     @PatchMapping("/me/detail")
     public ResponseEntity<Void> patchUserDetail(@AuthenticationPrincipal String userEmail, @RequestBody UserDetailPatchRequestDTO requestDTO) {
         log.info("{}", requestDTO);
