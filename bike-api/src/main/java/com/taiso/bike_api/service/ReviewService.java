@@ -1,6 +1,7 @@
 package com.taiso.bike_api.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -153,61 +154,82 @@ public class ReviewService {
 	// 내 완료 번개 참여회원 리뷰 작성화면 서비스
     @Transactional
 	public List<LightningCompletedReviewsResponseDTO> completedReviews(Long lightningId, Authentication authentication) {
-
-    	// 1. 현재 로그인한 사용자 (리뷰 작성자) 조회
-    	Optional<UserEntity> optionalUser = userRepository.findByEmail(authentication.getName());
-    	if (optionalUser.isEmpty()) {
-    	    throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
-    	}
-    	
-    	// 2. 번개 이벤트 조회 (존재하지 않으면 404)
-    	LightningEntity lightningEntity = lightningRepository.findById(lightningId)
-                .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));	
-    	
-    	// 3. 번개로 리뷰 조회
-    	List<UserReviewEntity> reviewEntities = userReviewRepository.findByLightning_LightningId(lightningId);
-    	log.info("responseDTOs ===== {}",reviewEntities);
-    	
-    	// 4. LightningCompletedReviewsResponseDTO 리스트로 매핑
-    	List<LightningCompletedReviewsResponseDTO> responseDTOs = reviewEntities.stream()
-    			.map((UserReviewEntity review) -> {
-    		        // 리뷰 받는 사용자(UserEntity)로부터 필요한 정보를 DTO로 매핑
-    		        LightningCompletedReviewsUserDetailDTO userDetailDTO = LightningCompletedReviewsUserDetailDTO.builder()
-    		            .userId(review.getReviewed().getUserId())
-    		            .reviewedNickname(review.getReviewed().getUserNickname())
-    		            .reviewedProfileImg(review.getReviewed().getUserProfileImg())
-    		            .build();
-
-    		        // 해당 번개 이벤트와 리뷰 받는 사용자에 대한 참가 정보(LightningUserEntity)를 조회
-    		        Optional<LightningUserEntity> optionalLightningUserEntity = 
-    		            lightningUserRepository.findByLightningAndUser(lightningEntity, review.getReviewed().getUser());
-    		        
-    		        // lightningUserDTO 매핑
-    		        LightningCompletedReviewsLightningUserDTO lightningUserDTO = null;
-    		        if (optionalLightningUserEntity.isPresent()) {
-    		            LightningUserEntity lue = optionalLightningUserEntity.get();
-    		            lightningUserDTO = LightningCompletedReviewsLightningUserDTO.builder()
-    		                .lightning(lightningEntity.getLightningId())
-    		                .role(lue.getRole())
-    		                .participantStatus(lue.getParticipantStatus())
-    		                .build();
-    		        }
-    		        
-    		        // LightningCompletedReviewsResponseDTO 매핑
-    		        return LightningCompletedReviewsResponseDTO.builder()
-    		            .reviewId(review.getReviewId())
-    		            .reviewer(review.getReviewer().getUserId())
-    		            .reviewed(review.getReviewed().getUserId())
-    		            .userDetailDTO(userDetailDTO)
-    		            .lightningUserDTO(lightningUserDTO)
-    		            .build();
-    			})
-                .collect(Collectors.toList());
-    	
-    	log.info("responseDTOs ===== {}",responseDTOs);
-    	return responseDTOs;
+        // 1. 현재 로그인한 사용자 (리뷰 작성자) 조회
+        UserEntity currentUser = userRepository.findByEmail(authentication.getName())
+            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
         
+        UserDetailEntity currentUserDetail = userDetailRepository.findById(currentUser.getUserId())
+            .orElseThrow(() -> new UserNotFoundException("사용자 상세 정보를 찾을 수 없습니다."));
         
+        // 2. 번개 이벤트 조회 (존재하지 않으면 404)
+        LightningEntity lightningEntity = lightningRepository.findById(lightningId)
+            .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));
+        
+        // 번개가 종료 상태인지 확인
+        if (lightningEntity.getStatus() != LightningStatus.종료) {
+            throw new LightningStatusMismatchException("종료된 번개만 리뷰 작성이 가능합니다.");
+        }
+        
+        // 3. 해당 번개의 모든 참가자 조회 (현재 사용자 제외)
+        List<LightningUserEntity> allParticipants = lightningUserRepository.findByLightning(lightningEntity);
+        
+        // 현재 사용자를 제외한 참가자 필터링
+        allParticipants = allParticipants.stream()
+            .filter(participant -> !participant.getUser().getUserId().equals(currentUser.getUserId()))
+            .collect(Collectors.toList());
+        
+        // 4. 현재 사용자가 작성한 리뷰 조회
+        List<UserReviewEntity> myReviews = userReviewRepository.findByLightningAndReviewer(
+            lightningEntity, currentUserDetail);
+        
+        // 5. 참가자별 리뷰 작성 여부를 맵으로 구성
+        // Map<리뷰 대상 ID, 리뷰 객체>
+        Map<Long, UserReviewEntity> reviewMap = myReviews.stream()
+            .collect(Collectors.toMap(
+                review -> review.getReviewed().getUserId(),
+                review -> review
+            ));
+        
+        // 6. 응답 DTO 구성
+        List<LightningCompletedReviewsResponseDTO> responseDTOs = allParticipants.stream()
+            .map(participant -> {
+                UserEntity participantUser = participant.getUser();
+                
+                // 해당 참가자의 상세 정보 조회
+                UserDetailEntity participantDetail = userDetailRepository.findById(participantUser.getUserId())
+                    .orElseThrow(() -> new UserNotFoundException("참가자 상세 정보를 찾을 수 없습니다."));
+                
+                // 사용자 상세 정보 DTO 구성
+                LightningCompletedReviewsUserDetailDTO userDetailDTO = LightningCompletedReviewsUserDetailDTO.builder()
+                    .userId(participantDetail.getUserId())
+                    .reviewedNickname(participantDetail.getUserNickname())
+                    .reviewedProfileImg(participantDetail.getUserProfileImg())
+                    .build();
+                
+                // 번개 참가 정보 DTO 구성
+                LightningCompletedReviewsLightningUserDTO lightningUserDTO = LightningCompletedReviewsLightningUserDTO.builder()
+                    .lightning(lightningEntity.getLightningId())
+                    .role(participant.getRole())
+                    .participantStatus(participant.getParticipantStatus())
+                    .build();
+                
+                // 리뷰 작성 여부 및 리뷰 ID 확인
+                UserReviewEntity review = reviewMap.get(participantUser.getUserId());
+                Long reviewId = review != null ? review.getReviewId() : null;
+                
+                // 응답 DTO 구성
+                return LightningCompletedReviewsResponseDTO.builder()
+                    .reviewId(reviewId)  // 리뷰가 없으면 null
+                    .reviewer(currentUser.getUserId())
+                    .reviewed(participantUser.getUserId())
+                    .userDetailDTO(userDetailDTO)
+                    .lightningUserDTO(lightningUserDTO)
+                    .isReviewed(review != null)  // 리뷰 작성 여부
+                    .build();
+            })
+            .collect(Collectors.toList());
+        
+        return responseDTOs;
 	}
 
 }
