@@ -35,7 +35,7 @@ const KakaolocationMap: React.FC<KakaoMapProps> = ({ lat, lng }) => {
     marker.setMap(map);
   }, [lat, lng]);
 
-  return <div ref={mapRef} style={{ width: "300px", height: "300px" }} />;
+  return <div ref={mapRef} style={{ width: "300px", height: "250px" }} />;
 };
 
 export default KakaolocationMap;

@@ -1,5 +1,6 @@
 import { get } from "../api/request";
 import { post } from "../api/request";
+import axios from "axios";
 
 export interface LoginRequest {
   email: string;

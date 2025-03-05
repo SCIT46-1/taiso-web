@@ -347,7 +347,7 @@ public class LightningMemberService {
                 .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));
 
         //번개가 마감인지 확인
-        if (lightningEntity.getStatus() != LightningStatus.마감 || lightningEntity.getStatus() != LightningStatus.강제마감) {
+        if (lightningEntity.getStatus() != LightningStatus.마감 && lightningEntity.getStatus() != LightningStatus.강제마감) {
             throw new LightningStatusMismatchException("마감된 번개가 아닙니다.");
         }
         if (!userEntity.getUserId().equals(lightningEntity.getCreatorId())) {

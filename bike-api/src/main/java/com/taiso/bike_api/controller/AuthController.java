@@ -209,7 +209,7 @@ public class AuthController {
     }
 
     @GetMapping("/me/account")
-    @Operation(summary = "로그인 상태 확인", description = "JWT 쿠키를 확인하여 로그인 여부 및 사용자 정보를 반환")
+    @Operation(summary = "내 계정 정보 조회", description = "내 계정 정보 조회")
     public ResponseEntity<UserInfoGetResponseDTO> getUserInfo(Authentication authentication) {
         UserInfoGetResponseDTO responseDTO = authService.getUserInfo(authentication);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
