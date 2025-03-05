@@ -3,7 +3,11 @@ package com.taiso.bike_api.repository;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.taiso.bike_api.domain.ClubEntity;
@@ -22,5 +26,9 @@ public interface ClubMemberRepository extends JpaRepository<ClubMemberEntity, Lo
 
 	Optional<ClubMemberEntity> findByClubAndUser_UserId(ClubEntity club, Long userId);
 
-	
-	}
+	// 클럽ID으로 해당 클럽 멤버 일괄 삭제 - NewClubService
+	@Modifying
+	@Transactional
+	@Query("DELETE FROM ClubMemberEntity cm WHERE cm.club.id = :clubId")
+	void deleteAllByClubId(@Param("clubId") Long clubId);
+}
