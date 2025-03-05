@@ -37,7 +37,7 @@ public class UserDetailController {
     }
 
     @GetMapping("/me/details")
-    public ResponseEntity<UserDetailGetResponseDTO> getMethodName(@AuthenticationPrincipal String userEmail) {
+    public ResponseEntity<UserDetailGetResponseDTO> getUserDetail(@AuthenticationPrincipal String userEmail) {
         return ResponseEntity.status(HttpStatus.OK).body(userDetailService2.getUserDetail(userEmail));
     }
     
