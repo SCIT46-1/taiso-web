@@ -1,9 +1,14 @@
 import { useNavigate, useParams } from "react-router";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useAuthStore } from "../../stores/useAuthStore";
 import lightningService, {
   LightningDetailGetResponse,
 } from "../../services/lightningService";
+import weatherService, {
+  WeatherInfo,
+  HourlyWeatherInfo,
+} from "../../services/weatherService";
+import { getWeatherIcon } from "../../utils/weatherIcons";
 import KakaoMapRoute from "../../components/KakaoMap";
 import KakaolocationMap from "../../components/KakaolocationMap";
 import UserImage from "../../components/UserImage";
@@ -13,6 +18,91 @@ interface ModalProps {
   title: string;
   children: React.ReactNode;
   actions: React.ReactNode;
+}
+
+interface WeatherDisplayProps {
+  weatherInfo: WeatherInfo | null;
+  hourlyForecasts: HourlyWeatherInfo[];
+  forecastDate: string;
+  isLoading: boolean;
+}
+
+function WeatherDisplay({
+  weatherInfo,
+  hourlyForecasts,
+  forecastDate,
+  isLoading,
+}: WeatherDisplayProps) {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-full gap-2">
+        <div>날씨정보 로딩중</div>
+        <span className="loading loading-dots loading-sm"></span>
+      </div>
+    );
+  }
+
+  if (!weatherInfo && hourlyForecasts.length === 0) {
+    return (
+      <div className="p-2 rounded shadow-sm text-gray-500 text-sm">
+        3일 이내의 날씨 정보만 제공합니다!
+      </div>
+    );
+  }
+
+  // Get the event time range for display
+  const startTime = hourlyForecasts.length > 0 ? hourlyForecasts[0].time : "";
+  const endTime =
+    hourlyForecasts.length > 0
+      ? hourlyForecasts[hourlyForecasts.length - 1].time
+      : "";
+  // const timeRangeDisplay =
+  //   hourlyForecasts.length > 0 ? `${startTime} ~ ${endTime}` : "";
+
+  console.log(startTime + "asdafsfas");
+  console.log(endTime + "asdafsfas");
+
+  return (
+    <div className="rounded-lg p-2">
+      <div className="font-bold text-lg mb-3">({forecastDate})</div>
+
+      {/* Hourly Forecast */}
+      {hourlyForecasts.length > 0 && (
+        <div>
+          <div className="overflow-x-auto">
+            <div className="flex space-x-3 pb-2">
+              {hourlyForecasts.map((forecast, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-lg p-3 flex-shrink-0 w-28 shadow-sm flex flex-col items-center border border-gray-200"
+                >
+                  <div className="text-sm font-bold">{forecast.time}</div>
+                  <div className="text-2xl my-1">
+                    {getWeatherIcon(
+                      forecast.weatherInfo.skyCondition,
+                      forecast.weatherInfo.precipitation
+                    )}
+                  </div>
+                  <div className="text-sm font-medium">
+                    {forecast.weatherInfo.temperature}°C
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    강수확률 : {forecast.weatherInfo.precipitationProbability}%
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    풍속 : {forecast.weatherInfo.windSpeed}m/s
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    습도 : {forecast.weatherInfo.humidity}%
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Modal({ id, title, children, actions }: ModalProps) {
@@ -38,16 +128,31 @@ function LightningDetailPage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  // 로딩 상태 관리
+  // 로딩 상태 및 날씨 관련 상태
   const [loadingJoin, setLoadingJoin] = useState(false);
   const [loadingLeave, setLoadingLeave] = useState(false);
   const [loadingLightningClose, setLoadingLightningClose] = useState(false);
   const [loadingLightningEnd, setLoadingLightningEnd] = useState(false);
   const [loadingAcceptLightning, setLoadingAcceptLightning] = useState(false);
-  // 참여자 승인/거절 버튼 별 로딩 상태 (key: lightningUserId)
   const [loadingParticipantActions, setLoadingParticipantActions] = useState<
     Record<number, { accept: boolean; reject: boolean }>
   >({});
+
+  const [weatherInfo, setWeatherInfo] = useState<WeatherInfo | null>(null);
+  const [hourlyForecasts, setHourlyForecasts] = useState<HourlyWeatherInfo[]>(
+    []
+  );
+  const [forecastDate, setForecastDate] = useState<string>("");
+  const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
+
+  // 날씨 데이터 캐시: key를 이벤트 날짜, 위치, 지속시간 조합으로 생성
+  const weatherCache = useRef<{
+    [key: string]: {
+      weatherInfo: WeatherInfo | null;
+      hourlyForecasts: HourlyWeatherInfo[];
+      forecastDate: string;
+    };
+  }>({});
 
   const fetchLightningDetail = useCallback(async () => {
     setIsLoading(true);
@@ -56,6 +161,10 @@ function LightningDetailPage() {
         Number(lightningId)
       );
       setLightningDetail(data);
+
+      if (data) {
+        fetchWeatherData(data);
+      }
     } catch (error) {
       console.error("데이터 로딩 실패:", error);
     } finally {
@@ -80,6 +189,7 @@ function LightningDetailPage() {
         ) || null
       : null;
   }, [lightningDetail, user]);
+  console.log(currentMemberStatus?.participantStatus + "currentMemberStatus");
 
   const closeModal = (id: string) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
@@ -208,6 +318,125 @@ function LightningDetailPage() {
     }
   };
 
+  const fetchWeatherData = async (detail: LightningDetailGetResponse) => {
+    if (
+      !detail.eventDate ||
+      !detail.latitude ||
+      !detail.longitude ||
+      !detail.duration
+    ) {
+      return;
+    }
+
+    // 캐시 키 생성: 이벤트 날짜, 위치, 지속시간 조합
+    const cacheKey = `${detail.eventDate}-${detail.latitude}-${detail.longitude}-${detail.duration}`;
+    if (weatherCache.current[cacheKey]) {
+      // 캐시에 저장된 값이 있다면 바로 상태에 할당
+      const cachedData = weatherCache.current[cacheKey];
+      setWeatherInfo(cachedData.weatherInfo);
+      setHourlyForecasts(cachedData.hourlyForecasts);
+      setForecastDate(cachedData.forecastDate);
+      return;
+    }
+
+    setWeatherLoading(true);
+
+    try {
+      const eventDateTime = new Date(detail.eventDate);
+      const eventEndDateTime = new Date(
+        eventDateTime.getTime() + detail.duration * 60 * 1000
+      );
+
+      const formattedDate = eventDateTime.toISOString().split("T")[0];
+      const startHours = eventDateTime.getHours().toString().padStart(2, "0");
+      const startMinutes = eventDateTime
+        .getMinutes()
+        .toString()
+        .padStart(2, "0");
+      const formattedStartTime = `${startHours}:${startMinutes}`;
+      // const endHours = eventEndDateTime.getHours().toString().padStart(2, "0");
+      // const endMinutes = eventEndDateTime
+      //   .getMinutes()
+      //   .toString()
+      //   .padStart(2, "0");
+      // const formattedEndTime = `${endHours}:${endMinutes}`;
+
+      const nx = Math.floor(detail.latitude);
+      const ny = Math.floor(detail.longitude);
+
+      const { hourlyForecasts, date } =
+        await weatherService.getHourlyWeatherForecasts(formattedDate, nx, ny);
+
+      const startHour = eventDateTime.getHours();
+      const endHour = eventEndDateTime.getHours();
+      const adjustedEndHour =
+        eventEndDateTime.getMinutes() === 0
+          ? Math.max(0, endHour - 1)
+          : endHour;
+
+      const filteredForecasts = hourlyForecasts.filter((forecast) => {
+        const forecastHour = parseInt(forecast.time.split(":")[0]);
+        return forecastHour >= startHour && forecastHour <= adjustedEndHour;
+      });
+
+      if (filteredForecasts.length === 0) {
+        const closestToStart = hourlyForecasts.reduce((closest, current) => {
+          const currentHour = parseInt(current.time.split(":")[0]);
+          const closestHour = parseInt(closest.time.split(":")[0]);
+          return Math.abs(currentHour - startHour) <
+            Math.abs(closestHour - startHour)
+            ? current
+            : closest;
+        }, hourlyForecasts[0]);
+
+        const closestToEnd = hourlyForecasts.reduce((closest, current) => {
+          const currentHour = parseInt(current.time.split(":")[0]);
+          const closestHour = parseInt(closest.time.split(":")[0]);
+          return Math.abs(currentHour - endHour) <
+            Math.abs(closestHour - endHour)
+            ? current
+            : closest;
+        }, hourlyForecasts[0]);
+
+        if (closestToStart.time !== closestToEnd.time) {
+          setHourlyForecasts([closestToStart, closestToEnd]);
+        } else {
+          setHourlyForecasts([closestToStart]);
+        }
+      } else {
+        filteredForecasts.sort((a, b) => {
+          return (
+            parseInt(a.time.split(":")[0]) - parseInt(b.time.split(":")[0])
+          );
+        });
+        setHourlyForecasts(filteredForecasts);
+      }
+
+      setForecastDate(date);
+
+      const weatherData = await weatherService.getWeatherForecast(
+        formattedDate,
+        formattedStartTime,
+        nx,
+        ny
+      );
+
+      setWeatherInfo(weatherData);
+
+      // 캐시에 결과 저장
+      weatherCache.current[cacheKey] = {
+        weatherInfo: weatherData,
+        hourlyForecasts:
+          filteredForecasts.length > 0 ? filteredForecasts : hourlyForecasts,
+        forecastDate: date,
+      };
+    } catch (error) {
+      console.error("날씨 정보 불러오기 실패:", error);
+    } finally {
+      setWeatherLoading(false);
+    }
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -224,6 +453,17 @@ function LightningDetailPage() {
 
       {/* 하단 좌측 상세정보 영역 */}
       <div className="flex flex-col p-4 rounded-xl shadow-2xl border border-base-300">
+        <div className="">
+          {lightningDetail?.status !== "종료" &&
+            lightningDetail?.status !== "취소" && (
+              <WeatherDisplay
+                weatherInfo={weatherInfo}
+                hourlyForecasts={hourlyForecasts}
+                forecastDate={forecastDate}
+                isLoading={weatherLoading}
+              />
+            )}
+        </div>
         <h2 className="text-2xl font-bold mb-2">{lightningDetail?.title}</h2>
         <div className="flex flex-wrap gap-1">
           <div className="badge badge-primary badge-outline">
@@ -261,8 +501,8 @@ function LightningDetailPage() {
 
       {/* 하단 우측 참여자 및 지도 영역 */}
       <div className="flex flex-col items-center justify-center p-4 rounded-xl shadow-2xl border border-base-300">
-        <div className="mb-4">
-          <div>
+        <div className="mb-4 mt-2">
+          <div className="font-semibold">
             {lightningDetail?.eventDate
               ? new Date(lightningDetail.eventDate).toLocaleString("ko-KR", {
                   month: "long",
@@ -273,7 +513,7 @@ function LightningDetailPage() {
                 })
               : ""}{" "}
           </div>
-          <div>
+          <div className="text-sm text-gray-500 mb-4">
             {lightningDetail?.duration
               ? lightningDetail.duration >= 60
                 ? `${Math.floor(lightningDetail.duration / 60)}시간${
@@ -285,27 +525,17 @@ function LightningDetailPage() {
               : ""}{" "}
             동안 진행됩니다.
           </div>
-          <div>{lightningDetail?.address}</div>
           <KakaolocationMap
             lat={lightningDetail?.latitude}
             lng={lightningDetail?.longitude}
           />
-        </div>
-        <div className="mb-4">번개 참여자 목록</div>
-        <div>
-          {" "}
-          {lightningDetail?.currentMemberCount} / {lightningDetail?.capacity}{" "}
-        </div>
-        <div className="mb-4">
-          마감까지{" "}
-          {lightningDetail?.capacity &&
-            lightningDetail.currentMemberCount &&
-            lightningDetail.capacity - lightningDetail.currentMemberCount}{" "}
-          명
+          <div className="font-semibold text-sm mt-1">
+            {lightningDetail?.address}
+          </div>
         </div>
         {!user && (
           <div
-            className="btn btn-primary"
+            className="btn  w-full no-animation btn-primary"
             onClick={() =>
               navigate("/auth/landing", {
                 state: { from: `/lightning/${lightningId}` },
@@ -315,14 +545,13 @@ function LightningDetailPage() {
             로그인 하고 번개 참여하기!
           </div>
         )}
-        <div> {lightningDetail?.status} </div>
         {user &&
           !isCreator &&
           !currentMemberStatus &&
           lightningDetail?.recruitType === "참가형" &&
           lightningDetail?.status === "모집" && (
             <button
-              className="btn mb-4"
+              className="btn w-full no-animation btn-primary"
               onClick={() => showModal("join-modal")}
             >
               참여하기
@@ -334,7 +563,7 @@ function LightningDetailPage() {
           !currentMemberStatus &&
           lightningDetail?.status === "모집" && (
             <button
-              className="btn mb-4"
+              className="btn w-full"
               onClick={() => showModal("accept-modal")}
             >
               신청하기
@@ -345,12 +574,47 @@ function LightningDetailPage() {
           currentMemberStatus?.participantStatus === "완료" &&
           lightningDetail?.status === "모집" && (
             <button
-              className="btn mb-4"
+              className="btn w-full no-animation"
               onClick={() => showModal("leave-modal")}
             >
               번개 나가기
             </button>
           )}
+        {user &&
+          !isCreator &&
+          (lightningDetail?.status === "마감" ||
+            lightningDetail?.status === "강제마감") &&
+          currentMemberStatus == null && (
+            <button className="btn  w-full no-animation btn-disabled">
+              이미 마감되었습니다!
+            </button>
+          )}
+        {user &&
+          !isCreator &&
+          currentMemberStatus?.participantStatus === "탈퇴" && (
+            <button className="btn  w-full no-animation btn-disabled">
+              탈퇴한 번개에 참여할 수 없습니다!
+            </button>
+          )}
+        {user &&
+          !isCreator &&
+          currentMemberStatus?.participantStatus === "신청대기" && (
+            <button className="btn  w-full no-animation btn-disabled">
+              신청 대기 중입니다!
+            </button>
+          )}
+        <div className="divider"></div>
+        <div className=" mr-auto ml-3 font-bold">
+          참가 인원 마감까지{" "}
+          {lightningDetail?.capacity &&
+            lightningDetail.currentMemberCount &&
+            lightningDetail.capacity - lightningDetail.currentMemberCount}
+          명 남았습니다!
+        </div>
+        <div className="mr-auto ml-3 mt-1 text-sm text-gray-500 mb-2">
+          참가인원 {lightningDetail?.currentMemberCount} /{" "}
+          {lightningDetail?.capacity}{" "}
+        </div>
 
         <div className="w-full">
           {lightningDetail?.member
@@ -362,10 +626,10 @@ function LightningDetailPage() {
             .map((member, index) => (
               <div
                 key={index}
-                className="flex flex-row items-center gap-2 p-2 border-b"
+                className="flex flex-row items-center gap-2 p-2 "
               >
                 <UserImage profileImage={member.memberProfileImg as string} />
-                <div>{member.memberNickname}</div>
+                <div className="font-medium ">{member.memberNickname}</div>
                 {member.role === "번개생성자" && (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -373,7 +637,7 @@ function LightningDetailPage() {
                     height="24"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="currentColor"
+                    stroke="rgba(255,215,0,1)"
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -386,19 +650,18 @@ function LightningDetailPage() {
               </div>
             ))}
         </div>
-        {isCreator && (
+        {isCreator && lightningDetail?.recruitType === "수락형" && (
           <div className="w-full mt-4">
+            <h3 className="font-bold mb-2 ml-2">신청 대기 중인 참가자</h3>
             {lightningDetail?.member
               .filter((member) => member.participantStatus === "신청대기")
               .map((member, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-2 border"
-                >
+                <div key={index} className="flex items-center gap-2 p-2">
+                  <UserImage profileImage={member.memberProfileImg as string} />
                   <div>{member.memberNickname}</div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 ml-auto items-center">
                     <button
-                      className="btn"
+                      className="btn btn-sm"
                       disabled={
                         loadingParticipantActions[member.lightningUserId]
                           ?.accept
@@ -412,7 +675,7 @@ function LightningDetailPage() {
                         : "수락하기"}
                     </button>
                     <button
-                      className="btn"
+                      className="btn btn-sm"
                       disabled={
                         loadingParticipantActions[member.lightningUserId]
                           ?.reject
@@ -430,7 +693,7 @@ function LightningDetailPage() {
               ))}
             {lightningDetail?.status === "모집" && (
               <button
-                className="btn mt-4"
+                className="btn mt-4 w-full"
                 disabled={loadingLightningClose}
                 onClick={() => showModal("lightning-close-modal")}
               >
@@ -440,7 +703,30 @@ function LightningDetailPage() {
             {(lightningDetail?.status === "마감" ||
               lightningDetail?.status === "강제마감") && (
               <button
-                className="btn mt-4"
+                className="btn mt-4 w-full"
+                disabled={loadingLightningEnd}
+                onClick={() => showModal("lightning-end-modal")}
+              >
+                {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
+              </button>
+            )}
+          </div>
+        )}
+        {isCreator && lightningDetail?.recruitType === "참가형" && (
+          <div className="w-full mt-4">
+            {lightningDetail?.status === "모집" && (
+              <button
+                className="btn mt-4 w-full"
+                disabled={loadingLightningClose}
+                onClick={() => showModal("lightning-close-modal")}
+              >
+                {loadingLightningClose ? "마감 중..." : "번개 마감하기"}
+              </button>
+            )}
+            {(lightningDetail?.status === "마감" ||
+              lightningDetail?.status === "강제마감") && (
+              <button
+                className="btn mt-4 w-full"
                 disabled={loadingLightningEnd}
                 onClick={() => showModal("lightning-end-modal")}
               >
@@ -451,14 +737,11 @@ function LightningDetailPage() {
         )}
         {!isCreator && lightningDetail?.recruitType === "수락형" && (
           <div className="w-full mt-4">
-            <h3 className="font-medium mb-2">신청 대기 중인 참가자</h3>
+            <h3 className="font-bold mb-2 ml-2">신청 대기 중인 참가자</h3>
             {lightningDetail?.member
               .filter((member) => member.participantStatus === "신청대기")
               .map((member, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 p-2 border-b"
-                >
+                <div key={index} className="flex items-center gap-2 p-2 ">
                   <UserImage profileImage={member.memberProfileImg as string} />
                   <div className="flex flex-col">
                     <div className="font-medium">{member.memberNickname}</div>
@@ -501,7 +784,7 @@ function LightningDetailPage() {
         <>
           <p>아래 사항을 다시 한 번 확인해 주세요!</p>
           <div>{lightningDetail?.eventDate} 시에 열리는 번개입니다.</div>
-          <div>
+          <div className="text-sm text-gray-500">
             {lightningDetail?.duration
               ? lightningDetail.duration >= 60
                 ? `${Math.floor(lightningDetail.duration / 60)}시간${
@@ -681,4 +964,3 @@ function LightningDetailPage() {
 }
 
 export default LightningDetailPage;
-

@@ -17,7 +17,8 @@ import LightningDetailPage from "./pages/lightning/lightningDetailPage";
 import AuthRoute from "./AuthRoute";
 import UserOnboardingPage from "./pages/auth/UserOnboardingPage";
 import UserDetailPage from "./pages/UserDetailPage";
-import UserAccountPage from "./pages/UserAccountPage";
+import UserDetailUpdate from "./pages/user/userDetailUpdate";
+import UserAccountPage from "./pages/user/UserAccountPage";
 
 const router = createBrowserRouter([
   {
@@ -70,6 +71,7 @@ const router = createBrowserRouter([
             path: "user",
             children: [
               { path: "me/account", element: <UserAccountPage /> },
+              { path: "me/update", element: <UserDetailUpdate /> },
               // { path: "me/lightning-reservation", element: <UserLightningPage /> },
               // { path: "me/club", element: <UserClubPage /> },
               // { path: "me/route", element: <UserRoutePage /> },

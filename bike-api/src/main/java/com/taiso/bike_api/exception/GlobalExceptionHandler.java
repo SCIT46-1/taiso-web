@@ -380,7 +380,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    // 탈퇴 회원이 클럽 관리자가 아닌지 확인 (관리자는 클럽장 위임 후 탈퇴 가능)
+     // 탈퇴 회원이 클럽 관리자가 아닌지 확인 (관리자는 클럽장 위임 후 탈퇴 가능)
     @ExceptionHandler(ClubLeaderCannotLeaveException.class)
     public ResponseEntity<ErrorResponseDTO> handleClubLeaderCannotLeaveException(ClubLeaderCannotLeaveException ex,
             HttpServletRequest request) {
@@ -400,4 +400,25 @@ public class GlobalExceptionHandler {
    
     
     
+    // 클럽보드 공지글 작성 권한 없음 예외 처리
+    @ExceptionHandler(ClubBoardNoticeNotPermissionException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubBoardNoticeNotPermissionException(ClubBoardNoticeNotPermissionException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    // 클럽보드 게시글 미존재 예외 처리
+    @ExceptionHandler(ClubBoardNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubBoardNotFoundException(ClubBoardNotFoundException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    // 클럽보드 삭제&수정 권한 없음 예외 처리
+    @ExceptionHandler(ClubBoardNotPermissionException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubBoardNotPermissionException(ClubBoardNotPermissionException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
 }

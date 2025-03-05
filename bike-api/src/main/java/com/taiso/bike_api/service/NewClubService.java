@@ -1,10 +1,12 @@
 package com.taiso.bike_api.service;
 
 import com.taiso.bike_api.domain.ClubEntity;
+import com.taiso.bike_api.domain.ClubMemberEntity;
 import com.taiso.bike_api.domain.LightningTagCategoryEntity;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.ClubCreateRequestDTO;
 import com.taiso.bike_api.exception.*;
+import com.taiso.bike_api.repository.ClubMemberRepository;
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.LightningTagCategoryRepository;
 import com.taiso.bike_api.repository.UserRepository;
@@ -32,6 +34,9 @@ public class NewClubService {
 
     @Autowired
     private LightningTagCategoryRepository lightningTagCategoryRepository;
+
+    @Autowired
+    private ClubMemberRepository clubMemberRepository;
 
     @Autowired
     S3Service s3Service;
@@ -75,7 +80,7 @@ public class NewClubService {
             log.info("프로필 이미지는 null이거나 빈 파일이므로 업데이트하지 않고 기존 DTO의 값 사용");
         }
 
-        // 최종 빌드
+        // 클럽 최종 빌드
         ClubEntity club = ClubEntity.builder()
                 .clubProfileImageId(requestDTO.getClubProfileImageId())
                 .clubName(requestDTO.getClubName())
@@ -87,6 +92,17 @@ public class NewClubService {
                 .build();
 
         clubRepository.save(club);
+
+        // 클럽 멤버에 클럽장으로 생성 추가
+        ClubMemberEntity clubMemberLeader = ClubMemberEntity.builder()
+                .user(clubCreator)
+                .club(club)
+                .role(ClubMemberEntity.Role.클럽장)
+                .participantStatus(ClubMemberEntity.ParticipantStatus.완료)
+                .build();
+
+        clubMemberRepository.save(clubMemberLeader);
+
     }
 
     // 클럽 삭제 (클럽 리더만)
@@ -112,6 +128,9 @@ public class NewClubService {
         if(user != club.getClubLeader()) {
             throw new ClubMemberMismatchException("클럽 삭제 권한이 없습니다.");
         }
+
+        // 클럽 멤버 테이블 일괄 삭제
+        clubMemberRepository.deleteAllByClubId(club.getClubId());
 
         clubRepository.delete(club);
 
