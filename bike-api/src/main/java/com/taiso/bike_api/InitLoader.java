@@ -108,6 +108,16 @@ public class InitLoader implements CommandLineRunner {
                 .maxUser(8)
                 .build();
         clubRepository.save(club3);
+
+        ClubEntity club4 = ClubEntity.builder()
+                .clubProfileImageId(null)
+                .clubName("4번 클럽")
+                .clubLeader(user2)
+                .clubShortDescription("열심히 자전거 타자")
+                .clubDescription("3번째 클럽 자전거 타기 설명")
+                .maxUser(8)
+                .build();
+        clubRepository.save(club4);
            
         // 클럽 멤버 생성
         ClubMemberEntity clubMember1 = ClubMemberEntity.builder()
@@ -157,6 +167,22 @@ public class InitLoader implements CommandLineRunner {
                 .participantStatus(ParticipantStatus.신청대기)
                 .build();
         clubMemberRepository.save(clubMember3user3);
+
+        ClubMemberEntity clubMember4user1 = ClubMemberEntity.builder()
+                .user(user2)
+                .club(club4)
+                .role(Role.클럽장)
+                .participantStatus(ParticipantStatus.승인)
+                .build();
+        clubMemberRepository.save(clubMember4user1);
+
+        ClubMemberEntity clubMember4user2 = ClubMemberEntity.builder()
+                .user(user1)
+                .club(club4)
+                .role(Role.멤버)
+                .participantStatus(ParticipantStatus.승인)
+                .build();
+        clubMemberRepository.save(clubMember4user2);
         
         // 번개 이벤트 생성
         
@@ -254,7 +280,7 @@ public class InitLoader implements CommandLineRunner {
                 15L,
                 "서울특별시 삼성역",
                 false,
-                null,
+                4L,
                 route
         );
         lightningUserRepository.save(lightning3);
@@ -301,7 +327,7 @@ public class InitLoader implements CommandLineRunner {
                 10L,
                 "서울특별시 중구",
                 false,
-                null,
+                4L,
                 route
         );
         lightningUserRepository.save(lightning4);

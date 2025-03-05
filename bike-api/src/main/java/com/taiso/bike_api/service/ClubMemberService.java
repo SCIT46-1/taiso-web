@@ -2,6 +2,7 @@ package com.taiso.bike_api.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -9,22 +10,24 @@ import org.springframework.stereotype.Service;
 
 import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.ClubMemberEntity;
-import com.taiso.bike_api.domain.LightningUserEntity;
 import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 import com.taiso.bike_api.domain.ClubMemberEntity.Role;
+import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.UserEntity;
+import com.taiso.bike_api.dto.ClubLightningListResponseDTO;
+import com.taiso.bike_api.exception.ClubLeaderCannotLeaveException;
 import com.taiso.bike_api.exception.ClubLeaderMismatchException;
 import com.taiso.bike_api.exception.ClubMemberAlreadyExistsException;
 import com.taiso.bike_api.exception.ClubMemberFullException;
 import com.taiso.bike_api.exception.ClubMemberMismatchException;
+import com.taiso.bike_api.exception.ClubMemberNotFoundException;
 import com.taiso.bike_api.exception.ClubNotFoundException;
 import com.taiso.bike_api.exception.ClubStatusMismatchException;
-import com.taiso.bike_api.exception.LightningCreatorMismatchException;
-import com.taiso.bike_api.exception.LightningUserMismatchException;
-import com.taiso.bike_api.exception.LightningUserStatusNotPendingException;
+import com.taiso.bike_api.exception.LightningNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.repository.ClubMemberRepository;
 import com.taiso.bike_api.repository.ClubRepository;
+import com.taiso.bike_api.repository.LightningRepository;
 import com.taiso.bike_api.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -42,6 +45,9 @@ public class ClubMemberService {
 
 	@Autowired
 	private ClubMemberRepository clubMemberRepository;
+	
+	@Autowired
+	private LightningRepository lightningRepository;
 	
 	// 클럽 가입 신청 서비스
 	@Transactional
@@ -96,12 +102,12 @@ public class ClubMemberService {
         
         // 3. 클럽 관리자와 로그인한 사람이 일치하는지 확인 (승인 권한 확인) -> 403 FORBIDDEN
         if (!userEntity.getUserId().equals(clubEntity.getClubLeader().getUserId() )) {
-            throw new ClubLeaderMismatchException("유저와 번개 생성자가 같지 않음 FORBIDDEN");
+            throw new ClubLeaderMismatchException("유저와 클럽 생성자가 같지 않음 FORBIDDEN");
         }
 
         // 4. 승인 대상 참가 신청자 조회 (존재하지 않으면 404)
         ClubMemberEntity joinUserEntity = clubMemberRepository.findByClubAndUser_UserId(clubEntity, userId)
-        		.orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다. NOT_FOUND")); 
+        		.orElseThrow(() -> new UserNotFoundException("클럽 가입 신청 사용자를 찾을 수 없습니다. NOT_FOUND")); 
 
         // 5. 해당 클럽 참가 신청자와 클럽이 일치하는지 확인
         if (!joinUserEntity.getClub().getClubId().equals(clubEntity.getClubId())) {
@@ -117,4 +123,141 @@ public class ClubMemberService {
         joinUserEntity.setParticipantStatus(ClubMemberEntity.ParticipantStatus.승인);
         
 	}
+
+	// 클럽 가입 거절 서비스
+	@Transactional
+	public void clubMemberReject(Long clubId, Long userId, Authentication authentication) {
+
+		// 1. 클럽 아이디로 엔티티 가져오기 
+        ClubEntity clubEntity = clubRepository.findById(clubId)
+                .orElseThrow(() -> new ClubNotFoundException("클럽을 찾을 수 없습니다. NOT_FOUND"));
+
+        // 2. 유저 아이디로 엔티티 가져오기
+        UserEntity userEntity = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다. NOT_FOUND"));   
+        
+        // 3. 클럽 관리자와 로그인한 사람이 일치하는지 확인 (승인 권한 확인) -> 403 FORBIDDEN
+        if (!userEntity.getUserId().equals(clubEntity.getClubLeader().getUserId() )) {
+            throw new ClubLeaderMismatchException("유저와 클럽 생성자가 같지 않음 FORBIDDEN");
+        }
+
+        // 4. 거절 대상 신청자 조회 (존재하지 않으면 404)
+        ClubMemberEntity joinUserEntity = clubMemberRepository.findByClubAndUser_UserId(clubEntity, userId)
+        		.orElseThrow(() -> new UserNotFoundException("클럽 가입 신청 사용자를 찾을 수 없습니다. NOT_FOUND")); 
+
+        // 5. 해당 클럽 참가 신청자와 클럽이 일치하는지 확인
+        if (!joinUserEntity.getClub().getClubId().equals(clubEntity.getClubId())) {
+            throw new ClubMemberMismatchException("클럽과 참가 신청하는 유저가 일치하지 않음");
+        }
+        
+        // 6. 클럽 참가 신청자의 상태가 '신청대기'인지 확인 (아니면 승인/거절 불가)
+        if (joinUserEntity.getParticipantStatus() != ParticipantStatus.신청대기) {
+            throw new ClubStatusMismatchException("클럽 참가 신청자가 신청대기 상태가 아닙니다.");
+        }
+
+        // 7. 거절(탈퇴) 처리
+        joinUserEntity.setParticipantStatus(ClubMemberEntity.ParticipantStatus.탈퇴);
+        
+	}
+
+	// 클럽 회원 탈퇴 서비스
+	public void clubMemberWithdrawal(Long clubId, Authentication authentication) {
+
+		// 1. 클럽 아이디로 엔티티 가져오기 
+        ClubEntity clubEntity = clubRepository.findById(clubId)
+                .orElseThrow(() -> new ClubNotFoundException("클럽을 찾을 수 없습니다. NOT_FOUND"));
+
+        // 2. 유저 아이디로 엔티티 가져오기
+        UserEntity userEntity = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다. NOT_FOUND"));   
+
+        // 3. 회원이 클럽에 존재하는지 확인 (존재하지 않으면 404)
+        ClubMemberEntity joinUserEntity = clubMemberRepository.findByClubAndUser(clubEntity, userEntity)
+        		.orElseThrow(() -> new UserNotFoundException("클럽에서 사용자를 찾을 수 없습니다. NOT_FOUND")); 
+
+        // 4. 해당 클럽 참가 신청자와 클럽이 일치하는지 확인
+        if (!joinUserEntity.getClub().getClubId().equals(clubEntity.getClubId())) {
+            throw new ClubMemberMismatchException("클럽과 탈퇴하는 유저가 일치하지 않음");
+        }
+
+        // 5. 클럽 탈퇴 신청자의 상태가 '탈퇴'상태가 아닌지 확인(거절 상태인데 탈퇴하고 다시 신청하는 경우 방지)
+        if (joinUserEntity.getParticipantStatus() == ParticipantStatus.탈퇴) {
+            throw new ClubStatusMismatchException("클럽 탈퇴 유저가 거절 상태입니다.(탈퇴)");
+        }
+
+        // 6. 탈퇴 회원이 클럽 관리자가 아닌지 확인 (관리자는 클럽장 위임 후 탈퇴 가능) 403 FORBIDDEN
+        if (userEntity.getUserId().equals(clubEntity.getClubLeader().getUserId() )) {
+            throw new ClubLeaderCannotLeaveException("탈퇴 회원이 클럽 관리자로 되어있음 FORBIDDEN");
+        }
+
+        // 7. 거절(탈퇴) 처리
+        clubMemberRepository.deleteById(joinUserEntity.getMemberId());
+		
+	}
+
+	// 클럽 번개 리스트 조회 서비스
+	public List<ClubLightningListResponseDTO> clubLightningsList(Long clubId, Authentication authentication) {
+
+		// 1. 클럽 아이디로 엔티티 가져오기 
+        ClubEntity clubEntity = clubRepository.findById(clubId)
+                .orElseThrow(() -> new ClubNotFoundException("클럽을 찾을 수 없습니다. NOT_FOUND"));
+        
+        // 2. 유저 아이디로 엔티티 가져오기
+        UserEntity userEntity = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다. NOT_FOUND"));  
+
+        // 3. 회원이 클럽에 존재하는지 확인 (존재하지 않으면 404)
+        ClubMemberEntity joinUserEntity = clubMemberRepository.findByClubAndUser(clubEntity, userEntity)
+        		.orElseThrow(() -> new ClubMemberNotFoundException("클럽에서 사용자를 찾을 수 없습니다. NOT_FOUND")); 
+        
+        // 4. 리스트 조회자가 클럽에 승인 되어 있는지 확인 필요
+        if (joinUserEntity.getParticipantStatus() != ParticipantStatus.승인) {
+            throw new ClubStatusMismatchException("리스트 조회자가 클럽에 승인 상태가 아닙니다.");
+        }
+        
+        // 5. 클럽의 번개가 존재하지 않는 경우 예외 처리 404 
+        List<LightningEntity> lightningList = lightningRepository.findByClubId(clubEntity.getClubId());
+        if (lightningList.isEmpty()) {
+            throw new LightningNotFoundException("클럽의 번개가 존재하지 않습니다. NOT_FOUND");
+        }
+        
+        // 6. 엔티티를 DTO로 매핑 (별도 매핑 메서드 사용)
+        List<ClubLightningListResponseDTO> responseList = lightningList.stream()
+                .map(this::mapToClubLightningListResponseDTO)
+                .collect(Collectors.toList());
+
+        log.info("Retrieved {} lightning events for club {}", responseList.size(), clubId);
+        
+        return responseList;
+	}
+	
+	// ClubLightningListResponseDTO 매핑 (클럽 번개 리스트 조회)
+	private ClubLightningListResponseDTO mapToClubLightningListResponseDTO(LightningEntity lightning) {
+	    // 라우트가 널일 가능성을 고려
+	    Long routeId = (lightning.getRoute() != null) ? lightning.getRoute().getRouteId() : null;
+	    
+	    // 참가자 목록이 널이면 0으로 처리
+	    int currentParticipant = (lightning.getLightningUsers() != null) ? lightning.getLightningUsers().size() : 0;
+
+	    return ClubLightningListResponseDTO.builder()
+	            .lightningId(lightning.getLightningId())
+	            .creatorId(lightning.getCreatorId())
+	            .title(lightning.getTitle())
+	            .eventDate(lightning.getEventDate())
+	            .duration(lightning.getDuration())
+	            .createdAt(lightning.getCreatedAt())
+	            .status(lightning.getStatus())
+	            .capacity(lightning.getCapacity())
+	            .currentParticipant(currentParticipant)
+	            .gender(lightning.getGender())
+	            .level(lightning.getLevel())
+	            .bikeType(lightning.getBikeType())
+	            .tags(lightning.getTags())
+	            .address(lightning.getAddress())
+	            .clubId(lightning.getClubId())
+	            .routeId(routeId)
+	            .build();
+	}
+	
+	
 }
