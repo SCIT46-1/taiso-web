@@ -19,6 +19,8 @@ import UserOnboardingPage from "./pages/auth/UserOnboardingPage";
 import UserDetailPage from "./pages/UserDetailPage";
 import UserDetailUpdate from "./pages/user/userDetailUpdate";
 import UserAccountPage from "./pages/user/UserAccountPage";
+import UserLightningPage from "./pages/user/UserLightningPage";
+import UserLightningCompletePage from "./pages/user/UserLightningCompletePage";
 
 const router = createBrowserRouter([
   {
@@ -72,7 +74,15 @@ const router = createBrowserRouter([
             children: [
               { path: "me/account", element: <UserAccountPage /> },
               { path: "me/update", element: <UserDetailUpdate /> },
-              // { path: "me/lightning-reservation", element: <UserLightningPage /> },
+
+              {
+                path: "me/lightning-reservation",
+                element: <UserLightningPage />,
+              },
+              {
+                path: "me/lightning-completed",
+                element: <UserLightningCompletePage />,
+              },
               // { path: "me/club", element: <UserClubPage /> },
               // { path: "me/route", element: <UserRoutePage /> },
               // { path: "me/bookmark", element: <UserBookmarkPage /> },

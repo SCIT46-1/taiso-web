@@ -97,7 +97,12 @@ function Navbar() {
                 <Link to="/user/me/account">계정 정보 수정</Link>
               </li>
               <li>
-                <Link to="/settings">내 번개 예약 정보</Link>
+                <Link to="/user/me/lightning-reservation">
+                  내 번개 예약 정보
+                </Link>
+              </li>
+              <li>
+                <Link to="/user/me/lightning-completed">내 번개 완료 정보</Link>
               </li>
               <li>
                 <Link to="/settings">내 클럽 정보</Link>

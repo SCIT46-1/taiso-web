@@ -71,10 +71,47 @@ export interface UserDetailResponse {
   tags: string[];
 }
 
+export interface MyLightningResponse {
+  lightning: {
+    lightningId: number;
+    title: string;
+    eventDate: string; // ISO 8601 date string
+    creatorId: number;
+    status: string;
+    duration: number;
+    capacity: number;
+    address: string | null;
+  };
+  users: {
+    userId: number;
+    userNickname: string;
+    userProfileImg: string | null;
+    bio: string | null;
+  }[];
+  tags: {
+    tags: string[];
+  };
+  status: string;
+}
+
 const getUserDetail = async (userId: number): Promise<UserDetailResponse> => {
   return await get(`/users/${userId}`);
 };
 
+//내 예약 번개 조회
+const getMyReservationLightning = async (): Promise<MyLightningResponse[]> => {
+  const status = encodeURIComponent("모집,마감,강제마감");
+  return await get(`/users/me/lightnings?status=${status}`);
+};
+
+//내 완료 번개 조회
+const getMyCompletedLightning = async (): Promise<MyLightningResponse[]> => {
+  const status = encodeURIComponent("완료");
+  return await get(`/users/me/lightnings?status=${status}`);
+};
+
 export default {
   getUserDetail,
+  getMyReservationLightning,
+  getMyCompletedLightning,
 };
