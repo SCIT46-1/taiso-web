@@ -9,6 +9,7 @@ export interface LoginRequest {
 export interface LoginResponse {
   userId: number;
   userEmail: string;
+  userNickname: string;
 }
 
 export interface RegisterRequest {
@@ -19,6 +20,7 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   userId: number;
   email: string;
+  userNickname: string;
 }
 
 export interface AuthTestResponse {
@@ -30,6 +32,7 @@ export interface AuthTestResponse {
 export interface KakaoAuthResultDTO {
   userId: number;
   userEmail: string;
+  userNickname: string;
 }
 
 const login = async (payload: LoginRequest): Promise<LoginResponse> => {

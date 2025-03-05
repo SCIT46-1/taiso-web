@@ -94,14 +94,6 @@ const weatherService = {
       // Format target date for finding the forecast
       const targetDate = date.replace(/-/g, "");
 
-      console.log("API request parameters:", {
-        baseDate,
-        baseTime,
-        targetDate,
-        nx,
-        ny,
-      });
-
       const response = await axios.get<WeatherResponse>(
         `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst`,
         {
@@ -163,12 +155,8 @@ const weatherService = {
   ): { hourlyForecasts: HourlyWeatherInfo[]; date: string } {
     const items = data.response.body.items.item;
 
-    console.log(`Looking for forecasts for date: ${targetDate}`);
-    console.log(`Total forecast items: ${items.length}`);
-
     // Filter items for the target date
     const dateItems = items.filter((item) => item.fcstDate === targetDate);
-    console.log(`Found ${dateItems.length} items for date ${targetDate}`);
 
     if (dateItems.length === 0) {
       return { hourlyForecasts: [], date: targetDate };
@@ -178,7 +166,6 @@ const weatherService = {
     const uniqueTimes = [
       ...new Set(dateItems.map((item) => item.fcstTime)),
     ].sort();
-    console.log("Available forecast times:", uniqueTimes);
 
     // Create hourly forecasts
     const hourlyForecasts: HourlyWeatherInfo[] = [];
@@ -234,8 +221,6 @@ const weatherService = {
       });
     }
 
-    console.log(`Created ${hourlyForecasts.length} hourly forecasts`);
-
     // Format date for display
     const displayDate = `${targetDate.substring(0, 4)}-${targetDate.substring(
       4,
@@ -255,33 +240,21 @@ const weatherService = {
   ): WeatherInfo | null {
     const items = data.response.body.items.item;
 
-    console.log(
-      `Looking for forecast for date: ${targetDate}, time: ${targetTime}`
-    );
-    console.log(`Total forecast items: ${items.length}`);
-
     // First try: exact match for date and time
     let relevantItems = items.filter(
       (item) => item.fcstDate === targetDate && item.fcstTime === targetTime
     );
 
-    console.log(`Found ${relevantItems.length} items with exact match`);
-
     // If no exact match, try just matching the date and find closest time
     if (relevantItems.length === 0) {
-      console.log("No exact time match, finding closest forecast time");
-
       // Get all items for the target date
       const dateItems = items.filter((item) => item.fcstDate === targetDate);
-
-      console.log(`Found ${dateItems.length} items for date ${targetDate}`);
 
       if (dateItems.length > 0) {
         // Get unique forecast times for that date
         const uniqueTimes = [
           ...new Set(dateItems.map((item) => item.fcstTime)),
         ].sort();
-        console.log("Available forecast times:", uniqueTimes);
 
         if (uniqueTimes.length > 0) {
           // Get the closest time
@@ -297,24 +270,16 @@ const weatherService = {
             }
           }
 
-          console.log(`Using closest time: ${closestTime}`);
-
           // Get items for that time
           relevantItems = dateItems.filter(
             (item) => item.fcstTime === closestTime
           );
-
-          console.log(`Found ${relevantItems.length} items for closest time`);
         }
       }
     }
 
     // If still no match, fallback to any available data
     if (relevantItems.length === 0) {
-      console.log(
-        "No relevant weather data found for the specified date and time"
-      );
-
       // If we need to fall back to default values, just return the basic weather info
       return {
         temperature: "정보 없음",
@@ -338,7 +303,6 @@ const weatherService = {
 
     // Get the forecast categories we have for this time
     const categories = relevantItems.map((item) => item.category);
-    console.log("Available categories:", categories);
 
     // Process the matched items
     relevantItems.forEach((item) => {
@@ -364,7 +328,6 @@ const weatherService = {
       }
     });
 
-    console.log("Final weather info:", weatherInfo);
     return weatherInfo;
   },
 };

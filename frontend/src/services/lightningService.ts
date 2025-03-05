@@ -1,4 +1,4 @@
-import { post, get, patch } from "../api/request";
+import { post, get, patch, del } from "../api/request";
 
 export interface LightningGetRequest {
   gender: string;
@@ -128,6 +128,23 @@ interface Route {
   routePoints: RoutePoint[];
 }
 
+export interface UserReviewData {
+  isReviewed: boolean;
+  lightningUserDTO: {
+    lightning: number;
+    role: string;
+    participantStatus: string;
+  };
+  reviewId: number | null;
+  reviewed: number;
+  reviewer: number;
+  userDetailDTO: {
+    userId: number;
+    reviewedNickname: string;
+    reviewedProfileImg: string | null;
+  };
+}
+
 const createLightning = async (
   payload: LightningPostRequest
 ): Promise<LightningPostResponse> => {
@@ -197,6 +214,32 @@ const endLightning = async (lightningId: number): Promise<void> => {
   return await patch(`/lightnings/${lightningId}/end`);
 };
 
+//번개 리뷰 정보 조회
+const getLightningReview = async (
+  lightningId: number
+): Promise<UserReviewData[]> => {
+  return await get(`/lightnings/${lightningId}/reviews`);
+};
+
+const submitUserReview = async (
+  lightningId: number,
+  userId: number,
+  reviewData: { reviewContent: string; reviewTag: string }
+): Promise<void> => {
+  return await post(
+    `/lightnings/${lightningId}/reviews?userId=${userId}`,
+    reviewData
+  );
+};
+
+//리뷰 삭제
+const deleteUserReview = async (
+  lightningId: number,
+  userId: number
+): Promise<void> => {
+  return await del(`/lightnings/${lightningId}/reviews?userId=${userId}`);
+};
+
 export default {
   createLightning,
   getLightningList,
@@ -208,4 +251,7 @@ export default {
   rejectLightning,
   closeLightning,
   endLightning,
+  getLightningReview,
+  submitUserReview,
+  deleteUserReview,
 };

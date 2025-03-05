@@ -99,7 +99,14 @@ function RegisterForm({ redirectPath = "/" }) {
     try {
       setLoading(true);
       const response: RegisterResponse = await authService.register(payload);
-      setUser({ email: response.email, userId: response.userId });
+      setUser(
+        {
+          email: response.email,
+          userId: response.userId,
+          userNickname: response.userNickname,
+        },
+        false
+      );
       // 리다이렉트 전 로그 추가
       console.log(
         "RegisterForm - Registration successful, redirecting to:",

@@ -59,7 +59,6 @@ function LightningList({
       const formattedDate = selectedDate.toLocaleDateString("en-CA", {
         timeZone: "Asia/Seoul",
       });
-      console.log(formattedDate);
       const data = await lightningService.getLightningList(
         page,
         PAGE_SIZE,
@@ -97,8 +96,6 @@ function LightningList({
   useEffect(() => {
     fetchLightningList();
   }, [page, sort, gender, bikeType, level, region, tags, selectedDate]);
-
-  console.log(lightningList);
 
   const handleLoadMore = () => {
     setPage((prev) => prev + 1);
@@ -160,84 +157,91 @@ function LightningList({
         ) : (
           lightningList.map((lightning) => (
             <div key={lightning.lightningId} className="w-[90%]">
-              <Link to={`/lightning/${lightning.lightningId}`}>
-                <div className="bg-base-100 w-full flex items-center">
-                  <figure className="size-40 flex items-center justify-center ml-4 relative">
-                    <ImageWithSkeleton
-                      src={lightning.routeImgId}
-                      alt={lightning.title}
-                    />
-                  </figure>
-                  <div className="flex flex-col p-2 ml-6">
-                    <div className="flex flex-col ">
-                      <div className="text-xs text-gray-500">
-                        {formatDate(lightning.eventDate)} ({lightning.duration}
-                        분)
-                      </div>
-                      <div className="text-lg font-semibold">
-                        {lightning.title}
-                      </div>
-                      <div className="text-sm text-gray-500 flex items-center gap-1">
-                        <svg
-                          data-slot="icon"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                          aria-hidden="true"
-                          className="size-4"
-                        >
-                          <path
-                            clipRule="evenodd"
-                            fillRule="evenodd"
-                            d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
-                          ></path>
-                        </svg>
-                        {lightning.address}
-                      </div>
-                      <div className="text-sm text-gray-500 flex items-center gap-1 ">
-                        <svg
-                          data-slot="icon"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                          aria-hidden="true"
-                          className="size-4"
-                        >
-                          <path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z"></path>
-                        </svg>
-                        {lightning.currentParticipants}/{lightning.capacity}명
-                      </div>
-                      <div className="flex flex-wrap gap-1 mt-2 max-w-[400px]">
-                        <div className="badge badge-primary badge-outline">
-                          {lightning.gender}
+              <div className="flex">
+                <Link
+                  to={`/lightning/${lightning.lightningId}`}
+                  className="flex-1"
+                >
+                  <div className="bg-base-100 w-full flex items-center">
+                    <figure className="size-40 flex items-center justify-center ml-4 relative">
+                      <ImageWithSkeleton
+                        src={lightning.routeImgId}
+                        alt={lightning.title}
+                      />
+                    </figure>
+                    <div className="flex flex-col p-2 ml-6">
+                      <div className="flex flex-col ">
+                        <div className="text-xs text-gray-500">
+                          {formatDate(lightning.eventDate)} (
+                          {lightning.duration}
+                          분)
                         </div>
-                        <div className="badge badge-primary badge-outline">
-                          {lightning.level}
+                        <div className="text-lg font-semibold">
+                          {lightning.title}
                         </div>
-                        <div className="badge badge-primary badge-outline">
-                          {lightning.bikeType}
-                        </div>
-                        {lightning.tags.map((tag, index) => (
-                          <div
-                            key={index}
-                            className="badge badge-primary badge-outline"
+                        <div className="text-sm text-gray-500 flex items-center gap-1">
+                          <svg
+                            data-slot="icon"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                            className="size-4"
                           >
-                            {tag}
+                            <path
+                              clipRule="evenodd"
+                              fillRule="evenodd"
+                              d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
+                            ></path>
+                          </svg>
+                          {lightning.address}
+                        </div>
+                        <div className="text-sm text-gray-500 flex items-center gap-1 ">
+                          <svg
+                            data-slot="icon"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                            className="size-4"
+                          >
+                            <path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z"></path>
+                          </svg>
+                          {lightning.currentParticipants}/{lightning.capacity}명
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-2 max-w-[400px]">
+                          <div className="badge badge-primary badge-outline">
+                            {lightning.gender}
                           </div>
-                        ))}
+                          <div className="badge badge-primary badge-outline">
+                            {lightning.level}
+                          </div>
+                          <div className="badge badge-primary badge-outline">
+                            {lightning.bikeType}
+                          </div>
+                          {lightning.tags.map((tag, index) => (
+                            <div
+                              key={index}
+                              className="badge badge-primary badge-outline"
+                            >
+                              {tag}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="p-4 mt-auto ml-auto flex items-center justify-center">
-                    <Link
-                      to={`/lightning/${lightning.lightningId}`}
-                      className="group"
-                    >
-                      {renderStatusButton(lightning.status)}
-                    </Link>
-                  </div>
+                </Link>
+
+                <div className="p-4 mt-auto flex items-center justify-center">
+                  <Link
+                    to={`/lightning/${lightning.lightningId}`}
+                    className="group"
+                  >
+                    {renderStatusButton(lightning.status)}
+                  </Link>
                 </div>
-              </Link>
+              </div>
               <div className="divider w-full -my-2"></div>
             </div>
           ))
