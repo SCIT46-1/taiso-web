@@ -50,12 +50,12 @@ function WeatherDisplay({
     );
   }
 
-  // Get the event time range for display
-  const startTime = hourlyForecasts.length > 0 ? hourlyForecasts[0].time : "";
-  const endTime =
-    hourlyForecasts.length > 0
-      ? hourlyForecasts[hourlyForecasts.length - 1].time
-      : "";
+  // // Get the event time range for display
+  // const startTime = hourlyForecasts.length > 0 ? hourlyForecasts[0].time : "";
+  // const endTime =
+  //   hourlyForecasts.length > 0
+  //     ? hourlyForecasts[hourlyForecasts.length - 1].time
+  //     : "";
   // const timeRangeDisplay =
   //   hourlyForecasts.length > 0 ? `${startTime} ~ ${endTime}` : "";
 
@@ -326,14 +326,6 @@ function LightningDetailPage() {
 
     // 캐시 키 생성: 이벤트 날짜, 위치, 지속시간 조합
     const cacheKey = `${detail.eventDate}-${detail.latitude}-${detail.longitude}-${detail.duration}`;
-    if (weatherCache.current[cacheKey]) {
-      // 캐시에 저장된 값이 있다면 바로 상태에 할당
-      const cachedData = weatherCache.current[cacheKey];
-      setWeatherInfo(cachedData.weatherInfo);
-      setHourlyForecasts(cachedData.hourlyForecasts);
-      setForecastDate(cachedData.forecastDate);
-      return;
-    }
 
     setWeatherLoading(true);
 
@@ -350,18 +342,6 @@ function LightningDetailPage() {
         .toString()
         .padStart(2, "0");
       const formattedStartTime = `${startHours}:${startMinutes}`;
-      // const endHours = eventEndDateTime.getHours().toString().padStart(2, "0");
-      // const endMinutes = eventEndDateTime
-      //   .getMinutes()
-      //   .toString()
-      //   .padStart(2, "0");
-      // const formattedEndTime = `${endHours}:${endMinutes}`;
-
-      const nx = Math.floor(detail.latitude);
-      const ny = Math.floor(detail.longitude);
-
-      const { hourlyForecasts, date } =
-        await weatherService.getHourlyWeatherForecasts(formattedDate, nx, ny);
 
       const startHour = eventDateTime.getHours();
       const endHour = eventEndDateTime.getHours();
@@ -370,11 +350,28 @@ function LightningDetailPage() {
           ? Math.max(0, endHour - 1)
           : endHour;
 
+      // 캐시에 저장된 값이 있다면 바로 상태에 할당
+      if (weatherCache.current[cacheKey]) {
+        const cachedData = weatherCache.current[cacheKey];
+        setWeatherInfo(cachedData.weatherInfo);
+        setHourlyForecasts(cachedData.hourlyForecasts);
+        setForecastDate(cachedData.forecastDate);
+        setWeatherLoading(false);
+        return;
+      }
+
+      const nx = Math.floor(detail.latitude);
+      const ny = Math.floor(detail.longitude);
+
+      const { hourlyForecasts, date } =
+        await weatherService.getHourlyWeatherForecasts(formattedDate, nx, ny);
+
       const filteredForecasts = hourlyForecasts.filter((forecast) => {
         const forecastHour = parseInt(forecast.time.split(":")[0]);
         return forecastHour >= startHour && forecastHour <= adjustedEndHour;
       });
 
+      let forecasts = [];
       if (filteredForecasts.length === 0) {
         const closestToStart = hourlyForecasts.reduce((closest, current) => {
           const currentHour = parseInt(current.time.split(":")[0]);
@@ -395,9 +392,9 @@ function LightningDetailPage() {
         }, hourlyForecasts[0]);
 
         if (closestToStart.time !== closestToEnd.time) {
-          setHourlyForecasts([closestToStart, closestToEnd]);
+          forecasts = [closestToStart, closestToEnd];
         } else {
-          setHourlyForecasts([closestToStart]);
+          forecasts = [closestToStart];
         }
       } else {
         filteredForecasts.sort((a, b) => {
@@ -405,9 +402,10 @@ function LightningDetailPage() {
             parseInt(a.time.split(":")[0]) - parseInt(b.time.split(":")[0])
           );
         });
-        setHourlyForecasts(filteredForecasts);
+        forecasts = filteredForecasts;
       }
 
+      setHourlyForecasts(forecasts);
       setForecastDate(date);
 
       const weatherData = await weatherService.getWeatherForecast(
@@ -422,8 +420,7 @@ function LightningDetailPage() {
       // 캐시에 결과 저장
       weatherCache.current[cacheKey] = {
         weatherInfo: weatherData,
-        hourlyForecasts:
-          filteredForecasts.length > 0 ? filteredForecasts : hourlyForecasts,
+        hourlyForecasts: forecasts,
         forecastDate: date,
       };
     } catch (error) {
