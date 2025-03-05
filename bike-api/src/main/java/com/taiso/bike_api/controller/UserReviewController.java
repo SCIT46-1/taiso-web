@@ -29,10 +29,10 @@ public class UserReviewController {
     @Operation(summary = "회원 리뷰 리스트", description = "받은 리뷰 리스트 조회 API")
     @GetMapping("/{userId}/review")
     public ResponseEntity<List<UserReviewResponseDTO>> getReviewList (
-            @PathVariable(name = "UserId") Long userId) {
+            @PathVariable(name = "userId") Long userId) {
 
         List<UserReviewResponseDTO> listUserReviewResponseDTO = userReviewService.getAllReview(userId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(listUserReviewResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(listUserReviewResponseDTO);
     }
 }
