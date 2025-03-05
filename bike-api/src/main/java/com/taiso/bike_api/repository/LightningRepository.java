@@ -2,6 +2,7 @@ package com.taiso.bike_api.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,4 +40,8 @@ public interface LightningRepository extends JpaRepository<LightningEntity, Long
             LocalDateTime startTime,
             LocalDateTime endTime
     );
+
+	// 클럽 번개 리스트 조회 repository
+	List<LightningEntity> findByClubId(Long clubId);
+	
 }
