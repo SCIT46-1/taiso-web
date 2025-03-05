@@ -9,10 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.taiso.bike_api.domain.LightningEntity;
-
 import com.taiso.bike_api.domain.LightningEntity.LightningStatus;
 import com.taiso.bike_api.domain.LightningUserEntity;
-
 import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.domain.UserReviewEntity;
@@ -26,9 +24,7 @@ import com.taiso.bike_api.exception.LightningUserReviewMismatchException;
 import com.taiso.bike_api.exception.ReviewNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.repository.LightningRepository;
-
 import com.taiso.bike_api.repository.LightningUserRepository;
-
 import com.taiso.bike_api.repository.UserDetailRepository;
 import com.taiso.bike_api.repository.UserRepository;
 import com.taiso.bike_api.repository.UserReviewRepository;
@@ -208,6 +204,7 @@ public class ReviewService {
     			})
                 .collect(Collectors.toList());
     	
+    	log.info("responseDTOs ===== {}",responseDTOs);
     	return responseDTOs;
         
         
