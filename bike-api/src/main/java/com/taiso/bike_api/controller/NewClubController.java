@@ -50,6 +50,4 @@ public class NewClubController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
-
-
 }
