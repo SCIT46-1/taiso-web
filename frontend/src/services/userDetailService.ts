@@ -107,7 +107,7 @@ const getMyReservationLightning = async (): Promise<MyLightningResponse[]> => {
 
 //내 완료 번개 조회
 const getMyCompletedLightning = async (): Promise<MyLightningResponse[]> => {
-  const status = encodeURIComponent("완료");
+  const status = encodeURIComponent("종료");
   return await get(`/users/me/lightnings?status=${status}`);
 };
 

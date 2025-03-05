@@ -46,7 +46,14 @@ function LoginForm({ redirectPath = "/" }) {
     try {
       setLoading(true);
       const response: LoginResponse = await authService.login(payload);
-      setUser({ email: response.userEmail, userId: response.userId });
+      setUser(
+        {
+          email: response.userEmail,
+          userId: response.userId,
+          userNickname: response.userNickname,
+        },
+        false
+      );
       // 리다이렉트 경로로 이동 전 로그 추가
       console.log(
         "LoginForm - Login successful, redirecting to:",

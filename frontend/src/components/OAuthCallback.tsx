@@ -30,10 +30,14 @@ const OAuthCallback: React.FC = () => {
         .kakaoLogin(code)
         .then((result) => {
           console.log("OAuthCallback - Kakao login successful");
-          setUser({
-            email: result.userEmail,
-            userId: result.userId,
-          });
+          setUser(
+            {
+              email: result.userEmail,
+              userId: result.userId,
+              userNickname: result.userNickname,
+            },
+            true
+          );
           console.log("OAuthCallback - Redirecting to:", redirectPath);
           navigate(redirectPath);
         })

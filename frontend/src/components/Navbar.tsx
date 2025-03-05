@@ -86,7 +86,7 @@ function Navbar() {
                 />
               </div>
             </div>
-            <div className="text-sm font-bold">이시형</div>
+            <div className="text-sm font-bold">{user?.userNickname}</div>
           </div>
           <ul className="menu mb-4 mt-4">
             <>
