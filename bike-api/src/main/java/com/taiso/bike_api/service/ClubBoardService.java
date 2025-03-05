@@ -33,7 +33,7 @@ public class ClubBoardService {
     @Autowired
     private ClubMemberRepository clubMemberRepository;
 
-    // 클럽보드 글 작성
+    // 클럽보드 게시글 작성
     public void createClubBoard(ClubBoardPostRequestDTO clubBoardPostRequestDTO, Long clubId, Authentication authentication) {
 
         log.info("들어온 클럽ID : {}", clubId);
@@ -72,6 +72,44 @@ public class ClubBoardService {
 
         // Entity 저장
         clubBoardRepository.save(board);
+
+    }
+
+    // 클럽보드 게시글 삭제
+    public void deleteClubBoard(Long clubId, Long boardId, Authentication authentication) {
+
+        // 해당 클럽 조회
+        ClubEntity club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new ClubNotFoundException("해당 클럽을 찾을 수 없습니다."));
+
+        // 현재 사용자 조회
+        UserEntity user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("현재 사용자를 찾을 수 없습니다."));
+
+        ClubBoardEntity board = clubBoardRepository.findById(boardId)
+                .orElseThrow(() -> new ClubBoardNotFoundException("해당 게시글을 찾을 수 없습니다."));
+
+        // 클럽 가입여부 확인
+        Optional<ClubMemberEntity> existingClubMember = clubMemberRepository.findByClubAndUser_UserId(club,user.getUserId());
+        log.info("현재 유저의 ID : {}", existingClubMember);
+        if (existingClubMember.isEmpty()) {
+            throw new ClubMemberMismatchException("해당 클럽 회원이 아닙니다.");
+        }
+
+        // 삭제 권한 확인 (작성자 or 클럽장)
+        if (board.getPostWriter() != user) {
+            if (club.getClubLeader() != user) {
+                throw new ClubBoardNotPermissionException("해당 게시글을 삭제할 권한이 없습니다.");
+            }
+            throw new ClubBoardNotPermissionException("해당 게시글의 작성자가 아닙니다.");
+        }
+            // 통과 후 삭제
+            else clubBoardRepository.delete(board);
+
+
+
+
+
 
     }
 }

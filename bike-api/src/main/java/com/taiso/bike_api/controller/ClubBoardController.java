@@ -34,6 +34,19 @@ public class ClubBoardController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
 
+    @DeleteMapping("/{clubId}/boards/{boardId}")
+    public ResponseEntity<ClubBoardPostRequestDTO> deleteClubBoard (
+            @PathVariable Long clubId
+            , @PathVariable Long boardId
+            , Authentication authentication) {
+
+        log.info("로직 시작 시 들어온 클럽ID : {}", clubId);
+        log.info("로직 시작 시 들어온 보드ID : {}", boardId);
+        clubBoardService.deleteClubBoard(clubId, boardId, authentication);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+    }
+
 
 
 }
