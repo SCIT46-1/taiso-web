@@ -302,7 +302,7 @@ const weatherService = {
     };
 
     // Get the forecast categories we have for this time
-    const categories = relevantItems.map((item) => item.category);
+    // const categories = relevantItems.map((item) => item.category);
 
     // Process the matched items
     relevantItems.forEach((item) => {

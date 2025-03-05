@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import UserLightningVar from "../../components/UserLightningVar";
 import UserCompletedLightningList from "../../components/UserCompletedLightningList";
 
