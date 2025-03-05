@@ -46,7 +46,7 @@ public class ClubEntity {
      * 클럽 이미지 id (null이면 기본 이미지)
      */
     @Column(name = "club_profile_image_id")
-    private Long clubProfileImageId;
+    private String clubProfileImageId;
 
     /**
      * 클럽명 (고유)

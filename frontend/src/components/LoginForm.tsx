@@ -6,7 +6,9 @@ import authService, {
 import { useAuthStore } from "../stores/useAuthStore";
 import { useNavigate } from "react-router-dom";
 
-function LoginForm() {
+function LoginForm({ redirectPath = "/" }) {
+  // 디버깅 로그 추가
+  console.log("LoginForm - Redirect path:", redirectPath);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
@@ -26,7 +28,10 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    setLoginFailed(false); // 새 제출 시 실패 상태 초기화
+    setLoginFailed(false);
+
+    // 디버깅 로그 추가
+    console.log("LoginForm - Submit with redirect to:", redirectPath);
 
     // 이메일 검증 (이미 터치되어 있다면)
     if (email.length > 0 && !emailRegex.test(email)) {
@@ -42,7 +47,12 @@ function LoginForm() {
       setLoading(true);
       const response: LoginResponse = await authService.login(payload);
       setUser({ email: response.userEmail, userId: response.userId });
-      navigate("/");
+      // 리다이렉트 경로로 이동 전 로그 추가
+      console.log(
+        "LoginForm - Login successful, redirecting to:",
+        redirectPath
+      );
+      navigate(redirectPath);
     } catch (err) {
       console.error(err);
       setLoginFailed(true);

@@ -1,6 +1,7 @@
 package com.taiso.bike_api.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -66,7 +67,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @Operation(summary = "내 페이지 정보 조회", description = "회원 프로필 페이지 정보 조회")
-    public ResponseEntity<UserDetailResponseDTO> getUserDetail(@PathVariable Long userId) {
+    public ResponseEntity<UserDetailResponseDTO> getUserDetail(@PathVariable(name = "userId") Long userId) {
 
         log.info(userId.toString());
         // 찾아온 데이터를 담기
@@ -76,11 +77,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userDetailResponseDTO);
     }
 
+
     @GetMapping("/me/lightnings")
+    @Operation(summary = "내 예약 번개 리스트", description = "내가 예약한 번개 리스트 조회")
     public ResponseEntity<List<UserLightningsGetResponseDTO>> getUserLightnings(
-        @RequestParam(name = "status") List<LightningStatus> status
+        @RequestParam(name = "status") List<String> status
         , @AuthenticationPrincipal String userEmail) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserLightnings(status, userEmail));
+        List<LightningStatus> statusList = status.stream()
+            .map(LightningStatus::valueOf) // 문자열을 Enum으로 변환
+            .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserLightnings(statusList, userEmail));
     }
     
     

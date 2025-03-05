@@ -329,4 +329,63 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
     
+    // 클럽 미존재 예외 처리
+    @ExceptionHandler(ClubNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubNotFoundException(ClubNotFoundException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(
+                ex.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    // 이미 참여한 클럽 예외 처리
+    @ExceptionHandler(ClubMemberAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubMemberAlreadyExistsException(ClubMemberAlreadyExistsException ex, HttpServletRequest request) {
+        log.error("LightningUserAlreadyExistsException: ", ex);
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(
+                ex.getMessage(), HttpStatus.CONFLICT, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }   
+
+    // 클럽 인원이 가득 찼을 때 예외 처리
+    @ExceptionHandler(ClubMemberFullException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubMemberFullException(ClubMemberFullException ex, HttpServletRequest request) {
+        log.error("LightningUserAlreadyExistsException: ", ex);
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(
+                ex.getMessage(), HttpStatus.CONFLICT, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }   
+    
+    // 클럽 관리자와 로그인한 사람이 일치하는지 확인
+    @ExceptionHandler(ClubLeaderMismatchException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubLeaderMismatchException(ClubLeaderMismatchException ex,
+            HttpServletRequest request) {
+        log.error("RouteDeleteAccessDeniedException: ", ex);
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN,
+                request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }    
+
+    // 해당 클럽 참가 신청자와 클럽이 일치하는지 확인
+    @ExceptionHandler(ClubMemberMismatchException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubMemberMismatchException(ClubMemberMismatchException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(
+                ex.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+	// 6. 클럽 참가 신청자의 상태가 '신청대기'인지 확인 (아니면 승인/거절 불가)
+    @ExceptionHandler(ClubStatusMismatchException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubStatusMismatchException(ClubStatusMismatchException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    // 이미 존재하는 클럽명 예외 처리
+    @ExceptionHandler(ClubAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubAlreadyExistsException(ClubAlreadyExistsException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+    
+    
 }

@@ -2,6 +2,7 @@ package com.taiso.bike_api.service;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,9 +92,6 @@ public class UserDetailService {
         entity.setUserNickname(userDetailRequestDTO.getUserNickname());
         entity.setUserProfileImg(userDetailRequestDTO.getProfileImg());
         entity.setUserBackgroundImg(userDetailRequestDTO.getBackgroundImg());
-
-        //종료하기
-        s3Service.close();
     }
 
 
@@ -121,10 +119,10 @@ public class UserDetailService {
                     .bio(userDetail.getBio())
                     .profileImg(userDetail.getUserProfileImg())
                     .backgroundImg(userDetail.getUserBackgroundImg())
+                    .level(userDetail.getLevel().name())
+                    .gender(userDetail.getGender().name())
+                    .tags(userDetail.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
                     .build();
-
-        //종료하기
-        s3Service.close();
 
         return userDetailResponseDTO;
     }

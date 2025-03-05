@@ -3,6 +3,7 @@ package com.taiso.bike_api.config;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,7 +42,8 @@ public class SecurityConfig {
     @Autowired
     private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-
+    @Value("${app.cors.allowed-origins}")
+    private String[] allowedOrigins;
     
     /**
      * SecurityFilterChain 빈을 등록하여 스프링 시큐리티 설정을 구성합니다.
@@ -76,7 +78,7 @@ public class SecurityConfig {
                 // 인증 없이 접근 가능한 URL (예: 인증 관련 엔드포인트, H2 콘솔)
                 //TODO: 권한 관련 수정 필요
                         .requestMatchers("/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**",
-                                "/api/auth/kakao", "/api/lightnings/", "/api/routes/**", "/api/lightnings/{lightningId}")
+                                "/api/auth/kakao", "/api/lightnings/", "/api/routes/**", "/api/lightnings/{lightningId}", "/api/lightnings", "/api/clubs")
                         .permitAll()
 
                 // 그 외 모든 요청은 인증 필요
@@ -119,8 +121,8 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // TODO: 프로덕션 도메인 추가
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

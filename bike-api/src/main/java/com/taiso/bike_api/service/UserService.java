@@ -21,7 +21,7 @@ import com.taiso.bike_api.dto.RegisterResponseDTO;
 import com.taiso.bike_api.dto.UserLightningsGetResponseDTO;
 import com.taiso.bike_api.dto.UserLightningsGetResponseLightningDTO;
 import com.taiso.bike_api.dto.UserLightningsGetResponseTagsDTO;
-import com.taiso.bike_api.dto.UserLightningsGetResponseUsersDTO;
+import com.taiso.bike_api.dto.UserLightningsGetResponseUserDTO;
 import com.taiso.bike_api.exception.EmailAlreadyExistsException;
 import com.taiso.bike_api.exception.UserLightningsGetInvalidStatusException;
 import com.taiso.bike_api.exception.UserNotFoundException;
@@ -113,7 +113,7 @@ public class UserService {
 
         // 비정상적인 status: 종료와 모집이 함께 제시된다거나 하는 경우
         if (status.stream().anyMatch(s -> s.equals(LightningStatus.종료))
-                && status.stream().anyMatch(s -> List.of(LightningStatus.모집, LightningStatus.마감).contains(s))
+                && status.stream().anyMatch(s -> List.of(LightningStatus.모집, LightningStatus.마감, LightningStatus.강제마감).contains(s))
                 || status.stream().anyMatch(s -> s.equals(LightningStatus.취소))) {
             throw new UserLightningsGetInvalidStatusException("잘못된 참가상태조건 요청입니다.");
         }
@@ -122,7 +122,7 @@ public class UserService {
         List<ParticipantStatus> pStatus = new ArrayList<>(status.contains(LightningStatus.종료) ? Arrays.asList(ParticipantStatus.승인, ParticipantStatus.완료) : Arrays.asList(ParticipantStatus.승인, ParticipantStatus.완료, ParticipantStatus.신청대기));
 
         // 예약 또는 완료 번개 리스트 조회
-        List<LightningUserEntity> lightningUserEntityList = lightningUserRepository.findByUserAndParticipantStatusAndLightning_LightningStatusOrderByLightning_EventDateDesc(user, pStatus, status);
+        List<LightningUserEntity> lightningUserEntityList = lightningUserRepository.findByUserAndParticipantStatusInAndLightning_StatusInOrderByLightning_EventDateDesc(user, pStatus, status);
 
         // LightningUserEntity 리스트를 UserLightningsGetResponseDTO 리스트로 변환
         List<UserLightningsGetResponseDTO> userLightningsGetResponseDTOList = lightningUserEntityList.stream().map(
@@ -136,14 +136,16 @@ public class UserService {
                                                                                                                                     .duration(lightningUserEntity.getLightning().getDuration())
                                                                                                                                     .capacity(lightningUserEntity.getLightning().getCapacity())
                                                                                                                                     .build())
-                                                                                    .users(UserLightningsGetResponseUsersDTO.builder()
-                                                                                                                            .userId(lightningUserRepository.findByLightningAndParticipantStatusIn(
-                                                                                                                                lightningUserEntity.getLightning()
-                                                                                                                                , new ArrayList<>(Arrays.asList(ParticipantStatus.승인, ParticipantStatus.완료, ParticipantStatus.신청대기)))
-                                                                                                                                                    .stream()
-                                                                                                                                                    .map(entity -> entity.getUser().getUserId())
-                                                                                                                                                    .collect(Collectors.toSet()))
-                                                                                                                            .build())
+                                                                                    .users(lightningUserRepository.findByLightningAndParticipantStatusIn(
+                                                                                        lightningUserEntity.getLightning()
+                                                                                        , new ArrayList<>(Arrays.asList(ParticipantStatus.승인, ParticipantStatus.완료, ParticipantStatus.신청대기)))
+                                                                                                                  .stream()
+                                                                                                                  .map(entity -> UserLightningsGetResponseUserDTO.builder()
+                                                                                                                                                                .userId(entity.getUser().getUserId())
+                                                                                                                                                                .userNickname(entity.getUser().getUserDetail().getUserNickname())
+                                                                                                                                                                .userProfileImg(entity.getUser().getUserDetail().getUserProfileImg())
+                                                                                                                                                                .build())
+                                                                                                                  .collect(Collectors.toSet()))
                                                                                     .tags(UserLightningsGetResponseTagsDTO.builder()
                                                                                                                           .tags(lightningUserEntity.getLightning().getTags().stream().map(
                                                                                                                                tag -> tag.getName())
