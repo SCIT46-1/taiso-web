@@ -1,6 +1,7 @@
 package com.taiso.bike_api.controller;
 
 
+import com.taiso.bike_api.dto.ClubBoardPatchRequestDTO;
 import com.taiso.bike_api.dto.ClubBoardPostRequestDTO;
 import com.taiso.bike_api.service.ClubBoardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,28 +22,44 @@ public class ClubBoardController {
     @Autowired
     private ClubBoardService clubBoardService;
 
-    @Operation(summary = "클럽 생성", description = "클럽을 생성하는 API")
+    @Operation(summary = "클럽 게시글 생성", description = "클럽 게시글 생성 API")
     @PostMapping("/{clubId}/boards")
     public ResponseEntity<ClubBoardPostRequestDTO> createClubBoard(
-            @RequestBody ClubBoardPostRequestDTO clubBoardPostRequestDTO
-            , @PathVariable Long clubId
-            , Authentication authentication) {
+                                        @RequestBody ClubBoardPostRequestDTO clubBoardPostRequestDTO
+                                        , @PathVariable Long clubId
+                                        , Authentication authentication) {
 
         log.info("로직 시작 시 들어온 DTO : {}", clubBoardPostRequestDTO.toString());
         clubBoardService.createClubBoard(clubBoardPostRequestDTO, clubId, authentication);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
+    @Operation(summary = "클럽 게시글 삭제", description = "클럽 게시글 삭제 API")
     @DeleteMapping("/{clubId}/boards/{boardId}")
     public ResponseEntity<ClubBoardPostRequestDTO> deleteClubBoard (
-            @PathVariable Long clubId
-            , @PathVariable Long boardId
-            , Authentication authentication) {
+                                                @PathVariable Long clubId
+                                                , @PathVariable Long boardId
+                                                , Authentication authentication) {
 
         log.info("로직 시작 시 들어온 클럽ID : {}", clubId);
         log.info("로직 시작 시 들어온 보드ID : {}", boardId);
         clubBoardService.deleteClubBoard(clubId, boardId, authentication);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+    }
+
+    // 수정 화면 조회 API 추가작업 해야함
+
+    @Operation(summary = "클럽 게시글 수정", description = "클럽 게시글 수정 API")
+    @PatchMapping("/{clubId}/boards/{boardId}")
+    public ResponseEntity<ClubBoardPostRequestDTO> deleteClubBoard (
+                                        @RequestBody ClubBoardPatchRequestDTO clubBoardPatchRequestDTO
+                                        , @PathVariable Long clubId
+                                        , @PathVariable Long boardId
+                                        , Authentication authentication) {
+
+        clubBoardService.patchClubBoard(clubBoardPatchRequestDTO, clubId, boardId, authentication);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
