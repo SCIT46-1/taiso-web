@@ -354,11 +354,11 @@ function LightningDetailPage() {
         .toString()
         .padStart(2, "0");
       const formattedStartTime = `${startHours}:${startMinutes}`;
-      const endHours = eventEndDateTime.getHours().toString().padStart(2, "0");
-      const endMinutes = eventEndDateTime
-        .getMinutes()
-        .toString()
-        .padStart(2, "0");
+      // const endHours = eventEndDateTime.getHours().toString().padStart(2, "0");
+      // const endMinutes = eventEndDateTime
+      //   .getMinutes()
+      //   .toString()
+      //   .padStart(2, "0");
       // const formattedEndTime = `${endHours}:${endMinutes}`;
 
       const nx = Math.floor(detail.latitude);

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
-import authService from "../services/authService";
 
 function UserUpdateForm() {
   const { user } = useAuthStore();
@@ -81,10 +80,10 @@ function UserUpdateForm() {
       return;
     }
 
-    const payload = {
-      userId: user?.userId,
-      password,
-    };
+    // const payload = {
+    //   userId: user?.userId,
+    //   password,
+    // };
 
     try {
       setLoading(true);
