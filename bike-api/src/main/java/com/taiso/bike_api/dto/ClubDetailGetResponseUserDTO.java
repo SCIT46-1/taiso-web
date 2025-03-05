@@ -22,12 +22,12 @@ public class ClubDetailGetResponseUserDTO {
     private String userProfileImage;
     private String bio;
 
-    public static ClubDetailGetResponseUserDTO toDTO(UserEntity user, UserDetailEntity userDetail) {
+    public static ClubDetailGetResponseUserDTO toDTO(UserEntity user) {
         return ClubDetailGetResponseUserDTO.builder()
                                            .userId(user.getUserId())
-                                           .userNickname(userDetail.getUserNickname())
-                                           .userProfileImage(userDetail.getUserProfileImg())
-                                           .bio(userDetail.getBio())
+                                           .userNickname(user.getUserDetail().getUserNickname())
+                                           .userProfileImage(user.getUserDetail().getUserProfileImg())
+                                           .bio(user.getUserDetail().getBio())
                                            .build();
     }
 }
