@@ -379,6 +379,13 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request.getRequestURI());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
+
+    // 클럽보드 공지글 권한 없음 예외 처리
+    @ExceptionHandler(ClubBoardNoticeNotPermissionException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubBoardNoticeNotPermissionException(ClubBoardNoticeNotPermissionException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
     
     
 }
