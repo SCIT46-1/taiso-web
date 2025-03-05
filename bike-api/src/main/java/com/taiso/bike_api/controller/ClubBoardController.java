@@ -53,7 +53,7 @@ public class ClubBoardController {
 
     @Operation(summary = "클럽 게시글 수정", description = "클럽 게시글 수정 API")
     @PatchMapping("/{clubId}/boards/{boardId}")
-    public ResponseEntity<ClubBoardPostRequestDTO> deleteClubBoard (
+    public ResponseEntity<ClubBoardPostRequestDTO> patchClubBoard (
                                         @RequestBody ClubBoardPatchRequestDTO clubBoardPatchRequestDTO
                                         , @PathVariable Long clubId
                                         , @PathVariable Long boardId
