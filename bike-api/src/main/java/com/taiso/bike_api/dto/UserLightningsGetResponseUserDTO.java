@@ -15,6 +15,9 @@ import lombok.ToString;
 @Getter
 @ToString
 @Builder
-public class UserLightningsGetResponseUsersDTO {
-    private Set<Long> userId;
+public class UserLightningsGetResponseUserDTO {
+    private Long userId;
+    private String userNickname;
+    private String userProfileImg;
+    private String bio;
 }

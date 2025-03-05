@@ -1,6 +1,9 @@
 package com.taiso.bike_api.dto;
 
 
+import java.util.List;
+import java.util.Set;
+
 import com.taiso.bike_api.domain.LightningUserEntity.ParticipantStatus;
 
 import lombok.AllArgsConstructor;
@@ -18,7 +21,7 @@ import lombok.ToString;
 @Builder
 public class UserLightningsGetResponseDTO {
     private UserLightningsGetResponseLightningDTO lightning;
-    private UserLightningsGetResponseUsersDTO users;
+    private Set<UserLightningsGetResponseUserDTO> users;
     private UserLightningsGetResponseTagsDTO tags;
     private ParticipantStatus status;
 }
