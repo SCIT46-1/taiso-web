@@ -1,6 +1,7 @@
 package com.taiso.bike_api.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.taiso.bike_api.domain.LightningUserEntity.ParticipantStatus;
+import com.taiso.bike_api.domain.LightningEntity.LightningStatus;
 import com.taiso.bike_api.dto.UserDetailRequestDTO;
 import com.taiso.bike_api.dto.UserDetailResponseDTO;
 import com.taiso.bike_api.dto.UserLightningReviewResponseDTO;
@@ -80,9 +81,12 @@ public class UserController {
     @GetMapping("/me/lightnings")
     @Operation(summary = "내 예약 번개 리스트", description = "내가 예약한 번개 리스트 조회")
     public ResponseEntity<List<UserLightningsGetResponseDTO>> getUserLightnings(
-        @RequestParam(name = "status") List<ParticipantStatus> status
+        @RequestParam(name = "status") List<String> status
         , @AuthenticationPrincipal String userEmail) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserLightnings(status, userEmail));
+        List<LightningStatus> statusList = status.stream()
+            .map(LightningStatus::valueOf) // 문자열을 Enum으로 변환
+            .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserLightnings(statusList, userEmail));
     }
     
     

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.taiso.bike_api.domain.LightningEntity;
+import com.taiso.bike_api.domain.LightningEntity.LightningStatus;
 import com.taiso.bike_api.domain.LightningUserEntity;
 import com.taiso.bike_api.domain.LightningUserEntity.ParticipantStatus;
 import com.taiso.bike_api.domain.UserDetailEntity;
@@ -51,4 +52,7 @@ public interface LightningUserRepository extends JpaRepository<LightningUserEnti
 
     //유저아이디랑 번개아이디로 참여자 조회
     Optional<LightningUserEntity> findByUser_UserIdAndLightning_LightningId(Long userId, Long lightningId);
+
+    List<LightningUserEntity> findByUserAndParticipantStatusInAndLightning_StatusInOrderByLightning_EventDateDesc(
+            UserEntity user, List<ParticipantStatus> pStatus, List<LightningStatus> status);
 }
