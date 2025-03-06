@@ -15,9 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -243,22 +241,45 @@ public class ClubBoardService {
         // 필터링된 데이터로 페이징 조회
         Page<ClubBoardEntity> clubBoardPage = clubBoardRepository.findAll(spec, pageable);
 
-        //빌더
+        // 1. clubBoardPage에서 가져온 모든 userId를 추출하여 한 번에 조회
+        List<Long> userIds = clubBoardPage.getContent().stream()
+                .map(culbBoard -> culbBoard.getPostWriter().getUserId())
+                .filter(Objects::nonNull) // userId가 null인 경우 제거
+                .distinct() // 중복 제거
+                .collect(Collectors.toList());
+
+        // 2. 한 번의 DB 조회로 모든 UserDetailEntity 가져오기
+        List<UserDetailEntity> userDetails = userDetailRepository.findByUserIdIn(userIds);
+        Map<Long, UserDetailEntity> writerDetailMap = userIds.isEmpty()
+                ? new HashMap<>()
+                : userDetails.stream()
+                .distinct()  // 중복 제거 (equals/hashCode가 올바르게 구현되어 있어야 함)
+                .collect(Collectors.toMap(
+                        UserDetailEntity::getUserId,
+                        detail -> detail
+                ));
+
+        // 3. clubBoardPage의 데이터를 ResponseClubBoardListDTO로 변환
         List<ResponseClubBoardListDTO> clubBoardDTO = clubBoardPage.getContent().stream()
-                .map(culbBoard -> ResponseClubBoardListDTO.builder()
-                        .postId(culbBoard.getPostId())
-                        .postTitle(culbBoard.getPostTitle())
-                        .postWriter(culbBoard.getPostWriter().getUserId())
-//                        .writerNickname()
-//                        .writerProfileImg()
-                        .postContent(culbBoard.getPostContent())
-                        .createdAt(culbBoard.getCreatedAt())
-                        .updatedAt(culbBoard.getUpdatedAt())
-                        .isNotice(culbBoard.getIsNotice())
-                        // 관리자 권한 확인 (작성자 or 클럽장)
-                        .canDelete(culbBoard.getPostWriter() == user || club.getClubLeader() == user) // 작성자&클럽장 가능
-                        .canEdit(culbBoard.getPostWriter() == user) // 작성자만 가능
-                        .build())
+                .map(culbBoard -> {
+                    Long writerId = culbBoard.getPostWriter().getUserId();
+                    UserDetailEntity writerDetail = writerDetailMap.get(writerId); // 미리 가져온 Map에서 조회
+
+                    return ResponseClubBoardListDTO.builder()
+                            .postId(culbBoard.getPostId())
+                            .postTitle(culbBoard.getPostTitle())
+                            .postWriter(writerId)
+                            .writerNickname(writerDetail != null ? writerDetail.getUserNickname() : "알 수 없음") // 닉네임 가져오기
+                            .writerProfileImg(writerDetail != null ? writerDetail.getUserProfileImg() : null) // 프로필 이미지 가져오기
+                            .postContent(culbBoard.getPostContent())
+                            .createdAt(culbBoard.getCreatedAt())
+                            .updatedAt(culbBoard.getUpdatedAt())
+                            .isNotice(culbBoard.getIsNotice())
+                            // 권한 확인
+                            .canEdit(culbBoard.getPostWriter().equals(user) || club.getClubLeader().equals(user)) // 작성자 또는 클럽장 가능
+                            .canDelete(culbBoard.getPostWriter().equals(user)) // 작성자만 가능
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         return ClubBoardListResponseDTO.builder()

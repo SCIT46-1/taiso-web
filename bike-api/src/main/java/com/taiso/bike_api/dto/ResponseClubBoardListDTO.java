@@ -15,8 +15,8 @@ public class ResponseClubBoardListDTO {
 
     private Long postId;
     private Long postWriter;
-//    private String writerNickname;
-//    private String writerProfileImg;
+    private String writerNickname;
+    private String writerProfileImg;
     private String postTitle;
     // 미리보기용
     private String postContent;

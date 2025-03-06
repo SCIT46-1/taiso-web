@@ -17,5 +17,5 @@ public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Lo
     Optional<UserDetailEntity> findByUserEmail(String email);
 
     // userIds 리스트에 포함된 사용자 정보를 한 번에 조회
-    Optional<Object> findByUserIdIn(List<Long> userIds);
+    List<UserDetailEntity> findByUserIdIn(List<Long> userIds);
 }
