@@ -84,6 +84,7 @@ public class AuthController {
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
         loginResponseDTO.setUserEmail(authentication.getName());
         loginResponseDTO.setUserId(userService.getUserIdByEmail(authentication.getName()));
+        loginResponseDTO.setUserNickname(userService.getUserNicknameByEmail(authentication.getName()));
 
     
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
@@ -157,7 +158,7 @@ public class AuthController {
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
         loginResponseDTO.setUserEmail(result.getUserEmail());
         loginResponseDTO.setUserId(result.getUserId());
-
+        loginResponseDTO.setUserNickname(result.getUserNickname());
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
     }    
 
@@ -187,7 +188,7 @@ public class AuthController {
     @PatchMapping("/me")
     @Operation(summary = "내 비밀번호 수정", description = "내 비밀번호 수정")
     public ResponseEntity<Void> updatePassword(
-        @RequestBody UserPasswordUpdateRequestDTO requestDTO
+        @Valid @RequestBody UserPasswordUpdateRequestDTO requestDTO
         , @AuthenticationPrincipal String userEmail
         , HttpServletResponse response) {
 

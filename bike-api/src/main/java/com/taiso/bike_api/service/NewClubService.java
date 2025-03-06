@@ -1,24 +1,30 @@
 package com.taiso.bike_api.service;
 
-import com.taiso.bike_api.domain.ClubEntity;
-import com.taiso.bike_api.domain.ClubMemberEntity;
-import com.taiso.bike_api.domain.LightningTagCategoryEntity;
-import com.taiso.bike_api.domain.UserEntity;
-import com.taiso.bike_api.dto.ClubCreateRequestDTO;
-import com.taiso.bike_api.exception.*;
-import com.taiso.bike_api.repository.ClubMemberRepository;
-import com.taiso.bike_api.repository.ClubRepository;
-import com.taiso.bike_api.repository.LightningTagCategoryRepository;
-import com.taiso.bike_api.repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.taiso.bike_api.domain.ClubEntity;
+import com.taiso.bike_api.domain.ClubMemberEntity;
+import com.taiso.bike_api.domain.LightningTagCategoryEntity;
+import com.taiso.bike_api.domain.UserEntity;
+import com.taiso.bike_api.dto.ClubCreateRequestDTO;
+import com.taiso.bike_api.exception.ClubAlreadyExistsException;
+import com.taiso.bike_api.exception.ClubMemberMismatchException;
+import com.taiso.bike_api.exception.ClubNotFoundException;
+import com.taiso.bike_api.exception.InvalidFileExtensionException;
+import com.taiso.bike_api.exception.UserNotFoundException;
+import com.taiso.bike_api.repository.ClubMemberRepository;
+import com.taiso.bike_api.repository.ClubRepository;
+import com.taiso.bike_api.repository.LightningTagCategoryRepository;
+import com.taiso.bike_api.repository.UserRepository;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -71,7 +77,7 @@ public class NewClubService {
             }
 
             // null&확장자 확인되면 S3에 업로드 후 DB에 저장할 Id 생성
-            String clubProfileImageId = s3Service.uploadFile(clubProfileImage, clubCreator.getUserId());
+            String clubProfileImageId = s3Service.uploadClubImage(clubProfileImage, clubCreator.getUserId());
             // 프로필 이미지 Id 업데이트
             requestDTO.setClubProfileImageId(clubProfileImageId);
         } else {

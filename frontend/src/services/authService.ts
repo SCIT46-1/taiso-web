@@ -1,4 +1,4 @@
-import { get } from "../api/request";
+import { get, patch } from "../api/request";
 import { post } from "../api/request";
 
 export interface LoginRequest {
@@ -35,6 +35,11 @@ export interface KakaoAuthResultDTO {
   userNickname: string;
 }
 
+export interface UpdateUserAuthInfoRequest {
+  currentPassword: string;
+  password: string;
+}
+
 const login = async (payload: LoginRequest): Promise<LoginResponse> => {
   const response: LoginResponse = await post("/auth/login", payload);
   console.log(response);
@@ -67,6 +72,12 @@ const checkEmail = async (email: string): Promise<boolean> => {
   return await get(`/auth/check-email?email=${email}`);
 };
 
+const updateUserAuthInfo = async (
+  payload: UpdateUserAuthInfoRequest
+): Promise<void> => {
+  return await patch("/auth/me", payload);
+};
+
 export default {
   login,
   register,
@@ -75,4 +86,5 @@ export default {
   kakaoLogin,
   authCheck,
   checkEmail,
+  updateUserAuthInfo,
 };

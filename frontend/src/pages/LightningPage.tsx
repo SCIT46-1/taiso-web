@@ -110,7 +110,6 @@ function LightningPage() {
     setSearchParams,
   ]);
 
-
   return (
     <div className="min-h-screen flex flex-col w-full">
       <MainNavbar />
@@ -319,7 +318,7 @@ function LightningPage() {
           </div>
         )}
 
-        <div className="fixed bottom-8 right-10 z-50">
+        <div className="fixed bottom-8 right-10 z-50 no-animation">
           {/* 번개 생성 버튼 */}
           <Link to="/lightning/post" className="btn btn-primary btn-circle">
             <svg

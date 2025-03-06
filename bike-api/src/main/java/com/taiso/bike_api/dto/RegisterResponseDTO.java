@@ -14,4 +14,5 @@ import lombok.ToString;
 public class RegisterResponseDTO {
     private Long userId;
     private String email;
+    private String userNickname;
 } 
