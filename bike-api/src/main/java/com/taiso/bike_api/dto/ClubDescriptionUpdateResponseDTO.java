@@ -14,10 +14,12 @@ import lombok.ToString;
 @ToString
 @Builder
 public class ClubDescriptionUpdateResponseDTO {
-    @Builder.Default
-    private String message = "클럽 소개글이 수정되었습니다.";
 
-    public static ClubDescriptionUpdateResponseDTO toDTO() {
-        return ClubDescriptionUpdateResponseDTO.builder().build();
+    private String message;
+
+    public static ClubDescriptionUpdateResponseDTO toDTO(String message) {
+        return ClubDescriptionUpdateResponseDTO.builder()
+                                               .message("클럽 소개글이 수정되었습니다.")
+                                               .build();
     }
 }

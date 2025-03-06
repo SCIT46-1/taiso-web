@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.taiso.bike_api.dto.ClubDescriptionUpdateRequestDTO;
 import com.taiso.bike_api.dto.ClubDescriptionUpdateResponseDTO;
 import com.taiso.bike_api.dto.ClubDetailGetResponseDTO;
+import com.taiso.bike_api.dto.ClubDetailsUpdateRequestDTO;
+import com.taiso.bike_api.dto.ClubDetailsUpdateResponseDTO;
 import com.taiso.bike_api.dto.ClubsGetResponseDTO;
 import com.taiso.bike_api.service.ClubService;
 
@@ -43,6 +45,14 @@ public class ClubController {
         , @RequestBody ClubDescriptionUpdateRequestDTO requestDTO
         , Authentication authentication) {
         return ResponseEntity.status(HttpStatus.OK).body(clubService.updateClubDescription(clubId, requestDTO, authentication));
+    }
+
+    @PatchMapping("/{clubId}")
+    public ResponseEntity<ClubDetailsUpdateResponseDTO> updateClubDetails(
+        @PathVariable(name = "clubId") Long clubId
+        , @RequestBody ClubDetailsUpdateRequestDTO requestDTO
+        , Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK).body(clubService.updateClubDetails(clubId, requestDTO, authentication));
     }
 
 }
