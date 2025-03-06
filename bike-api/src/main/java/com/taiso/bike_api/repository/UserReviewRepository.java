@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.domain.UserReviewEntity;
@@ -26,4 +27,6 @@ public interface UserReviewRepository extends JpaRepository<UserReviewEntity, Lo
 
 
   	List<UserReviewEntity> findByReviewed_UserId(Long userId);
+	
+	List<UserReviewEntity> findByLightningAndReviewer(LightningEntity lightning, UserDetailEntity reviewer);
 }

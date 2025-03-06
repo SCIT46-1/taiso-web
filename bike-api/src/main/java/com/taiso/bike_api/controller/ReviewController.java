@@ -68,7 +68,7 @@ public class ReviewController {
 		
 		List<LightningCompletedReviewsResponseDTO> responseDTOs = reviewService.completedReviews(lightningId, authentication);
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(responseDTOs);
+		return ResponseEntity.status(HttpStatus.OK).body(responseDTOs);
 	}
 	
 	

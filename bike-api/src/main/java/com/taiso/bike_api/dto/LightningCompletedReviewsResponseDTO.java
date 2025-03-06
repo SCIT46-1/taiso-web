@@ -28,4 +28,6 @@ public class LightningCompletedReviewsResponseDTO {
     // lightningUserEntity 역할, 상태, 아이디
 	private LightningCompletedReviewsLightningUserDTO lightningUserDTO;
     
+    // 리뷰 작성 여부
+    private Boolean isReviewed;
 }
