@@ -258,6 +258,52 @@ public class ClubMemberService {
 	            .routeId(routeId)
 	            .build();
 	}
+
+	// 클럽장 위임 서비스
+	@Transactional
+	public void clubLeader(Long clubId, Long userId, Authentication authentication) {
+
+		// 1. 클럽 아이디로 엔티티 가져오기 
+        ClubEntity clubEntity = clubRepository.findById(clubId)
+                .orElseThrow(() -> new ClubNotFoundException("클럽을 찾을 수 없습니다. NOT_FOUND"));
+
+        // 2. 로그인 사용자 엔티티 가져오기
+        UserEntity currentUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다. NOT_FOUND"));   
+        
+        // 3. 현재 사용자가 클럽 리더인지 확인 (승인 권한 확인) -> 403 FORBIDDEN
+        if (!currentUser.getUserId().equals(clubEntity.getClubLeader().getUserId() )) {
+            throw new ClubLeaderMismatchException("클럽 리더만 클럽장 위임을 할 수 있음 FORBIDDEN");
+        }
+
+        // 4. 클럽장을 받는 유저와 클럽이 일치하는지 조회 (존재하지 않으면 404)
+        ClubMemberEntity newLeaderMember = clubMemberRepository.findByClubAndUser_UserId(clubEntity, userId)
+        		.orElseThrow(() -> new UserNotFoundException("클럽장이 되는 사용자를 클럽에서 찾을 수 없습니다. NOT_FOUND")); 
+
+        // 5. 클럽장을 받는 유저와 클럽이 일치하는지 확인
+        if (!newLeaderMember.getClub().getClubId().equals(clubEntity.getClubId())) {
+            throw new ClubMemberMismatchException("클럽과 클럽장이 되는 대상이 일치하지 않음");
+        }  
+        
+        // 6. 클럽장을 받는 유저가 클럽에 승인 되어 있는지 확인 필요
+        if (newLeaderMember.getParticipantStatus() != ParticipantStatus.승인) {
+            throw new ClubStatusMismatchException("클럽장을 받는 유저가 승인 상태가 아닙니다.");
+        }
+
+        // 7. 클럽장을 받는 유저 entity 가져오기
+        UserEntity newLeaderUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다. NOT_FOUND")); 
+        
+        // 8. 클럽장을 멤버로 변경하기 위한 clubMemberEntity 가져오기
+        ClubMemberEntity ClubleaderEntity = clubMemberRepository.findByClubAndUser_UserId(clubEntity, currentUser.getUserId())
+        		.orElseThrow(() -> new UserNotFoundException("클럽장 사용자를 찾을 수 없습니다. NOT_FOUND"));
+        
+        // 9. 클럽장 위임
+        newLeaderMember.setRole(ClubMemberEntity.Role.클럽장);
+        ClubleaderEntity.setRole(ClubMemberEntity.Role.멤버);
+        clubEntity.setClubLeader(newLeaderUser);
+        
+	}
 	
 	
 }
