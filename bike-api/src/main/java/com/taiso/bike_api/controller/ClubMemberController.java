@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.taiso.bike_api.dto.ClubJoinMemberResponseDTO;
+import com.taiso.bike_api.dto.ClubLeaderResponseDTO;
 import com.taiso.bike_api.dto.ClubLightningListResponseDTO;
 import com.taiso.bike_api.dto.ClubMemberWithdrawalResponseDTO;
 import com.taiso.bike_api.service.ClubMemberService;
@@ -96,6 +97,19 @@ public class ClubMemberController {
 		List<ClubLightningListResponseDTO> responseList = clubMemberService.clubLightningsList(clubId, authentication);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(responseList);
+	}
+	
+	// 클럽장 위임
+	@PatchMapping("/{clubId}/leader/{userId}")
+  	@Operation(summary = "클럽장 위임", description = "클럽장 위임 API")
+	public ResponseEntity<ClubLeaderResponseDTO> clubLeaderController(
+    		@PathVariable(name = "clubId") Long clubId,
+    		@PathVariable(name = "userId") Long userId,
+			Authentication authentication
+			) {
+		clubMemberService.clubLeader(clubId, userId, authentication);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 	
 	
