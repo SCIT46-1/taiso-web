@@ -420,4 +420,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
+    // 클럽 수정권한 없음 예외 처리
+    @ExceptionHandler(ClubUpdateNoPermissionException.class)
+    public ResponseEntity<ErrorResponseDTO> handleClubUpdateNoPermissionException(ClubUpdateNoPermissionException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
 }
