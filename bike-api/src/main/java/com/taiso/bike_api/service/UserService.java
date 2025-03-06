@@ -88,7 +88,7 @@ public class UserService {
                     .build();
             userDetailRepository.save(userDetail);
 
-            return new RegisterResponseDTO(savedUser.getUserId(), savedUser.getEmail());
+            return new RegisterResponseDTO(savedUser.getUserId(), savedUser.getEmail(), randomNickname);
         } catch (DataIntegrityViolationException e) {
             throw new EmailAlreadyExistsException("이미 사용 중인 이메일입니다.");
         }
@@ -166,6 +166,15 @@ public class UserService {
     public boolean checkEmail(String email) {
         Optional<UserEntity> user = userRepository.findByEmail(email);
         return user.isPresent();
+    }
+
+    public String getUserNicknameByEmail(String email) {
+        Optional<UserEntity> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            return user.get().getUserDetail().getUserNickname();
+        } else {
+            throw new UserNotFoundException("User not found");
+        }
     }
     
 } 

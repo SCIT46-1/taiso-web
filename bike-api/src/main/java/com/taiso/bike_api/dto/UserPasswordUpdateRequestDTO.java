@@ -17,9 +17,9 @@ public class UserPasswordUpdateRequestDTO {
 
     @NotBlank
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9]).{8,25}$")
-    private String currentPwd;
+    private String currentPassword;
 
     @NotBlank
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9]).{8,25}$")
-    private String newPwd;
+    private String password;
 }

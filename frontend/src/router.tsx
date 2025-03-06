@@ -18,9 +18,12 @@ import AuthRoute from "./AuthRoute";
 import UserOnboardingPage from "./pages/auth/UserOnboardingPage";
 import UserDetailPage from "./pages/UserDetailPage";
 import UserDetailUpdate from "./pages/user/userDetailUpdate";
-import UserAccountPage from "./pages/user/UserAccountPage";
 import UserLightningPage from "./pages/user/UserLightningPage";
 import UserLightningCompletePage from "./pages/user/UserLightningCompletePage";
+import ClubDetailPage from "./pages/club/ClubDetailPage";
+import ClubPostPage from "./pages/club/ClubPostPage";
+import UserAccountUpdatePage from "./pages/user/UserAccountUpdatePage";
+import UserAccountPage from "./pages/user/UserAccountPage";
 
 const router = createBrowserRouter([
   {
@@ -51,8 +54,13 @@ const router = createBrowserRouter([
       },
       {
         path: "club",
-        children: [{ path: "", element: <ClubPage /> }],
+        children: [
+          { path: "", element: <ClubPage /> },
+          { path: ":clubId", element: <ClubDetailPage /> },
+          { path: "post", element: <ClubPostPage /> },
+        ],
       },
+
       {
         path: "users",
         children: [{ path: ":userId", element: <UserDetailPage /> }],
@@ -73,6 +81,7 @@ const router = createBrowserRouter([
             path: "user",
             children: [
               { path: "me/account", element: <UserAccountPage /> },
+              { path: "me/account/update", element: <UserAccountUpdatePage /> },
               { path: "me/update", element: <UserDetailUpdate /> },
 
               {

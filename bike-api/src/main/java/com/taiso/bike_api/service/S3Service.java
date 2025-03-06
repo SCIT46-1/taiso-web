@@ -72,6 +72,33 @@ public class S3Service {
         }
     }
 
+    // MultipartFile로 넘어온 클럽 이미지 파일을 S3에 업로드하고 파일 키를 반환
+    public String uploadClubImage(MultipartFile file, Long clubId) {
+
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null) {
+            throw new IllegalArgumentException("파일 이름이 없습니다.");
+        }
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+        String fileKey = "clubs/" + clubId + "/" + UUID.randomUUID() + extension;
+
+        try (InputStream inputStream = file.getInputStream()) {
+            s3Client.putObject(PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(fileKey)
+                    .contentType(file.getContentType())
+                    .build(), RequestBody.fromInputStream(inputStream, file.getSize()));
+        } catch (IOException e) {
+            throw new RuntimeException("파일 업로드 실패", e);
+        }
+        return fileKey;
+
+    }
+
+
+
+
     // 바이트 배열을 S3에 업로드하는 메서드 (예: 정적 지도 이미지 업로드)
     public String uploadFile(byte[] bytes, String key, String contentType) {
         s3Client.putObject(PutObjectRequest.builder()

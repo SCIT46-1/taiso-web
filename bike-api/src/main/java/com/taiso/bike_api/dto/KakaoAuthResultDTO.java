@@ -15,4 +15,5 @@ public class KakaoAuthResultDTO {
     private String jwtToken;
     private Long userId;
     private String userEmail;
+    private String userNickname;
 } 

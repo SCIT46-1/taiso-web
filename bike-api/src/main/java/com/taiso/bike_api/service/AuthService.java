@@ -17,12 +17,11 @@ import org.springframework.web.client.RestTemplate;
 
 import com.taiso.bike_api.config.KakaoProperties;
 import com.taiso.bike_api.domain.UserDetailEntity;
-import com.taiso.bike_api.dto.KakaoUserInfoDTO;
-import com.taiso.bike_api.dto.UserInfoGetResponseDTO;
-import com.taiso.bike_api.dto.UserPasswordUpdateRequestDTO;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.KakaoAuthResultDTO;
 import com.taiso.bike_api.dto.KakaoUserInfoDTO;
+import com.taiso.bike_api.dto.UserInfoGetResponseDTO;
+import com.taiso.bike_api.dto.UserPasswordUpdateRequestDTO;
 import com.taiso.bike_api.exception.KakaoAuthenticationException;
 import com.taiso.bike_api.exception.NotPermissionException;
 import com.taiso.bike_api.exception.UserNotFoundException;
@@ -54,7 +53,8 @@ public class AuthService {
                        JwtTokenProvider jwtTokenProvider,
                        UserRoleRepository userRoleRepository,
                        UserStatusRepository userStatusRepository,
-                       UserDetailRepository userDetailRepository) {
+                       UserDetailRepository userDetailRepository,
+                       PasswordEncoder passwordEncoder) {
         this.kakaoProperties = kakaoProperties;
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -62,6 +62,7 @@ public class AuthService {
         this.userRoleRepository = userRoleRepository;
         this.userStatusRepository = userStatusRepository;
         this.userDetailRepository = userDetailRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -110,7 +111,7 @@ public class AuthService {
         String jwtToken = jwtTokenProvider.generateToken(user.getEmail());
         
         // KakaoAuthResultDTO에 JWT 토큰과 사용자 정보를 담아 반환
-        return new KakaoAuthResultDTO(jwtToken, user.getUserId(), user.getEmail());
+        return new KakaoAuthResultDTO(jwtToken, user.getUserId(), user.getEmail(), userDetailRepository.findByUser(user).get().getUserNickname());
     }
 
     private String getKakaoAccessToken(String code) {
@@ -167,12 +168,12 @@ public class AuthService {
         );
 
         // 기존 비밀번호입력 체크
-        if(!passwordEncoder.matches(requestDTO.getCurrentPwd(), user.getPassword())) {
+        if(!passwordEncoder.matches(requestDTO.getCurrentPassword(), user.getPassword())) {
             throw new WrongPasswordException("잘못된 현재비밀번호입니다.");
         }
 
         // 새 비밀번호로 세팅
-        user.setPassword(passwordEncoder.encode(requestDTO.getNewPwd()));
+        user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
 
     }
 

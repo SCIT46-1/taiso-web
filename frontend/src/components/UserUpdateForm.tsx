@@ -1,31 +1,37 @@
 import { useState, useEffect } from "react";
-import { useAuthStore } from "../stores/useAuthStore";
+import authService from "../services/authService";
+import { useNavigate } from "react-router";
 
 function UserUpdateForm() {
-  const { user } = useAuthStore();
-  const [email, setEmail] = useState<string>("");
+  const [currentPassword, setCurrentPassword] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [passwordConfirm, setPasswordConfirm] = useState<string>("");
 
+  const [currentPasswordError, setCurrentPasswordError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
   const [passwordConfirmError, setPasswordConfirmError] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   // 인풋 터치 여부
+  const [currentPasswordTouched, setCurrentPasswordTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [passwordConfirmTouched, setPasswordConfirmTouched] = useState(false);
 
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   // 정규식 검증
   const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,25}$/;
 
-  useEffect(() => {
-    if (user) {
-      setEmail(user.email);
-    }
-  }, [user]);
+  const currentPasswordInputClass = `input input-bordered w-full flex items-center gap-2 ${
+    error
+      ? "input-error"
+      : currentPasswordTouched && currentPassword.length > 0
+      ? "input"
+      : currentPasswordTouched && currentPassword.length === 0
+      ? "input-error"
+      : ""
+  }`;
 
   const passwordInputClass = `input input-bordered w-full flex items-center gap-2 ${
     error
@@ -52,10 +58,17 @@ function UserUpdateForm() {
     e.preventDefault();
 
     // 기존 메시지 초기화
+    setCurrentPasswordError("");
     setPasswordError("");
     setPasswordConfirmError("");
     setError("");
     setSuccessMessage("");
+
+    // 현재 비밀번호 검증
+    if (currentPassword.length === 0) {
+      setCurrentPasswordError("현재 비밀번호를 입력해주세요!");
+      return;
+    }
 
     // 클라이언트 검증
     if (password.length > 0) {
@@ -80,23 +93,18 @@ function UserUpdateForm() {
       return;
     }
 
-    // const payload = {
-    //   userId: user?.userId,
-    //   password,
-    // };
+    const payload = {
+      currentPassword,
+      password,
+    };
 
     try {
       setLoading(true);
-      //   await authService.updateUserInfo(payload);
-      setSuccessMessage("비밀번호가 성공적으로 변경되었습니다.");
-      // 폼 초기화
-      setPassword("");
-      setPasswordConfirm("");
-      setPasswordTouched(false);
-      setPasswordConfirmTouched(false);
+      await authService.updateUserAuthInfo(payload);
+      navigate("/user/me/account");
     } catch (err: any) {
       console.error(err);
-      setError("정보 업데이트에 실패했습니다. 다시 시도해주세요.");
+      setError("비밀번호 변경에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -107,30 +115,52 @@ function UserUpdateForm() {
       onSubmit={handleSubmit}
       className="flex flex-col items-center justify-center max-w-sm mx-auto relative w-[20rem]"
     >
-      <label className="label text-sm text-gray-500 mr-auto" htmlFor="email">
-        이메일
+      <label
+        className="label text-sm text-gray-500 mr-auto"
+        htmlFor="currentPassword"
+      >
+        현재 비밀번호
       </label>
-      <label className="input input-bordered w-full flex items-center gap-2">
+      <label className={currentPasswordInputClass}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 16 16"
           fill="currentColor"
           className="h-4 w-4 opacity-70"
         >
-          <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
-          <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
+          <path
+            fillRule="evenodd"
+            d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
+            clipRule="evenodd"
+          />
         </svg>
         <input
-          id="email"
-          placeholder="이메일"
-          value={email}
-          disabled
-          className="w-full bg-gray-100"
+          id="currentPassword"
+          type="password"
+          placeholder="현재 비밀번호"
+          value={currentPassword}
+          onChange={(e) => {
+            setCurrentPassword(e.target.value);
+            if (currentPasswordError && e.target.value.length > 0) {
+              setCurrentPasswordError("");
+            }
+          }}
+          onBlur={() => {
+            setCurrentPasswordTouched(true);
+            if (currentPassword.length === 0) {
+              setCurrentPasswordError("현재 비밀번호를 입력해주세요!");
+            } else {
+              setCurrentPasswordError("");
+            }
+          }}
+          className="w-full"
         />
       </label>
-      <p className="mt-2 text-sm text-gray-500 text-left w-full">
-        이메일은 변경할 수 없습니다.
-      </p>
+      {currentPasswordError && (
+        <span className="mt-2 text-sm text-red-400 text-left w-full">
+          {currentPasswordError}
+        </span>
+      )}
 
       <label
         className="label text-sm text-gray-500 mt-4 mr-auto"

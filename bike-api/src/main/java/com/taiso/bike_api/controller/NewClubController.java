@@ -34,7 +34,7 @@ public class NewClubController {
 
         newClubService.createClub(requestDTO, authentication, clubProfileImage);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
     @Operation(summary = "클럽 삭제", description = "오직 리더만 클럽을 삭제하는 API")

@@ -153,7 +153,10 @@ function RoutePage() {
           </div>
         </div>
         <div className="fixed bottom-8 right-10 z-50">
-          <Link to="/route/post" className="btn btn-primary btn-circle">
+          <Link
+            to="/route/post"
+            className="btn btn-primary btn-circle no-animation"
+          >
             <svg
               data-slot="icon"
               fill="currentColor"
