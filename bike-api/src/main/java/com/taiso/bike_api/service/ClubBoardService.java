@@ -1,23 +1,22 @@
 package com.taiso.bike_api.service;
 
-import com.taiso.bike_api.domain.ClubBoardEntity;
-import com.taiso.bike_api.domain.ClubEntity;
-import com.taiso.bike_api.domain.ClubMemberEntity;
-import com.taiso.bike_api.domain.UserEntity;
-import com.taiso.bike_api.dto.ClubBoardPatchRequestDTO;
-import com.taiso.bike_api.dto.ClubBoardPostRequestDTO;
+import com.taiso.bike_api.domain.*;
+import com.taiso.bike_api.dto.*;
 import com.taiso.bike_api.exception.*;
-import com.taiso.bike_api.repository.ClubBoardRepository;
-import com.taiso.bike_api.repository.ClubMemberRepository;
-import com.taiso.bike_api.repository.ClubRepository;
-import com.taiso.bike_api.repository.UserRepository;
+import com.taiso.bike_api.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,6 +33,9 @@ public class ClubBoardService {
 
     @Autowired
     private ClubMemberRepository clubMemberRepository;
+
+    @Autowired
+    private UserDetailRepository userDetailRepository;
 
     // 클럽보드 게시글 작성
     public void createClubBoard(ClubBoardPostRequestDTO clubBoardPostRequestDTO, Long clubId, Authentication authentication) {
@@ -161,6 +163,134 @@ public class ClubBoardService {
     }
 
 
+    public ClubBoardGetResponseDTO getClubBoardOne(Long clubId, Long boardId, Authentication authentication) {
+
+        // 해당 클럽 조회
+        ClubEntity club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new ClubNotFoundException("해당 클럽을 찾을 수 없습니다."));
+
+        // 현재 사용자 조회
+        UserEntity user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("현재 사용자를 찾을 수 없습니다."));
+
+        // 클럽 가입여부 확인
+        Optional<ClubMemberEntity> existingClubMember = clubMemberRepository.findByClubAndUser_UserId(club,user.getUserId());
+        log.info("현재 유저의 ID : {}", existingClubMember);
+        if (existingClubMember.isEmpty()) {
+            throw new ClubMemberMismatchException("해당 클럽 회원이 아닙니다.");
+        }
+
+        // 해당 보드 조회
+        ClubBoardEntity board = clubBoardRepository.findById(boardId)
+                .orElseThrow(() -> new ClubBoardNotFoundException("해당 게시글을 찾을 수 없습니다."));
+
+        // 보드 작성자 디테일 조회
+        UserDetailEntity creatorDetail = userRepository.findById(board.getPostWriter().getUserId())
+                .flatMap(creator -> userDetailRepository.findById(user.getUserId()))
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+
+        // 관리자 권한 확인 (작성자 or 클럽장)
+        Boolean canEdit = false; // 작성자만 가능
+        Boolean canDelete = false; // 둘다 가능
+
+        if (board.getPostWriter() == user || club.getClubLeader() == user) {
+            canEdit = true;
+        }
+        if (board.getPostWriter() == user) {
+            canDelete = true;
+        }
+
+        // 빌드
+        ClubBoardGetResponseDTO boardOne = ClubBoardGetResponseDTO.builder()
+                .postId(board.getPostId())
+                .postWriter(board.getPostWriter().getUserId())
+                .writerNickname(creatorDetail.getUserNickname())
+                .writerProfileImg(creatorDetail.getUserProfileImg())
+                .postTitle(board.getPostTitle())
+                .postContent(board.getPostContent())
+                .createdAt(board.getCreatedAt())
+                .updatedAt(board.getUpdatedAt())
+                .isNotice(board.getIsNotice())
+                .canEdit(canEdit)
+                .canDelete(canDelete)
+                .build();
+
+        return boardOne;
+    }
+
+    // 클럽 보드 리스트 조회
+    public ClubBoardListResponseDTO getClubBoardList(int page, int size, String sort, Long clubId, Authentication authentication) {
+
+        // 해당 클럽 조회
+        ClubEntity club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new ClubNotFoundException("해당 클럽을 찾을 수 없습니다."));
+        // 현재 사용자 조회
+        UserEntity user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("현재 사용자를 찾을 수 없습니다."));
+
+        // 정렬 기준 설정
+        Sort sortObj = Sort.unsorted();
+        if (!sort.isEmpty()) {
+            sortObj = Sort.by(sort).ascending();
+        }
+        // 페이지 요청 생성
+        Pageable pageable = PageRequest.of(page, size, sortObj);
+        // 필터링 조건 생성
+        Specification<ClubBoardEntity> spec = Specification.where(null);
+
+        // 필터링된 데이터로 페이징 조회
+        Page<ClubBoardEntity> clubBoardPage = clubBoardRepository.findAll(spec, pageable);
+
+        // 1. clubBoardPage에서 가져온 모든 userId를 추출하여 한 번에 조회
+        List<Long> userIds = clubBoardPage.getContent().stream()
+                .map(culbBoard -> culbBoard.getPostWriter().getUserId())
+                .filter(Objects::nonNull) // userId가 null인 경우 제거
+                .distinct() // 중복 제거
+                .collect(Collectors.toList());
+
+        // 2. 한 번의 DB 조회로 모든 UserDetailEntity 가져오기
+        List<UserDetailEntity> userDetails = userDetailRepository.findByUserIdIn(userIds);
+        Map<Long, UserDetailEntity> writerDetailMap = userIds.isEmpty()
+                ? new HashMap<>()
+                : userDetails.stream()
+                .distinct()  // 중복 제거 (equals/hashCode가 올바르게 구현되어 있어야 함)
+                .collect(Collectors.toMap(
+                        UserDetailEntity::getUserId,
+                        detail -> detail
+                ));
+
+        // 3. clubBoardPage의 데이터를 ResponseClubBoardListDTO로 변환
+        List<ResponseClubBoardListDTO> clubBoardDTO = clubBoardPage.getContent().stream()
+                .map(culbBoard -> {
+                    Long writerId = culbBoard.getPostWriter().getUserId();
+                    UserDetailEntity writerDetail = writerDetailMap.get(writerId); // 미리 가져온 Map에서 조회
+
+                    return ResponseClubBoardListDTO.builder()
+                            .postId(culbBoard.getPostId())
+                            .postTitle(culbBoard.getPostTitle())
+                            .postWriter(writerId)
+                            .writerNickname(writerDetail != null ? writerDetail.getUserNickname() : "알 수 없음") // 닉네임 가져오기
+                            .writerProfileImg(writerDetail != null ? writerDetail.getUserProfileImg() : null) // 프로필 이미지 가져오기
+                            .postContent(culbBoard.getPostContent())
+                            .createdAt(culbBoard.getCreatedAt())
+                            .updatedAt(culbBoard.getUpdatedAt())
+                            .isNotice(culbBoard.getIsNotice())
+                            // 권한 확인
+                            .canEdit(culbBoard.getPostWriter().equals(user) || club.getClubLeader().equals(user)) // 작성자 또는 클럽장 가능
+                            .canDelete(culbBoard.getPostWriter().equals(user)) // 작성자만 가능
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return ClubBoardListResponseDTO.builder()
+                .content(clubBoardDTO)
+                .pageNo(clubBoardPage.getNumber() + 1)
+                .pageSize(clubBoardPage.getSize())
+                .totalElements(clubBoardPage.getTotalElements())
+                .totalPages(clubBoardPage.getTotalPages())
+                .last(clubBoardPage.isLast())
+                .build();
 
 
+    }
 }
