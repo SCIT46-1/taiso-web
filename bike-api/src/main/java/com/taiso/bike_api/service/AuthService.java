@@ -45,7 +45,7 @@ public class AuthService {
     private final UserRoleRepository userRoleRepository;
     private final UserStatusRepository userStatusRepository;
     private final UserDetailRepository userDetailRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
 
     public AuthService(KakaoProperties kakaoProperties,

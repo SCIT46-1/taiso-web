@@ -1,17 +1,29 @@
 package com.taiso.bike_api.controller;
 
 
-import com.taiso.bike_api.dto.*;
-import com.taiso.bike_api.service.ClubBoardService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.taiso.bike_api.dto.ClubBoardGetResponseDTO;
+import com.taiso.bike_api.dto.ClubBoardListResponseDTO;
+import com.taiso.bike_api.dto.ClubBoardPatchRequestDTO;
+import com.taiso.bike_api.dto.ClubBoardPostRequestDTO;
+import com.taiso.bike_api.service.ClubBoardService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
