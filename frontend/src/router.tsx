@@ -57,7 +57,6 @@ const router = createBrowserRouter([
         children: [
           { path: "", element: <ClubPage /> },
           { path: ":clubId", element: <ClubDetailPage /> },
-          { path: "post", element: <ClubPostPage /> },
         ],
       },
 
@@ -76,6 +75,10 @@ const router = createBrowserRouter([
           {
             path: "route",
             children: [{ path: "post", element: <RoutePostPage /> }],
+          },
+          {
+            path: "club",
+            children: [{ path: "post", element: <ClubPostPage /> }],
           },
           {
             path: "user",

@@ -43,21 +43,16 @@ function ClubPostPage() {
         tags,
       };
 
-      let response;
-
       if (clubProfileImage) {
         // 이미지가 있으면 멀티파트 요청 사용
-        response = await clubService.createClubWithImage(
-          clubData,
-          clubProfileImage
-        );
+        await clubService.createClubWithImage(clubData, clubProfileImage);
       } else {
         // 이미지가 없으면 일반 JSON 요청 사용
-        response = await clubService.createClub(clubData);
+        await clubService.createClub(clubData);
       }
 
       // 성공 시 클럽 상세 페이지로 이동
-      navigate(`/clubs`);
+      navigate(`/club`);
     } catch (error) {
       console.error("클럽 생성 오류:", error);
       alert("클럽 생성 중 오류가 발생했습니다.");
