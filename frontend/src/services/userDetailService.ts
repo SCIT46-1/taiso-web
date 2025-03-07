@@ -1,4 +1,4 @@
-import { get } from "../api/request";
+import { get, patch } from "../api/request";
 
 // export interface UserDetailGetResponse {
 //   userId: number;
@@ -129,6 +129,13 @@ const getUserDetail = async (): Promise<UserDetailResponse> => {
   return await get(`/users/me/details`);
 };
 
+//유저 디테일 수정
+const updateUserDetail = async (
+  payload: UserDetailPatchRequest
+): Promise<void> => {
+  return await patch(`/users/me/details`, payload);
+};
+
 //내 예약 번개 조회
 const getMyReservationLightning = async (): Promise<MyLightningResponse[]> => {
   const status = encodeURIComponent("모집,마감,강제마감");
@@ -147,4 +154,5 @@ export default {
   getUserAuthInfo,
   getUserDetail,
   getUserPageDetail,
+  updateUserDetail,
 };
