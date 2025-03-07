@@ -427,4 +427,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
+    // 자신을 북마크 했을 때 예외 처리
+    @ExceptionHandler(SelfBookmarkException.class)
+    public ResponseEntity<ErrorResponseDTO> handleSelfBookmarkException(SelfBookmarkException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+    
+    // 이미 동일한 북마크가 존재할 때 예외 처리 BookmarkAlreadyExistsException
+    @ExceptionHandler(BookmarkAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBookmarkAlreadyExistsException(BookmarkAlreadyExistsException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    // 북마크가 존재하고 있지 않을 때 
+    @ExceptionHandler(BookmarkNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBookmarkNotFoundException(BookmarkNotFoundException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
 }
