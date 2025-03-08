@@ -42,27 +42,30 @@ function ReviewList({ userId }: ReviewListProps) {
     }
 
     return (
-        <div className="flex flex-col gap-2 mt-4 sm:ml-12 ml-4">
+        <div className="w-[80%] flex flex-col gap-2 mt-4 sm:ml-12 ml-4">
+            <div className="text-2xl font-bold ml-2">review</div>
+            <div className="border-t border-gray-300 mb-2"></div>
             {/* 리뷰를 하나씩 꺼내서 출력 */}
             {userReviews?.map((review) => ( 
                 <div className="chat chat-start">
                     <div className="chat-image avatar">
                         <div className="w-10 rounded-full">
-                            <ImageWithSkeleton
+                            <img
                                 src={review.reviewerProfileImg}
                                 alt={review.reviewerNickname}
+                                className="size-24 bg-blue-200 -bottom-12 sm:left-14 left-6"
                             />
                         </div>
                     </div>
-                    <div className="badge badge-primary">
+                    <div className="badge badge-primary mb-1 ml-3">
                         {review?.reviewTag}
                     </div>
-                    <div>
+                    <div className="w-[100%] flex ml-2">
                         <div className="chat-bubble">
                             {review?.reviewContent}
                         </div>
                         <div>
-                            <span>{formatDate(review?.createdAt)}</span>
+                            <span className="text-gray-500 m-1 text-xs">{formatDate(review?.createdAt)}</span>
                         </div>
                     </div>
                 </div>

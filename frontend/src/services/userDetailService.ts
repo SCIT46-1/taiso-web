@@ -1,21 +1,21 @@
 import { get, patch } from "../api/request";
 
-// export interface UserDetailGetResponse {
-//   userId: number;
-//   userNickname: string;
-//   userProfileImg: string;
-//   userBackgroundImg: string;
-//   fullName: string;
-//   phoneNumber: string;
-//   birthDate: string;
-//   bio: string;
-//   gender: string;
-//   level: string;
-//   FTP: number;
-//   height: number;
-//   weight: number;
-//   tags: string[];
-// }
+export interface UserDetailGetResponse {
+  userId: number;
+  userNickname: string;
+  userProfileImg: string;
+  userBackgroundImg: string;
+  fullName: string;
+  phoneNumber: string;
+  birthDate: string;
+  bio: string;
+  gender: string;
+  level: string;
+  FTP: number;
+  height: number;
+  weight: number;
+  tags: string[];
+}
 
 export interface UserDetailPatchRequest {
   nickname: string;
