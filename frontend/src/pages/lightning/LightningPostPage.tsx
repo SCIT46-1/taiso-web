@@ -551,7 +551,7 @@ function LightningPostPage() {
 
             {/* 통합 선택 옵션 섹션 */}
             <div className="form-control mb-6 rounded-lg">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ">
                 <svg
                   data-slot="icon"
                   fill="grey"
@@ -566,7 +566,7 @@ function LightningPostPage() {
                     d="M4.5 2A2.5 2.5 0 0 0 2 4.5v3.879a2.5 2.5 0 0 0 .732 1.767l7.5 7.5a2.5 2.5 0 0 0 3.536 0l3.878-3.878a2.5 2.5 0 0 0 0-3.536l-7.5-7.5A2.5 2.5 0 0 0 8.38 2H4.5ZM5 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
                   />
                 </svg>
-                <h3 className="text-lg font-medium">태그 선택</h3>
+                <h3 className="text-base font-medium">태그 선택</h3>
               </div>
               {/* 지역 */}
               <div className="">

@@ -162,7 +162,7 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
       {/* 모달 */}
       <dialog ref={modalRef} className="modal">
         <div className="modal-box w-full max-w-3xl">
-          <h2 className="text-2xl font-extrabold mb-1">모임 시작 장소 등록</h2>
+          <h2 className="text-2xl font-bold mb-1">모임 시작 장소 등록</h2>
           <div className="text-sm text-gray-500 mb-2">
             지도를 클릭해서 모임 시작 장소를 선택해보세요!
           </div>

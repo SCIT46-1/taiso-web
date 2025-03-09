@@ -93,7 +93,7 @@ function UserDetailPage() {
 
   // 로딩 중일 때 처리
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="font-semibold">Loading...</div>;
   }
 
   // 태그 추가 함수

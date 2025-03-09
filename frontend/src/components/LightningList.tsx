@@ -103,32 +103,25 @@ function LightningList({
 
   // 날짜 포멧팅
   const formatDate = (date: string | number | Date) => {
-    const options: Intl.DateTimeFormatOptions = {
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: false, // 24시간 포맷
-    };
+    const dateObj = new Date(date);
+    const hours = dateObj.getHours();
+    const minutes = dateObj.getMinutes().toString().padStart(2, "0");
 
-    return new Date(date)
-      .toLocaleString("ko-KR", options)
-      .replace("오전", "")
-      .replace("오후", "");
+    return `${hours}:${minutes}`;
   };
 
   const renderStatusButton = (status: string) => {
     switch (status) {
       case "모집":
         return (
-          <button className="btn btn-outline btn-primary sm:w-[150px] no-animation">
+          <button className="btn btn-outline btn-primary md:w-[150px] w-full no-animation">
             참가
           </button>
         );
       case "마감":
         return (
           <button
-            className="btn btn-outline btn-error sm:w-[150px] no-animation"
+            className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
             disabled
           >
             마감
@@ -137,7 +130,7 @@ function LightningList({
       case "강제마감":
         return (
           <button
-            className="btn btn-outline btn-error sm:w-[150px] no-animation"
+            className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
             disabled
           >
             마감
@@ -147,7 +140,7 @@ function LightningList({
       default:
         return (
           <button
-            className="btn btn-outline btn-error sm:w-[150px] no-animation"
+            className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
             disabled
           >
             종료
@@ -166,36 +159,33 @@ function LightningList({
         ) : (
           lightningList.map((lightning) => (
             <div key={lightning.lightningId} className="w-[90%]">
-              <div className="flex">
+              <div className="md:flex block">
                 <Link
                   to={`/lightning/${lightning.lightningId}`}
                   className="flex-1 group"
                 >
-                  <div className="bg-base-100 w-full flex items-center">
-                    <figure className="size-40 flex items-center justify-center ml-4 relative overflow-hidden">
+                  <div className="bg-base-100 w-full md:flex block items-center">
+                    <figure className="size-40 flex items-center justify-center md:ml-4 mx-auto md:mx-0 relative overflow-hidden my-2 md:my-0">
                       <ImageWithSkeleton
                         src={lightning.routeImgId}
                         alt={lightning.title}
                       />
                     </figure>
-                    <div className="flex flex-col p-2 ml-6">
-                      <div className="flex flex-col ">
-                        <div className="text-xs text-gray-500">
+                    <div className="flex flex-col p-2 md:ml-6 md:text-left text-center">
+                      <div className="flex flex-col">
+                        <div className="text-base font-bold">
                           {formatDate(lightning.eventDate)} (
-                          {lightning.duration}
-                          분)
+                          {lightning.duration}분)
                         </div>
-                        <div className="text-lg font-semibold">
-                          {lightning.title}
-                        </div>
-                        <div className="text-sm text-gray-500 flex items-center gap-1">
+                        <div className="text-base">{lightning.title}</div>
+                        <div className="text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
                           <svg
                             data-slot="icon"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
-                            className="size-4"
+                            className="size-4 flex-shrink-0"
                           >
                             <path
                               clipRule="evenodd"
@@ -203,22 +193,24 @@ function LightningList({
                               d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
                             ></path>
                           </svg>
-                          {lightning.address}
+                          <span className="md:truncate md:max-w-none max-w-[180px] truncate">
+                            {lightning.address}
+                          </span>
                         </div>
-                        <div className="text-sm text-gray-500 flex items-center gap-1 ">
+                        <div className="text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
                           <svg
                             data-slot="icon"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
-                            className="size-4"
+                            className="size-4 flex-shrink-0"
                           >
                             <path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z"></path>
                           </svg>
                           {lightning.currentParticipants}/{lightning.capacity}명
                         </div>
-                        <div className="flex flex-wrap gap-1 mt-2 max-w-[400px]">
+                        <div className="flex flex-wrap gap-1 mt-2 md:justify-start justify-center">
                           <div className="badge badge-primary badge-outline">
                             {lightning.gender}
                           </div>
@@ -242,10 +234,10 @@ function LightningList({
                   </div>
                 </Link>
 
-                <div className="p-4 mt-auto flex items-center justify-center">
+                <div className="p-4 flex items-center justify-center md:mt-auto md:ml-0 mt-0 ml-auto">
                   <Link
                     to={`/lightning/${lightning.lightningId}`}
-                    className="group"
+                    className="group w-full md:w-auto"
                   >
                     {renderStatusButton(lightning.status)}
                   </Link>

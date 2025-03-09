@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface DateCarouselProps {
   /** 한 화면에 표시할 날짜 개수 (기본값 7) */
@@ -17,6 +17,7 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
    */
   const [offset, setOffset] = useState<number>(0);
   const [selectedDate, setSelectedDate] = useState<Date>(getTodayInKorea());
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -65,13 +66,37 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
     }
   };
 
+  // 선택된 날짜가 변경될 때 그 날짜가 화면에 보이도록 스크롤 조정
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const selectedIndex = dateList.findIndex(
+        (date) => date.toDateString() === selectedDate.toDateString()
+      );
+
+      if (selectedIndex !== -1) {
+        const dateElement = container.children[selectedIndex] as HTMLElement;
+        if (dateElement) {
+          const scrollPosition =
+            dateElement.offsetLeft -
+            container.offsetWidth / 2 +
+            dateElement.offsetWidth / 2;
+          container.scrollTo({ left: scrollPosition, behavior: "smooth" });
+        }
+      }
+    }
+  }, [selectedDate, dateList]);
+
   return (
-    <div className="flex items-center justify-center space-x-4 mt-4">
+    <div className="flex items-center justify-center space-x-2 sm:space-x-4 mt-4 px-2 sm:px-0 w-[90%] mx-auto">
       {/* 왼쪽 화살표 버튼 (과거 이동) */}
-      <button className="btn btn-circle no-animation" onClick={handlePrev}>
+      <button
+        className="btn btn-circle btn-sm sm:btn-md no-animation"
+        onClick={handlePrev}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
+          className="h-4 w-4 sm:h-5 sm:w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -85,8 +110,12 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
         </svg>
       </button>
 
-      {/* 날짜 목록 */}
-      <div className="flex items-center space-x-2">
+      {/* 날짜 목록 - 스크롤 가능한 컨테이너 */}
+      <div
+        ref={scrollContainerRef}
+        className="flex items-center overflow-x-auto hide-scrollbar"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
         {dateList.map((d, index) => {
           const dayIndex = d.getDay(); // 0: 일, 1: 월, ... 6: 토
           const dayNumber = d.getDate();
@@ -94,7 +123,7 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
 
           // 기본 원형 스타일
           let circleClasses =
-            "w-24 h-10 flex items-center justify-center rounded-full transition-colors no-animation";
+            "w-16 sm:w-24 h-8 sm:h-10 flex items-center justify-center rounded-full transition-colors no-animation mx-1";
           // 토/일이면 텍스트 빨간색, 아니면 검정색
           const textClasses = isWeekend(d) ? "text-red-500" : "text-black";
 
@@ -106,23 +135,28 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
           return (
             <div
               key={index}
-              className="flex flex-col items-center space-y-1 cursor-pointer"
+              className="flex flex-col items-center flex-shrink-0 cursor-pointer"
               onClick={() => handleDateClick(d)}
             >
               <div className={`${circleClasses} ${textClasses}`}>
-                {dayNumber}
+                <span className="text-sm sm:text-base">{dayNumber}</span>
               </div>
-              <div className={textClasses}>{dayName}</div>
+              <div className={`${textClasses} text-xs sm:text-sm`}>
+                {dayName}
+              </div>
             </div>
           );
         })}
       </div>
 
       {/* 오른쪽 화살표 버튼 (미래 이동) */}
-      <button className="btn btn-circle no-animation" onClick={handleNext}>
+      <button
+        className="btn btn-circle btn-sm sm:btn-md no-animation"
+        onClick={handleNext}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
+          className="h-4 w-4 sm:h-5 sm:w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -138,5 +172,15 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
     </div>
   );
 }
+
+// 스크롤바를 숨기기 위한 CSS 추가
+// 이 부분은 전역 CSS 파일에 추가하거나 인라인 스타일로 적용 가능
+const style = document.createElement("style");
+style.textContent = `
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+`;
+document.head.appendChild(style);
 
 export default DateCarousel;
