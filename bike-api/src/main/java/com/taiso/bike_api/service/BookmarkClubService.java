@@ -13,8 +13,10 @@ import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.BookmarkClubCreateResponseDTO;
+import com.taiso.bike_api.dto.BookmarkClubDeleteResponseDTO;
 import com.taiso.bike_api.dto.BookmarkClubsGetResponseDTO;
 import com.taiso.bike_api.exception.BookmarkAlreadyExistsException;
+import com.taiso.bike_api.exception.BookmarkNotFoundException;
 import com.taiso.bike_api.exception.ClubNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.repository.BookmarkRepository;
@@ -39,7 +41,7 @@ public class BookmarkClubService {
         UserEntity user = userRepository.findByEmail(authentication.getName()).get();
 
         // 사용자가 북마크한 클럽리스트 조회
-        List<BookmarkEntity> bookmarkList = bookmarkRepository.findAllByUserAndTargetType(user, BookmarkType.CLUB);
+        List<BookmarkEntity> bookmarkList = bookmarkRepository.findByUserAndTargetType(user, BookmarkType.CLUB);
 
         // 북마크한 클럽상세리스트 조회
         List<ClubEntity> clubList = clubRepository.findAllByClubIdIn(bookmarkList.stream().map(bookmark -> bookmark.getTargetId()).collect(Collectors.toList()));
@@ -85,6 +87,33 @@ public class BookmarkClubService {
                       .build());
 
         return BookmarkClubCreateResponseDTO.builder().message("북마크 등록이 완료되었습니다.").build();
+    
+    }
+
+    public BookmarkClubDeleteResponseDTO deleteBookmarkClub(Long clubId, Authentication authentication) {
+        
+        // 사용자 존재여부 확인
+        UserEntity user = userRepository.findByEmail(authentication.getName()).orElseThrow(() ->
+            new UserNotFoundException("존재하지 않는 사용자입니다.")
+        );
+
+        // 클럽 존재여부 확인
+        ClubEntity club = clubRepository.findByClubId(clubId).orElseThrow(() ->
+            new ClubNotFoundException("존재하지 않는 클럽입니다.")
+        );
+
+        // 북마크 존재여부 확인
+        BookmarkEntity bookmarkEntity = bookmarkRepository.
+        		findByTargetIdAndUserAndTargetType(clubId, user, BookmarkType.CLUB);
+        if (bookmarkEntity == null) {
+            throw new BookmarkNotFoundException("존재하지 않는 북마크입니다.");
+        }
+
+        // 엔티티 빌드 및 저장
+        bookmarkRepository.delete(bookmarkEntity);
+
+        return BookmarkClubDeleteResponseDTO.builder().message("북마크 삭제가 완료되었습니다.").build();
+    
     }
     
 }

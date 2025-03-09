@@ -1,9 +1,6 @@
 package com.taiso.bike_api.controller;
 
 import com.taiso.bike_api.dto.BookmarkLightningResponseDTO;
-import com.taiso.bike_api.dto.BookmarkUserDeleteResponseDTO;
-import com.taiso.bike_api.dto.BookmarkUserListResponseDTO;
-import com.taiso.bike_api.dto.BookmarkUserResponseDTO;
 import com.taiso.bike_api.service.BookmarkLightningService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
