@@ -176,5 +176,11 @@ public class UserService {
             throw new UserNotFoundException("User not found");
         }
     }
+
+    // 닉네임 중복 체크
+    public boolean checkNickname(String nickname) {
+        Optional<UserDetailEntity> userDetail = userDetailRepository.findByUserNickname(nickname);
+        return userDetail.isPresent();
+    }
     
 } 

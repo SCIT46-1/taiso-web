@@ -18,19 +18,31 @@ VALUES ('평지 도로', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO route_tag_category (name, created_at, updated_at)
 VALUES ('위험한 공도', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+
+--장거리, 친목, 가볍게, 따릉이, 아마추어, 훈련, 샤방, 커피 라이딩, 초 장거리, 무보급, 무정차
 -- 4. lightning_tag 테이블에 태그 추가
-INSERT INTO lightning_tag_category (name, created_at, updated_at)
-VALUES ('샤방법', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO lightning_tag_category (name, created_at, updated_at)
-VALUES ('오픈라이딩', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO lightning_tag_category (name, created_at, updated_at)
-VALUES ('따폭연', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO lightning_tag_category (name, created_at, updated_at)
 VALUES ('장거리', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO lightning_tag_category (name, created_at, updated_at)
+VALUES ('친목', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lightning_tag_category (name, created_at, updated_at)
+VALUES ('가볍게', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lightning_tag_category (name, created_at, updated_at)
 VALUES ('따릉이', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO lightning_tag_category (name, created_at, updated_at)
-VALUES ('친목', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES ('아마추어', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lightning_tag_category (name, created_at, updated_at)
+VALUES ('훈련', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lightning_tag_category (name, created_at, updated_at)
+VALUES ('샤방', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lightning_tag_category (name, created_at, updated_at)
+VALUES ('커피 라이딩', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lightning_tag_category (name, created_at, updated_at)
+VALUES ('초 장거리', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lightning_tag_category (name, created_at, updated_at)
+VALUES ('무보급', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lightning_tag_category (name, created_at, updated_at)
+VALUES ('무정차', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 4. user_tage 테이블에 태그 추가가
 INSERT INTO user_tag_category (category, name)

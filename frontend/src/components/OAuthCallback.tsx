@@ -38,8 +38,13 @@ const OAuthCallback: React.FC = () => {
             },
             true
           );
-          console.log("OAuthCallback - Redirecting to:", redirectPath);
-          navigate(redirectPath);
+          console.log("OAuthCallback - result.isNewUser:", result.newUser);
+          if (result.newUser) {
+            navigate("/user-onboarding");
+          } else {
+            console.log("OAuthCallback - Redirecting to:", redirectPath);
+            navigate(redirectPath);
+          }
         })
         .catch((error) => {
           console.error("OAuthCallback - Kakao login error:", error);
