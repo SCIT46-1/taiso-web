@@ -12,7 +12,10 @@ import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
 import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.UserEntity;
+import com.taiso.bike_api.dto.BookmarkClubCreateResponseDTO;
 import com.taiso.bike_api.dto.BookmarkClubsGetResponseDTO;
+import com.taiso.bike_api.exception.ClubNotFoundException;
+import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.repository.BookmarkRepository;
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.UserRepository;
@@ -54,6 +57,28 @@ public class BookmarkClubService {
                                                         .tags(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
                                                         .build())
                                                         .collect(Collectors.toList());
+    }
+
+    public BookmarkClubCreateResponseDTO createBookmarkClub(Long clubId, Authentication authentication) {
+
+        // 사용자 존재여부 확인
+        UserEntity user = userRepository.findByEmail(authentication.getName()).orElseThrow(() ->
+            new UserNotFoundException("존재하지 않는 사용자입니다.")
+        );
+
+        // 클럽 존재여부 확인
+        ClubEntity club = clubRepository.findByClubId(clubId).orElseThrow(() ->
+            new ClubNotFoundException("존재하지 않는 클럽입니다.")
+        );
+
+        // 엔티티 빌드 및 저장
+        bookmarkRepository.save(BookmarkEntity.builder()
+                      .user(user)
+                      .targetId(club.getClubId())
+                      .targetType(BookmarkType.CLUB)
+                      .build());
+
+        return BookmarkClubCreateResponseDTO.builder().message("북마크 등록이 완료되었습니다.").build();
     }
     
 }
