@@ -31,11 +31,6 @@ function UserOnboardingPage() {
     tags: [],
   });
 
-  // 태그 관련 상태
-  const [tagInput, setTagInput] = useState("");
-  const [bikeTypeInput, setBikeTypeInput] = useState("");
-  const [activityLocationInput, setActivityLocationInput] = useState("");
-
   useEffect(() => {
     const fetchNickname = async () => {
       const nickname = await authService.getNickname();
@@ -105,74 +100,6 @@ function UserOnboardingPage() {
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: Number(value) }));
-  };
-
-  // 태그 추가 함수
-  const addTag = () => {
-    if (tagInput.trim() && !userData.tags.includes(tagInput.trim())) {
-      setUserData((prev) => ({
-        ...prev,
-        tags: [...prev.tags, tagInput.trim()],
-      }));
-      setTagInput("");
-    }
-  };
-
-  // 태그 삭제 함수
-  const removeTag = (tagToRemove: string) => {
-    setUserData((prev) => ({
-      ...prev,
-      tags: prev.tags.filter((tag) => tag !== tagToRemove),
-    }));
-  };
-
-  // 자전거 타입 추가
-  const addBikeType = () => {
-    if (
-      bikeTypeInput.trim() &&
-      !userData.bikeType.includes(bikeTypeInput.trim())
-    ) {
-      setUserData((prev) => ({
-        ...prev,
-        bikeType: [...prev.bikeType, bikeTypeInput.trim()],
-      }));
-      setBikeTypeInput("");
-    }
-  };
-
-  // 자전거 타입 삭제
-  const removeBikeType = (typeToRemove: string) => {
-    setUserData((prev) => ({
-      ...prev,
-      bikeType: prev.bikeType.filter((type) => type !== typeToRemove),
-    }));
-  };
-
-  // 활동 지역 추가
-  const addActivityLocation = () => {
-    if (
-      activityLocationInput.trim() &&
-      !userData.activityLocation.includes(activityLocationInput.trim())
-    ) {
-      setUserData((prev) => ({
-        ...prev,
-        activityLocation: [
-          ...prev.activityLocation,
-          activityLocationInput.trim(),
-        ],
-      }));
-      setActivityLocationInput("");
-    }
-  };
-
-  // 활동 지역 삭제
-  const removeActivityLocation = (locationToRemove: string) => {
-    setUserData((prev) => ({
-      ...prev,
-      activityLocation: prev.activityLocation.filter(
-        (location) => location !== locationToRemove
-      ),
-    }));
   };
 
   // 활동 시간대 토글

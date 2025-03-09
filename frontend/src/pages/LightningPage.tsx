@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import MainNavbar from "../components/MainNavbar";
 import LightningList from "../components/LightningList";
@@ -63,10 +63,6 @@ function LightningPage() {
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 
   // Keep track of dropdown elements
-  const genderDropdownRef = useRef<HTMLDivElement>(null);
-  const bikeTypeDropdownRef = useRef<HTMLDivElement>(null);
-  const levelDropdownRef = useRef<HTMLDivElement>(null);
-  const locationDropdownRef = useRef<HTMLDivElement>(null);
 
   // 일반 태그 토글 (상태만 업데이트)
   const toggleAvailableTag = (tag: string): void => {

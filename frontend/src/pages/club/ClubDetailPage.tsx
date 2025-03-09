@@ -5,16 +5,15 @@ import clubService, {
   ClubBoardListResponse,
   ClubBoardDetailResponse,
   ClubBoardPostRequest,
-  ClubApplyResponse,
 } from "../../services/clubService";
 import ImageWithSkeleton from "../../components/ImageWithSkeleton";
-import { Link } from "react-router-dom";
 import { useAuthStore } from "../../stores/useAuthStore";
 
 function ClubDetailPage() {
   const { clubId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuthStore();
+  console.log(setSearchParams);
 
   // Club detail states
   const [clubDetail, setClubDetail] = useState<ClubDetailResponse | null>(null);

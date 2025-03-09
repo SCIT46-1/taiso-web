@@ -36,21 +36,6 @@ function UserAccountPage() {
       {/* 기본 사용자 정보 */}
       <div className="mb-6 border p-4">
         <div className="flex gap-4">
-          {/* 프로필 이미지 */}
-          <div>
-            {userDetail?.userProfileImg ? (
-              <img
-                src={userDetail.userProfileImg}
-                alt="프로필"
-                className="w-24 h-24 rounded-full"
-              />
-            ) : (
-              <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
-                이미지 없음
-              </div>
-            )}
-          </div>
-
           <div>
             <h2 className="text-lg font-semibold">
               {userDetail?.userNickname || "닉네임 없음"}
@@ -128,18 +113,6 @@ function UserAccountPage() {
           </div>
         </div>
       </div>
-
-      {/* 배경 이미지 정보 */}
-      {userDetail?.userBackgroundImg && (
-        <div className="mt-6 border p-4">
-          <h2 className="text-lg font-semibold mb-3">배경 이미지</h2>
-          <img
-            src={userDetail.userBackgroundImg}
-            alt="배경 이미지"
-            className="w-full h-40 object-cover"
-          />
-        </div>
-      )}
     </div>
   );
 }

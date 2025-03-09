@@ -31,7 +31,6 @@ interface WeatherDisplayProps {
 function WeatherDisplay({
   weatherInfo,
   hourlyForecasts,
-  forecastDate,
   isLoading,
 }: WeatherDisplayProps) {
   if (isLoading) {

@@ -1,4 +1,6 @@
-import userDetailService, { UserPageDetailResponse } from "../services/userDetailService";
+import userDetailService, {
+  UserPageDetailResponse,
+} from "../services/userDetailService";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
 import ReviewList from "../components/ReviewList";
@@ -29,22 +31,39 @@ export function Modal({ id, title, children, actions }: ModalProps) {
 
 function UserDetailPage() {
   const { userId } = useParams();
-  const [userDetail, setUserDetail] = useState<UserPageDetailResponse | null>(null);
+  const [userDetail, setUserDetail] = useState<UserPageDetailResponse | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
   //로딩 상태 관리
   const [loadingEdit, setLoadingEdit] = useState(false);
   //데이터 관리
-  const [nickName, setNickName] = useState<string>('');
-  const [bio, setBio] = useState<string>('');
-  const [gender, setGender] = useState<string>('');
-  const [level, setLevel] = useState<string>('');
+  const [nickName, setNickName] = useState<string>("");
+  const [bio, setBio] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
+  const [level, setLevel] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
-  const [inputTag, setInputTag] = useState<string>('');
-  const [availableTags, setAvailableTags] = useState<string[]>(['React', 'JavaScript', 'Node.js', 'CSS', 'HTML']); // 예시 태그들
+  const [inputTag, setInputTag] = useState<string>("");
+  const [availableTags, setAvailableTags] = useState<string[]>([
+    "React",
+    "JavaScript",
+    "Node.js",
+    "CSS",
+    "HTML",
+  ]); // 예시 태그들
 
-  
-
+  console.log(
+    setLoadingEdit,
+    nickName,
+    bio,
+    gender,
+    level,
+    tags,
+    inputTag,
+    availableTags,
+    setAvailableTags
+  );
 
   console.log(isLoading, user);
 
@@ -81,7 +100,7 @@ function UserDetailPage() {
   const handleAddTag = () => {
     if (inputTag && !tags.includes(inputTag)) {
       setTags([...tags, inputTag]);
-      setInputTag(''); // 입력 필드 초기화
+      setInputTag(""); // 입력 필드 초기화
     }
   };
 
@@ -120,7 +139,6 @@ function UserDetailPage() {
     modal?.showModal();
   };
 
-  
   return (
     <div className="md:w-full max-w-screen-md rounded-xl w-[90%] mt-2 border-base-300 border-[1px] shadow-xl">
       {/* 배경이미지 & 프로필 이미지 */}
@@ -146,11 +164,11 @@ function UserDetailPage() {
             {user?.userId == userDetail?.userId && (
               <button
                 className="badge badge-outline badge-error ml-2"
-                onClick={() => showModal("profile-edit-modal")}>
+                onClick={() => showModal("profile-edit-modal")}
+              >
                 edit
               </button>
             )}
-
           </div>
           <div className="ml-2">
             <div className="badge badge-primary badge-outline mr-1">
@@ -167,12 +185,12 @@ function UserDetailPage() {
           </div>
         </div>
 
-
         {/* 바이오 */}
-        <div tabIndex={0} className="collapse collapse-open bg-gray-100 border mb-6">
-          <div className="collapse-content text-sm m-4">
-            {userDetail?.bio}
-          </div>
+        <div
+          tabIndex={0}
+          className="collapse collapse-open bg-gray-100 border mb-6"
+        >
+          <div className="collapse-content text-sm m-4">{userDetail?.bio}</div>
         </div>
       </div>
 
@@ -185,12 +203,14 @@ function UserDetailPage() {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                className="inline-block h-8 w-8 stroke-current">
+                className="inline-block h-8 w-8 stroke-current"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                ></path>
               </svg>
             </div>
             <div className="stat-title">참여 번개</div>
@@ -202,12 +222,14 @@ function UserDetailPage() {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                className="inline-block h-8 w-8 stroke-current">
+                className="inline-block h-8 w-8 stroke-current"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                ></path>
               </svg>
             </div>
             <div className="stat-title">가입 클럽</div>
@@ -219,12 +241,14 @@ function UserDetailPage() {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                className="inline-block h-8 w-8 stroke-current">
+                className="inline-block h-8 w-8 stroke-current"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                ></path>
               </svg>
             </div>
             <div className="stat-title">등록 루트</div>
@@ -235,9 +259,7 @@ function UserDetailPage() {
 
       {/* 스트라바 통계 */}
       <div className="border bg-blue-300 flex flex-col items-center justify-center mt-8 mb-8 pt-2 pb-4">
-        <div className="text-2xl font-bold m-3 text-white">
-          STRAVA
-        </div>
+        <div className="text-2xl font-bold m-3 text-white">STRAVA</div>
         <div className="flex justify-center first:before:w-fit mx-auto gap-2 ">
           <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
             <div>주행거리</div>
@@ -250,12 +272,9 @@ function UserDetailPage() {
         </div>
       </div>
 
-
       {/* 리뷰 */}
       <ReviewList userId={Number(userId)} />
       <div className="h-24"></div>
-
-
 
       {/* 모달 컴포넌트들 */}
       <Modal
@@ -270,7 +289,10 @@ function UserDetailPage() {
             >
               {loadingEdit ? "수정중..." : "수정"}
             </button>
-            <button className="btn" onClick={() => closeModal("profile-edit-modal")}>
+            <button
+              className="btn"
+              onClick={() => closeModal("profile-edit-modal")}
+            >
               취소
             </button>
           </>
@@ -283,37 +305,46 @@ function UserDetailPage() {
               className="flex flex-col items-center justify-center max-w-sm mx-auto relative w-[20rem]"
             >
               {/* 닉네임 */}
-              <label className="label text-sm text-gray-500 mr-auto" htmlFor="nickName">
+              <label
+                className="label text-sm text-gray-500 mr-auto"
+                htmlFor="nickName"
+              >
                 닉네임
               </label>
               <input
                 id="nickName"
                 type="text"
                 placeholder="닉네임"
-                value={userDetail?.userNickname || ''}
+                value={userDetail?.userNickname || ""}
                 onChange={(e) => setNickName(e.target.value)}
                 className="input input-bordered w-full"
               />
 
               {/* 자기소개 */}
-              <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="bio">
+              <label
+                className="label text-sm text-gray-500 mt-4 mr-auto"
+                htmlFor="bio"
+              >
                 자기소개
               </label>
               <textarea
                 id="bio"
                 placeholder="자기소개를 입력하세요."
-                value={userDetail?.bio || ''}
+                value={userDetail?.bio || ""}
                 onChange={(e) => setBio(e.target.value)}
                 className="textarea textarea-bordered w-full"
               ></textarea>
 
               {/* 성별 선택 */}
-              <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="gender">
+              <label
+                className="label text-sm text-gray-500 mt-4 mr-auto"
+                htmlFor="gender"
+              >
                 성별
               </label>
               <select
                 id="gender"
-                value={userDetail?.gender || '그외'} // default로 'none'을 설정
+                value={userDetail?.gender || "그외"} // default로 'none'을 설정
                 onChange={(e) => setGender(e.target.value)}
                 className="select select-bordered w-full"
               >
@@ -322,14 +353,16 @@ function UserDetailPage() {
                 <option value="여자">여성</option>
               </select>
 
-
               {/* 레벨 선택 */}
-              <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="level">
+              <label
+                className="label text-sm text-gray-500 mt-4 mr-auto"
+                htmlFor="level"
+              >
                 레벨
               </label>
               <select
                 id="level"
-                value={userDetail?.level || ''}
+                value={userDetail?.level || ""}
                 onChange={(e) => setLevel(e.target.value)}
                 className="select select-bordered w-full"
               >
@@ -342,7 +375,9 @@ function UserDetailPage() {
 
               {/* 태그 입력 */}
               <div>
-                <label className="label text-sm text-gray-500 mt-4 mr-auto">태그</label>
+                <label className="label text-sm text-gray-500 mt-4 mr-auto">
+                  태그
+                </label>
                 <div className="flex w-full items-center">
                   <input
                     type="text"
@@ -350,7 +385,7 @@ function UserDetailPage() {
                     value={inputTag}
                     onChange={handleInputChange}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         handleAddTag(); // 엔터 키로 태그 추가
                       }
                     }}
@@ -368,7 +403,10 @@ function UserDetailPage() {
                 <div className="flex flex-wrap gap-2 mt-2 w-full">
                   {/* 이미 선택된 태그 표시 */}
                   {tags.map((tag, index) => (
-                    <div key={index} className="badge badge-primary flex items-center">
+                    <div
+                      key={index}
+                      className="badge badge-primary flex items-center"
+                    >
                       {tag}
                       <button
                         type="button"
@@ -383,12 +421,17 @@ function UserDetailPage() {
 
                 {/* 선택할 수 있는 태그 리스트 */}
                 <div className="mt-2">
-                  <label className="label text-sm text-gray-500">선택 가능한 태그</label>
+                  <label className="label text-sm text-gray-500">
+                    선택 가능한 태그
+                  </label>
                   <div className="flex flex-wrap gap-2">
                     {availableTags
                       .filter((availableTag) => !tags.includes(availableTag)) // 이미 선택된 태그는 제외
                       .map((availableTag, index) => (
-                        <div key={index} className="badge badge-outline cursor-pointer">
+                        <div
+                          key={index}
+                          className="badge badge-outline cursor-pointer"
+                        >
                           {availableTag}
                           <button
                             type="button"
@@ -412,16 +455,15 @@ function UserDetailPage() {
               {/* 제출 버튼 */}
               <button
                 type="submit"
-            //     disabled={loading}
-            //     className={btn btn-primary w-[20rem] mt-6 ${loading ? "disabled" : ""}}
-            >
-              {/* {loading ? "업데이트 중..." : "프로필 변경"} */}
-            </button>
-          </form>
+                //     disabled={loading}
+                //     className={btn btn-primary w-[20rem] mt-6 ${loading ? "disabled" : ""}}
+              >
+                {/* {loading ? "업데이트 중..." : "프로필 변경"} */}
+              </button>
+            </form>
           </div>
         </>
       </Modal>
-
     </div>
   );
 }
