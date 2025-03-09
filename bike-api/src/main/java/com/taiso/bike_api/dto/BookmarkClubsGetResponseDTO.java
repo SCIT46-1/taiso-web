@@ -4,7 +4,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.taiso.bike_api.domain.ClubEntity;
-import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +18,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @Builder
-public class ClubsGetResponseDTO {
+public class BookmarkClubsGetResponseDTO {
     private Long clubId;
     private String clubProfileImageId;
     private String clubName;
@@ -31,8 +30,8 @@ public class ClubsGetResponseDTO {
     private Integer currentScale;
     private Set<String> tags;
 
-    public static ClubsGetResponseDTO toDTO(ClubEntity club) {
-        return ClubsGetResponseDTO.builder()
+    public static BookmarkClubsGetResponseDTO toDTO(ClubEntity club) {
+        return BookmarkClubsGetResponseDTO.builder()
             .clubId(club.getClubId())
             .clubProfileImageId(club.getClubProfileImageId())
             .clubName(club.getClubName())
@@ -41,7 +40,7 @@ public class ClubsGetResponseDTO {
             .clubLeaderProfileImageId(club.getClubLeader().getUserDetail().getUserProfileImg())
             .clubShortDescription(club.getClubShortDescription())
             .maxScale(club.getMaxUser())
-            .currentScale(club.getUsers().stream().filter(member -> member.getParticipantStatus() == ParticipantStatus.완료 || member.getParticipantStatus() == ParticipantStatus.승인).collect(Collectors.toList()).size())
+            .currentScale(club.getUsers().size())
             .tags(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
             .build();
     }

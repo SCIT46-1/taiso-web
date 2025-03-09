@@ -1,5 +1,6 @@
 package com.taiso.bike_api.repository;
 
+
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +13,9 @@ import com.taiso.bike_api.domain.UserEntity;
 @Repository
 public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> {
 
+	// 클럽 북마크 조회
+  List<BookmarkEntity> findAllByUserAndTargetType(UserEntity user, BookmarkType club);
+  
 	// 북마크 등록 검증
 	boolean existsByUserAndTargetIdAndTargetType(UserEntity currentUser, Long userId, BookmarkType type);
 

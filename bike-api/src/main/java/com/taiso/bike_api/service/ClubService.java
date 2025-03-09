@@ -2,7 +2,6 @@ package com.taiso.bike_api.service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import com.taiso.bike_api.dto.ClubDetailsUpdateResponseDTO;
 import com.taiso.bike_api.dto.ClubsGetResponseDTO;
 import com.taiso.bike_api.exception.ClubNotFoundException;
 import com.taiso.bike_api.exception.ClubUpdateNoPermissionException;
-import com.taiso.bike_api.exception.LightningNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.LightningTagCategoryRepository;
