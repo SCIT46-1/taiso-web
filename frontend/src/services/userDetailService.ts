@@ -1,4 +1,4 @@
-import { get, patch } from "../api/request";
+import { get, patch, post } from "../api/request";
 
 // export interface UserDetailGetResponse {
 //   userId: number;
@@ -18,17 +18,15 @@ import { get, patch } from "../api/request";
 // }
 
 export interface UserDetailPatchRequest {
-  nickname: string;
-  userProfileImg: string;
-  userBackgroundImg: string;
+  userNickname: string;
+  fullName: string;
   phoneNumber: string;
   birthDate: string;
-  bio: string;
   gender: string;
   level: string;
   height: number;
   weight: number;
-  FTP: number;
+  ftp: number;
 }
 
 export interface UserDetailPostRequest {
@@ -63,8 +61,7 @@ export interface UserDetailRequest {
 export interface UserDetailResponse {
   userId: number;
   userNickname: string;
-  userProfileImg: string | null;
-  userBackgroundImg: string | null;
+
   fullName: string;
   phoneNumber: string;
   birthDate: string;
@@ -133,7 +130,7 @@ const getUserDetail = async (): Promise<UserDetailResponse> => {
 const updateUserDetail = async (
   payload: UserDetailPatchRequest
 ): Promise<void> => {
-  return await patch(`/users/me/details`, payload);
+  return await patch(`/users/me/detail`, payload);
 };
 
 //내 예약 번개 조회
@@ -148,6 +145,13 @@ const getMyCompletedLightning = async (): Promise<MyLightningResponse[]> => {
   return await get(`/users/me/lightnings?status=${status}`);
 };
 
+// 내 회원 디테일 등록
+const registerUserDetail = async (
+  payload: UserDetailPostRequest
+): Promise<void> => {
+  return await post(`/users/me/details`, payload);
+};
+
 export default {
   getMyReservationLightning,
   getMyCompletedLightning,
@@ -155,4 +159,5 @@ export default {
   getUserDetail,
   getUserPageDetail,
   updateUserDetail,
+  registerUserDetail,
 };

@@ -20,6 +20,7 @@ public class ClubDetailGetResponseUserDTO {
     private String userNickname;
     private String userProfileImage;
     private String bio;
+    private String participantStatus;
 
     public static ClubDetailGetResponseUserDTO toDTO(UserEntity user) {
         return ClubDetailGetResponseUserDTO.builder()

@@ -1,9 +1,9 @@
 package com.taiso.bike_api.service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.taiso.bike_api.exception.UserDetailNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +14,7 @@ import com.taiso.bike_api.dto.UserDetailGetResponseDTO;
 import com.taiso.bike_api.dto.UserDetailPatchRequestDTO;
 import com.taiso.bike_api.dto.UserDetailPostRequestDTO;
 import com.taiso.bike_api.exception.TagsNotFoundException;
+import com.taiso.bike_api.exception.UserDetailNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.repository.UserDetailRepository;
 import com.taiso.bike_api.repository.UserRepository;
@@ -32,31 +33,60 @@ public class UserDetailService2 {
     @Autowired
     private UserTagCategoryRepository userTagCategoryRepository;
     
-    @Autowired
-    private UserRepository userRepository;
-    
-    public void saveUserDetail(UserDetailPostRequestDTO requestDTO, String userEmail) {
+   @Autowired
+private UserRepository userRepository;
 
-        // 사용자 정보 가져오기
-        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
-        
-        // tag 종합하기
-        requestDTO.getTags().addAll(requestDTO.getBikeType().stream().map(bikeType -> bikeType.name()).collect(Collectors.toSet()));
-        requestDTO.getTags().addAll(requestDTO.getActivityDay().stream().map(activityDay -> activityDay.name()).collect(Collectors.toSet()));
-        requestDTO.getTags().addAll(requestDTO.getActivityTime().stream().map(activityTime -> activityTime.name()).collect(Collectors.toSet()));
-        requestDTO.getTags().addAll(requestDTO.getActivityLocation().stream().map(activityLocation -> activityLocation.name()).collect(Collectors.toSet()));
+public void saveUserDetail(UserDetailPostRequestDTO requestDTO, String userEmail) {
 
-        log.info("{}", requestDTO.getTags());
+    // 사용자 정보 가져오기
+    UserEntity user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
 
-        // tag 엔티티 가져오기
-        Set<UserTagCategoryEntity> tags = requestDTO.getTags().stream().map(tag -> userTagCategoryRepository.findByName(tag)
-        .orElseThrow(() -> new TagsNotFoundException("태그 정보가 없습니다.")))
-        .collect(Collectors.toSet());
+    // tag 종합하기
+    requestDTO.getTags().addAll(requestDTO.getBikeType().stream()
+            .map(Enum::name)
+            .collect(Collectors.toSet()));
+    requestDTO.getTags().addAll(requestDTO.getActivityDay().stream()
+            .map(Enum::name)
+            .collect(Collectors.toSet()));
+    requestDTO.getTags().addAll(requestDTO.getActivityTime().stream()
+            .map(Enum::name)
+            .collect(Collectors.toSet()));
+    requestDTO.getTags().addAll(requestDTO.getActivityLocation().stream()
+            .map(Enum::name)
+            .collect(Collectors.toSet()));
 
-        log.info("{}", requestDTO.getFTP());
+    log.info("tags: {}", requestDTO.getTags());
 
-        // UserDetailEntity 생성
-        UserDetailEntity userDetail = UserDetailEntity.builder()
+    // tag 엔티티 가져오기
+    Set<UserTagCategoryEntity> tags = requestDTO.getTags().stream()
+            .map(tag -> userTagCategoryRepository.findByName(tag)
+                    .orElseThrow(() -> new TagsNotFoundException("태그 정보가 없습니다.")))
+            .collect(Collectors.toSet());
+
+    log.info("FTP: {}", requestDTO.getFTP());
+
+    // 기존 UserDetailEntity 조회
+    Optional<UserDetailEntity> maybeUserDetail = userDetailRepository.findByUserId(user.getUserId());
+
+    UserDetailEntity userDetail;
+    if (maybeUserDetail.isPresent()) {
+        // 기존 엔티티 업데이트
+        userDetail = maybeUserDetail.get();
+        userDetail.setGender(requestDTO.getGender());
+        userDetail.setBirthDate(requestDTO.getBirthDate());
+        userDetail.setUserNickname(requestDTO.getUserNickname());
+        userDetail.setFullName(requestDTO.getFullName());
+        userDetail.setPhoneNumber(requestDTO.getPhoneNumber());
+        userDetail.setBio(requestDTO.getBio());
+        userDetail.setLevel(requestDTO.getLevel());
+        userDetail.setFTP(requestDTO.getFTP());
+        userDetail.setHeight(requestDTO.getHeight());
+        userDetail.setWeight(requestDTO.getWeight());
+        userDetail.setTags(tags);
+    } else {
+        // 엔티티가 없으면 새로 생성
+        userDetail = UserDetailEntity.builder()
                 .userId(user.getUserId())
                 .user(user)
                 .gender(requestDTO.getGender())
@@ -71,10 +101,11 @@ public class UserDetailService2 {
                 .weight(requestDTO.getWeight())
                 .tags(tags)
                 .build();
-
-        // UserDetailEntity 저장
-        userDetailRepository.save(userDetail);
     }
+
+    // 업데이트된 엔티티 저장 (영속성 컨텍스트 내의 단일 인스턴스 사용)
+    userDetailRepository.save(userDetail);
+}
 
     public UserDetailGetResponseDTO getUserDetail(String userEmail) {
         // 사용자 정보 가져오기
