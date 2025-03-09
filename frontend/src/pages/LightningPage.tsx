@@ -62,6 +62,8 @@ function LightningPage() {
   // 태그 모달 열림 상태
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 
+  // Keep track of dropdown elements
+
   // 일반 태그 토글 (상태만 업데이트)
   const toggleAvailableTag = (tag: string): void => {
     if (selectedAvailableTags.includes(tag)) {
@@ -71,21 +73,26 @@ function LightningPage() {
     }
   };
 
-  // 단일 선택 토글 (상태만 업데이트)
+  // Update toggle functions to close dropdown after selection
   const toggleGenderTag = (tag: string): void => {
     setSelectedGender(selectedGender === tag ? null : tag);
+    // Close the dropdown by adding an artificial click event on the document
+    document.body.click();
   };
 
   const toggleBikeTypeTag = (tag: string): void => {
     setSelectedBikeType(selectedBikeType === tag ? null : tag);
+    document.body.click();
   };
 
   const toggleLevelTag = (tag: string): void => {
     setSelectedLevel(selectedLevel === tag ? null : tag);
+    document.body.click();
   };
 
   const toggleLocationTag = (tag: string): void => {
     setSelectedLocation(selectedLocation === tag ? null : tag);
+    document.body.click();
   };
 
   // 필터 상태 변경 시 URL 파라미터를 한 번에 업데이트
@@ -111,7 +118,7 @@ function LightningPage() {
   ]);
 
   return (
-    <div className="min-h-screen flex flex-col w-full">
+    <div className="min-h-screen flex flex-col w-full no-animation">
       <MainNavbar />
       <DateCarousel onDateChange={(date) => setSelectedDate(date)} />
 
@@ -132,7 +139,7 @@ function LightningPage() {
           </button>
 
           {/* 성별 드롭다운 (단일 선택) */}
-          <div className="dropdown dropdown-hover">
+          <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-sm m-1">
               성별
               {selectedGender && (
@@ -162,7 +169,7 @@ function LightningPage() {
           </div>
 
           {/* 자전거 타입 드롭다운 (단일 선택) */}
-          <div className="dropdown dropdown-hover">
+          <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-sm m-1">
               자전거 타입
               {selectedBikeType && (
@@ -192,7 +199,7 @@ function LightningPage() {
           </div>
 
           {/* 난이도 드롭다운 (단일 선택) */}
-          <div className="dropdown dropdown-hover">
+          <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-sm m-1">
               난이도
               {selectedLevel && (
@@ -222,7 +229,7 @@ function LightningPage() {
           </div>
 
           {/* 지역 드롭다운 (단일 선택) */}
-          <div className="dropdown dropdown-hover">
+          <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-sm m-1">
               지역
               {selectedLocation && (

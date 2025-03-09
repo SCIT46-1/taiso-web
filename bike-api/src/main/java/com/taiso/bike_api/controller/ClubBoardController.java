@@ -38,7 +38,7 @@ public class ClubBoardController {
     @PostMapping("")
     public ResponseEntity<ClubBoardPostRequestDTO> createClubBoard(
                                         @RequestBody ClubBoardPostRequestDTO clubBoardPostRequestDTO
-                                        , @PathVariable Long clubId
+                                        , @PathVariable(name = "clubId") Long clubId
                                         , Authentication authentication) {
 
         log.info("로직 시작 시 들어온 DTO : {}", clubBoardPostRequestDTO.toString());
@@ -50,8 +50,8 @@ public class ClubBoardController {
     @Operation(summary = "클럽 게시글 삭제", description = "클럽 게시글 삭제 API")
     @DeleteMapping("/{boardId}")
     public ResponseEntity<ClubBoardPostRequestDTO> deleteClubBoard (
-                                                @PathVariable Long clubId
-                                                , @PathVariable Long boardId
+                                                @PathVariable(name = "clubId") Long clubId
+                                                , @PathVariable(name = "boardId") Long boardId
                                                 , Authentication authentication) {
 
         log.info("로직 시작 시 들어온 클럽ID : {}", clubId);
@@ -67,8 +67,8 @@ public class ClubBoardController {
     @PatchMapping("/{boardId}")
     public ResponseEntity<ClubBoardPostRequestDTO> patchClubBoard (
                                         @RequestBody ClubBoardPatchRequestDTO clubBoardPatchRequestDTO
-                                        , @PathVariable Long clubId
-                                        , @PathVariable Long boardId
+                                        , @PathVariable(name = "clubId") Long clubId
+                                        , @PathVariable(name = "boardId") Long boardId
                                         , Authentication authentication) {
 
         clubBoardService.patchClubBoard(clubBoardPatchRequestDTO, clubId, boardId, authentication);
@@ -79,8 +79,8 @@ public class ClubBoardController {
     @Operation(summary = "클럽 게시글 조회", description = "클럽 게시글 조회 API")
     @GetMapping("/{boardId}")
     public ResponseEntity<ClubBoardGetResponseDTO> getCluBoardOne (
-                                                @PathVariable Long clubId
-                                                , @PathVariable Long boardId
+                                                @PathVariable(name = "clubId") Long clubId
+                                                , @PathVariable(name = "boardId") Long boardId
                                                 , Authentication authentication) {
         ClubBoardGetResponseDTO clubBoardGetResponseDTO = clubBoardService.getClubBoardOne(clubId, boardId, authentication);
 
@@ -93,7 +93,7 @@ public class ClubBoardController {
             @RequestParam(name = "page", defaultValue = "0") int page
             , @RequestParam(name = "size", defaultValue = "8") int size
             , @RequestParam(name = "sort", defaultValue = "") String sort
-            , @PathVariable Long clubId
+            , @PathVariable(name = "clubId") Long clubId
             , Authentication authentication){
 
         ClubBoardListResponseDTO clubBoardListResponseDTO = clubBoardService.getClubBoardList(page, size, sort, clubId ,authentication);

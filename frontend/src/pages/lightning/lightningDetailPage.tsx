@@ -12,6 +12,7 @@ import { getWeatherIcon } from "../../utils/weatherIcons";
 import KakaoMapRoute from "../../components/KakaoMap";
 import KakaolocationMap from "../../components/KakaolocationMap";
 import UserImage from "../../components/UserImage";
+import LightningSummaryInfo from "../../components/LightningSummaryInfo";
 
 interface ModalProps {
   id: string;
@@ -30,7 +31,6 @@ interface WeatherDisplayProps {
 function WeatherDisplay({
   weatherInfo,
   hourlyForecasts,
-  forecastDate,
   isLoading,
 }: WeatherDisplayProps) {
   if (isLoading) {
@@ -50,19 +50,8 @@ function WeatherDisplay({
     );
   }
 
-  // // Get the event time range for display
-  // const startTime = hourlyForecasts.length > 0 ? hourlyForecasts[0].time : "";
-  // const endTime =
-  //   hourlyForecasts.length > 0
-  //     ? hourlyForecasts[hourlyForecasts.length - 1].time
-  //     : "";
-  // const timeRangeDisplay =
-  //   hourlyForecasts.length > 0 ? `${startTime} ~ ${endTime}` : "";
-
   return (
     <div className="rounded-lg p-2">
-      <div className="font-bold text-lg mb-3">({forecastDate})</div>
-
       {/* Hourly Forecast */}
       {hourlyForecasts.length > 0 && (
         <div>
@@ -105,8 +94,8 @@ function WeatherDisplay({
 export function Modal({ id, title, children, actions }: ModalProps) {
   return (
     <dialog id={id} className="modal">
-      <div className="modal-box">
-        <h3 className="font-bold text-lg">{title}</h3>
+      <div className="modal-box p-8">
+        <h3 className="font-extrabold text-2xl">{title}</h3>
         <div className="py-4">{children}</div>
         <div className="modal-action">{actions}</div>
       </div>
@@ -141,6 +130,45 @@ function LightningDetailPage() {
   );
   const [forecastDate, setForecastDate] = useState<string>("");
   const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
+
+  //테스트 ================================
+  //테스트용 모달 계속 열어 놓는 함수
+  // const testModalId = "join-modal"; // 테스트할 모달 ID 설정 (테스트 끝나면 빈 문자열로 변경)
+
+  // useEffect(() => {
+  //   // 테스트 모달 ID가 설정되어 있으면 실행
+  //   if (testModalId) {
+  //     // 모달 열기
+  //     const openTestModal = () => {
+  //       const modal = document.getElementById(testModalId) as HTMLDialogElement;
+  //       if (modal) {
+  //         modal.showModal();
+  //       }
+  //     };
+
+  //     // 페이지 로드 후 약간의 지연을 두고 모달 열기
+  //     const timer = setTimeout(openTestModal, 100);
+
+  //     // 모달이 닫힐 때 다시 열리도록 이벤트 리스너 추가
+  //     const handleDialogClose = () => {
+  //       setTimeout(openTestModal, 100);
+  //     };
+
+  //     const modal = document.getElementById(testModalId) as HTMLDialogElement;
+  //     if (modal) {
+  //       modal.addEventListener("close", handleDialogClose);
+  //     }
+
+  //     return () => {
+  //       clearTimeout(timer);
+  //       // 컴포넌트 언마운트 시 이벤트 리스너 제거
+  //       if (modal) {
+  //         modal.removeEventListener("close", handleDialogClose);
+  //       }
+  //     };
+  //   }
+  // }, [testModalId]);
+  //테스트 ================================
 
   // 날씨 데이터 캐시: key를 이벤트 날짜, 위치, 지속시간 조합으로 생성
   const weatherCache = useRef<{
@@ -435,65 +463,103 @@ function LightningDetailPage() {
   }
 
   return (
-    <div className="w-screen grid grid-cols-[2fr,1fr] gap-4 max-w-screen-lg mb-10">
+    <div className="w-screen grid grid-cols-[2fr,1fr] gap-4 max-w-screen-lg mb-10 no-animation">
       {/* 상단 지도 영역 */}
-
-      <div className="col-span-2 ">
+      <div className="col-span-2 shadow-sm">
         {lightningDetail?.route.routePoints && (
           <KakaoMapRoute routePoints={lightningDetail.route.routePoints} />
         )}
       </div>
 
-      {/* 하단 좌측 상세정보 영역 */}
-      <div className="flex flex-col p-4 rounded-xl shadow-2xl border border-base-300">
-        <div className="">
+      {/* 하단 좌측 영역을 두 개의 컨테이너로 분할 */}
+      <div className="flex flex-col gap-4">
+        {/* 좌측 상단 컨테이너: 날씨 정보 영역 - 아코디언 적용 */}
+        <div className="rounded-xl shadow-md border border-base-300">
           {lightningDetail?.status !== "종료" &&
             lightningDetail?.status !== "취소" && (
-              <WeatherDisplay
-                weatherInfo={weatherInfo}
-                hourlyForecasts={hourlyForecasts}
-                forecastDate={forecastDate}
-                isLoading={weatherLoading}
-              />
+              <div className="collapse collapse-arrow">
+                <input type="checkbox" />
+                <div className="collapse-title text-xl font-medium flex items-center">
+                  <span className="ml-1 text-lg font-extrabold">날씨 정보</span>
+                  {weatherLoading ? (
+                    <span className="loading loading-dots loading-sm ml-2"></span>
+                  ) : (
+                    hourlyForecasts.length > 0 && (
+                      <span className="text-sm font-normal"></span>
+                    )
+                  )}
+                </div>
+                <div className="collapse-content">
+                  <WeatherDisplay
+                    weatherInfo={weatherInfo}
+                    hourlyForecasts={hourlyForecasts}
+                    forecastDate={forecastDate}
+                    isLoading={weatherLoading}
+                  />
+                </div>
+              </div>
             )}
         </div>
-        <h2 className="text-2xl font-bold mb-2">{lightningDetail?.title}</h2>
-        <div className="flex flex-wrap gap-1">
-          <div className="badge badge-primary badge-outline">
-            {lightningDetail?.region}
-          </div>
-          <div className="badge badge-primary badge-outline">
-            {lightningDetail?.bikeType}
-          </div>
-          <div className="badge badge-primary badge-outline">
-            {lightningDetail?.level}
-          </div>
-          <div className="badge badge-primary badge-outline">
-            {lightningDetail?.gender}
-          </div>
-          {lightningDetail?.lightningTag &&
-            lightningDetail.lightningTag.map((tag, index) => (
-              <span key={index} className="badge badge-primary badge-outline">
-                {tag}
-              </span>
-            ))}
-        </div>
-        <div className="divider mt-2"></div>
-        <div className="flex items-center gap-2">
-          <UserImage
-            profileImage={lightningDetail?.creator.creatorProfileImg as string}
-          />
 
-          <span>{lightningDetail?.creator.creatorNickname}</span>
+        {/* 새로운 아코디언 컴포넌트 추가 */}
+        <div className="rounded-xl shadow-md border border-base-300">
+          <div className="collapse collapse-arrow">
+            <input type="checkbox" defaultChecked />
+            <div className="collapse-title text-xl font-medium flex items-center">
+              <span className="ml-1 text-lg font-extrabold">
+                간략한 번개 정보
+              </span>
+            </div>
+            <div className="collapse-content">
+              <div className="flex flex-col p-2">
+                {/* 여기에 코스 정보 내용을 추가하세요 */}
+                <LightningSummaryInfo
+                  gender={lightningDetail?.gender || ""}
+                  level={lightningDetail?.level || ""}
+                  recruitType={lightningDetail?.recruitType || ""}
+                  bikeType={lightningDetail?.bikeType || ""}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <p className="mt-2">{lightningDetail?.description}</p>
-        <div className="mt-4">{lightningDetail?.recruitType}</div>
-        <div className="mt-2 font-bold">주의사항</div>
-        <p>주의사항 내용을 여기에 작성합니다.</p>
+
+        {/* 좌측 하단 컨테이너: 상세 정보 영역 */}
+        <div className="rounded-xl shadow-md border border-base-300 p-6">
+          <div className="flex flex-col">
+            <h2 className="text-2xl font-bold mb-2">
+              {lightningDetail?.title}
+            </h2>
+            <div className="flex flex-wrap gap-1">
+              {lightningDetail?.lightningTag &&
+                lightningDetail.lightningTag.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="badge badge-primary badge-outline"
+                  >
+                    {tag}
+                  </span>
+                ))}
+            </div>
+            <div className="divider mt-2"></div>
+            <div className="flex items-center gap-2">
+              <UserImage
+                profileImage={
+                  lightningDetail?.creator.creatorProfileImg as string
+                }
+              />
+
+              <span>{lightningDetail?.creator.creatorNickname}</span>
+            </div>
+            <p className="mt-4">{lightningDetail?.description}</p>
+            <div className="mt-2 font-bold">주의사항</div>
+            <p>주의사항 내용을 여기에 작성합니다.</p>
+          </div>
+        </div>
       </div>
 
-      {/* 하단 우측 참여자 및 지도 영역 */}
-      <div className="flex flex-col items-center justify-center p-4 rounded-xl shadow-2xl border border-base-300">
+      {/* 하단 우측 참여자 및 지도 영역 - self-start 클래스 추가 */}
+      <div className="flex flex-col items-center justify-center p-4 rounded-xl shadow-xl border border-base-300 self-start">
         <div className="mb-4 mt-2">
           <div className="font-semibold">
             {lightningDetail?.eventDate
@@ -775,9 +841,12 @@ function LightningDetailPage() {
         }
       >
         <>
-          <p>아래 사항을 다시 한 번 확인해 주세요!</p>
-          <div>{lightningDetail?.eventDate} 시에 열리는 번개입니다.</div>
-          <div className="text-sm text-gray-500">
+          <p className="font-bold mb-2">
+            아래 사항을 다시 한 번 확인해 주세요!
+          </p>
+          <div>시작 시간: {lightningDetail?.eventDate}</div>
+          <div className="">
+            진행 시간:{" "}
             {lightningDetail?.duration
               ? lightningDetail.duration >= 60
                 ? `${Math.floor(lightningDetail.duration / 60)}시간${
@@ -787,11 +856,10 @@ function LightningDetailPage() {
                   }`
                 : `${lightningDetail.duration}분`
               : ""}{" "}
-            동안 진행됩니다.
           </div>
-          <div>{lightningDetail?.address}에서 진행됩니다.</div>
-          <div className="mt-2 font-bold">주의사항</div>
-          <p>주의사항 내용을 작성합니다.</p>
+          <div>진행 장소: {lightningDetail?.address}</div>
+          <div className="mt-2 font-extrabold">주의사항</div>
+          <p>참여하기 이후 번개를 나가면 다시 참여할 수 없어요!</p>
         </>
       </Modal>
 

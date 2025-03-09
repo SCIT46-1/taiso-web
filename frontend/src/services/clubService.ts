@@ -48,6 +48,55 @@ export interface ClubApplyResponse {
   clubMemberId: number;
 }
 
+export interface ClubBoardListResponse {
+  content: {
+    postId: number;
+    postWriter: number;
+    writerNickname: string;
+    writerProfileImg: string | null;
+    postTitle: string;
+    postContent: string;
+    createdAt: string;
+    updatedAt: string;
+    isNotice: boolean;
+    canDelete: boolean;
+    canEdit: boolean;
+  }[];
+  pageNo: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
+
+export interface ClubBoardDetailResponse {
+  postId: number;
+  postWriter: number;
+  writerNickname: string;
+  writerProfileImg: string | null;
+  postTitle: string;
+  postContent: string;
+  createdAt: string;
+  updatedAt: string;
+  isNotice: boolean;
+  canDelete: boolean;
+  canEdit: boolean;
+}
+
+export interface ClubDetailGetResponseUserDTO {
+  userId: number;
+  userNickname: string;
+  userProfileImage: string | null;
+  bio: string;
+  participantStatus: string;
+}
+
+export interface ClubBoardPostRequest {
+  postTitle: string;
+  postContent: string;
+  isNotice: boolean;
+}
+
 const getClubList = async (): Promise<ClubListResponse[]> => {
   return await get(`/clubs`);
 };
@@ -106,6 +155,57 @@ const leaveClub = async (clubId: number): Promise<ClubApplyResponse> => {
   return await del(`/clubs/${clubId}/members`);
 };
 
+//클럽 게시글 관련 API
+
+//클럽 게시글 리스트 조회
+const getClubBoardList = async (
+  clubId: number,
+  page: number,
+  size: number
+): Promise<ClubBoardListResponse> => {
+  return await get(`/clubs/${clubId}/boards?page=${page}&size=${size}`);
+};
+
+//클럽 게시글 상세 조회
+const getClubBoardDetail = async (
+  clubId: number,
+  boardId: number
+): Promise<ClubBoardDetailResponse> => {
+  return await get(`/clubs/${clubId}/boards/${boardId}`);
+};
+
+//클럽 게시글 작성
+const createClubBoard = async (
+  clubId: number,
+  boardData: ClubBoardPostRequest
+): Promise<ClubBoardDetailResponse> => {
+  return await post(`/clubs/${clubId}/boards`, boardData);
+};
+
+//클럽 게시글 수정
+const updateClubBoard = async (
+  clubId: number,
+  boardId: number,
+  boardData: ClubBoardPostRequest
+): Promise<ClubBoardDetailResponse> => {
+  return await patch(`/clubs/${clubId}/boards/${boardId}`, boardData);
+};
+
+//클럽 게시글 삭제
+const deleteClubBoard = async (
+  clubId: number,
+  boardId: number
+): Promise<void> => {
+  return await del(`/clubs/${clubId}/boards/${boardId}`);
+};
+
+// Get pending members for a club
+const getPendingMembers = async (
+  clubId: number
+): Promise<ClubDetailGetResponseUserDTO[]> => {
+  return await get(`/clubs/${clubId}/pending-members`);
+};
+
 export default {
   getClubList,
   getClubDetail,
@@ -115,4 +215,10 @@ export default {
   rejectClubMember,
   acceptClubMember,
   leaveClub,
+  getPendingMembers,
+  getClubBoardList,
+  getClubBoardDetail,
+  createClubBoard,
+  updateClubBoard,
+  deleteClubBoard,
 };

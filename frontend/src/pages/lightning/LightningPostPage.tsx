@@ -13,12 +13,17 @@ const RECRUIT_TYPE_OPTIONS = ["참가형", "수락형"];
 const BIKE_TYPE_OPTIONS = ["로드", "따릉이", "하이브리드", "자유"];
 const REGION_OPTIONS = ["서울", "경기", "대구", "강원"];
 const TAG_OPTIONS = [
-  "샤방법",
-  "오픈라이딩",
-  "따폭연",
   "장거리",
-  "따릉이",
   "친목",
+  "가볍게",
+  "따릉이",
+  "아마추어",
+  "훈련",
+  "샤방",
+  "커피 라이딩",
+  "초 장거리",
+  "무보급",
+  "무정차",
 ];
 
 interface LatLng {

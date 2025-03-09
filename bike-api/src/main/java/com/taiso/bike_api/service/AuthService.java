@@ -77,9 +77,13 @@ public class AuthService {
         KakaoUserInfoDTO kakaoUserInfo = getKakaoUserInfo(accessToken);
         System.out.println("kakaoUserInfo: " + kakaoUserInfo.getEmail());
 
+        // Create an array to hold the isNewUser flag - arrays are mutable even when final
+        final boolean[] isNewUserArr = {false};
+
         // 3. DB에 사용자 존재 여부 확인, 신규 가입 처리        
         UserEntity user = userRepository.findByEmail(kakaoUserInfo.getEmail())
                 .orElseGet(() -> {
+                    isNewUserArr[0] = true;  // This works because we're modifying array contents, not the array reference
                     UserEntity newUser = new UserEntity();
                     newUser.setEmail(kakaoUserInfo.getEmail());
                     // Set the default role and status (you need to replace these with actual default values)
@@ -107,11 +111,12 @@ public class AuthService {
                     return savedUser;
                 });
 
-        // 4. JWT 생성 (여기서는 사용자 이메일을 기반으로 토큰 생성)
+        // 4. JWT 생성
         String jwtToken = jwtTokenProvider.generateToken(user.getEmail());
         
-        // KakaoAuthResultDTO에 JWT 토큰과 사용자 정보를 담아 반환
-        return new KakaoAuthResultDTO(jwtToken, user.getUserId(), user.getEmail(), userDetailRepository.findByUser(user).get().getUserNickname());
+        // Use the value from the array when creating the result
+        return new KakaoAuthResultDTO(jwtToken, user.getUserId(), user.getEmail(), 
+            userDetailRepository.findByUser(user).get().getUserNickname(), isNewUserArr[0]);
     }
 
     private String getKakaoAccessToken(String code) {

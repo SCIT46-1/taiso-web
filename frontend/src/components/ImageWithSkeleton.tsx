@@ -5,7 +5,7 @@ function ImageWithSkeleton({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <div className="relative rounded-2xl overflow-hidden shadow-sm">
+    <div className="relative rounded-2xl overflow-hidden shadow-sm group">
       {!loaded && <div className="absolute inset-0 animate-pulse" />}
       <img
         src={src}

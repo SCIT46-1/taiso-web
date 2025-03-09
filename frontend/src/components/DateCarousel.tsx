@@ -86,7 +86,7 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
       </button>
 
       {/* 날짜 목록 */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2">
         {dateList.map((d, index) => {
           const dayIndex = d.getDay(); // 0: 일, 1: 월, ... 6: 토
           const dayNumber = d.getDate();
@@ -94,13 +94,13 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
 
           // 기본 원형 스타일
           let circleClasses =
-            "w-10 h-10 flex items-center justify-center rounded-full transition-colors no-animation";
+            "w-24 h-10 flex items-center justify-center rounded-full transition-colors no-animation";
           // 토/일이면 텍스트 빨간색, 아니면 검정색
           const textClasses = isWeekend(d) ? "text-red-500" : "text-black";
 
           // 선택된 날짜면 파란색 배경, 흰색 글자, 굵은 글씨 적용
           if (selectedDate.toDateString() === d.toDateString()) {
-            circleClasses += " bg-blue-500 text-white font-bold no-animation";
+            circleClasses += " bg-blue-400 text-white font-bold no-animation";
           }
 
           return (

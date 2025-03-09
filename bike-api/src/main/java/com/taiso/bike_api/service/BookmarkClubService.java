@@ -14,6 +14,7 @@ import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.BookmarkClubCreateResponseDTO;
 import com.taiso.bike_api.dto.BookmarkClubsGetResponseDTO;
+import com.taiso.bike_api.exception.BookmarkAlreadyExistsException;
 import com.taiso.bike_api.exception.ClubNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.repository.BookmarkRepository;
@@ -70,6 +71,11 @@ public class BookmarkClubService {
         ClubEntity club = clubRepository.findByClubId(clubId).orElseThrow(() ->
             new ClubNotFoundException("존재하지 않는 클럽입니다.")
         );
+
+        // 북마크 존재여부 확인
+        if (bookmarkRepository.existsByUserAndTargetIdAndTargetType(user, clubId, BookmarkType.CLUB)) {
+            throw new BookmarkAlreadyExistsException("이미 북마크된 클럽입니다.");
+        }
 
         // 엔티티 빌드 및 저장
         bookmarkRepository.save(BookmarkEntity.builder()

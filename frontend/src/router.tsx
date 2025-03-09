@@ -68,6 +68,7 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
+          { path: "user-onboarding", element: <UserOnboardingPage /> },
           {
             path: "lightning",
             children: [{ path: "post", element: <LightningPostPage /> }],
