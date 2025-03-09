@@ -122,10 +122,14 @@ function LightningPostPage() {
   };
 
   // MeetingLocationSelector에서 선택한 주소와 좌표를 저장하는 콜백 함수
-  const handleLocationSelect = (selectedAddress: string, coords: LatLng) => {
+  const handleLocationSelect = (
+    selectedAddress: string,
+    coords: LatLng,
+    locationName?: string
+  ) => {
     setFormData({
       ...formData,
-      address: selectedAddress,
+      address: locationName || selectedAddress,
       latitude: coords.lat.toString(),
       longitude: coords.lng.toString(),
     });
@@ -176,7 +180,7 @@ function LightningPostPage() {
   };
 
   return (
-    <>
+    <div className="no-animation">
       {/* 루트 등록 모달 */}
       <input type="checkbox" id="route_modal" className="modal-toggle" />
       <div className="modal" role="dialog">
@@ -190,8 +194,8 @@ function LightningPostPage() {
         </div>
       </div>
       {/* 번개 등록 폼 */}
-      <div className="flex justify-center items-center relative sm:w-full w-[90%]">
-        <div className="w-full max-w-lg bg-base-100 p-6">
+      <div className="flex justify-center items-center relative sm:w-full">
+        <div className="w-full max-w-lg bg-base-100 p-4">
           <h1 className="text-2xl font-bold text-center mb-4">번개 등록하기</h1>
           {serverError && (
             <p className="text-red-500 mb-4 text-center">{serverError}</p>
@@ -199,7 +203,24 @@ function LightningPostPage() {
           <form onSubmit={handleSubmit} noValidate>
             {/* 제목 */}
             <div className="form-control mb-4">
-              <label htmlFor="title" className="label">
+              <label
+                htmlFor="title"
+                className="label flex items-center gap-2 justify-start"
+              >
+                <svg
+                  data-slot="icon"
+                  fill="grey"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="w-5 h-5"
+                >
+                  <path
+                    clipRule="evenodd"
+                    fillRule="evenodd"
+                    d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm0 10.5a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Z"
+                  />
+                </svg>
                 <span className="label-text">제목</span>
               </label>
               <input
@@ -222,7 +243,24 @@ function LightningPostPage() {
 
             {/* 설명 */}
             <div className="form-control mb-4">
-              <label htmlFor="description" className="label">
+              <label
+                htmlFor="description"
+                className="label flex items-center gap-2 justify-start"
+              >
+                <svg
+                  data-slot="icon"
+                  fill="grey"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="w-5 h-5"
+                >
+                  <path
+                    clipRule="evenodd"
+                    fillRule="evenodd"
+                    d="M10 2c-2.236 0-4.43.18-6.57.524C1.993 2.755 1 4.014 1 5.426v5.148c0 1.413.993 2.67 2.43 2.902 1.168.188 2.352.327 3.55.414.28.02.521.18.642.413l1.713 3.293a.75.75 0 0 0 1.33 0l1.713-3.293a.783.783 0 0 1 .642-.413 41.102 41.102 0 0 0 3.55-.414c1.437-.231 2.43-1.49 2.43-2.902V5.426c0-1.413-.993-2.67-2.43-2.902A41.289 41.289 0 0 0 10 2ZM6.75 6a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5Zm0 2.5a.75.75 0 0 0 0 1.5h3.5a.75.75 0 0 0 0-1.5h-3.5Z"
+                  />
+                </svg>
                 <span className="label-text">설명</span>
               </label>
               <textarea
@@ -244,7 +282,25 @@ function LightningPostPage() {
 
             {/* 이벤트 날짜 */}
             <div className="form-control mb-4">
-              <label htmlFor="eventDate" className="label">
+              <label
+                htmlFor="eventDate"
+                className="label flex items-center gap-2 justify-start"
+              >
+                <svg
+                  data-slot="icon"
+                  fill="grey"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="w-5 h-5"
+                >
+                  <path d="M5.25 12a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H6a.75.75 0 0 1-.75-.75V12ZM6 13.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V14a.75.75 0 0 0-.75-.75H6ZM7.25 12a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H8a.75.75 0 0 1-.75-.75V12ZM8 13.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V14a.75.75 0 0 0-.75-.75H8ZM9.25 10a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H10a.75.75 0 0 1-.75-.75V10ZM10 11.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V12a.75.75 0 0 0-.75-.75H10ZM9.25 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H10a.75.75 0 0 1-.75-.75V14ZM12 9.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V10a.75.75 0 0 0-.75-.75H12ZM11.25 12a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H12a.75.75 0 0 1-.75-.75V12ZM12 13.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V14a.75.75 0 0 0-.75-.75H12ZM13.25 10a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H14a.75.75 0 0 1-.75-.75V10ZM14 11.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V12a.75.75 0 0 0-.75-.75H14Z" />
+                  <path
+                    clipRule="evenodd"
+                    fillRule="evenodd"
+                    d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z"
+                  />
+                </svg>
                 <span className="label-text">번개 모임 일시</span>
               </label>
               <input
@@ -267,7 +323,24 @@ function LightningPostPage() {
             {/* 지속 시간 */}
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="form-control">
-                <label htmlFor="duration" className="label">
+                <label
+                  htmlFor="duration"
+                  className="label flex items-center gap-2 justify-start"
+                >
+                  <svg
+                    data-slot="icon"
+                    fill="grey"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      clipRule="evenodd"
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
+                    />
+                  </svg>
                   <span className="label-text">번개 예상 소요시간 (분)</span>
                 </label>
                 <input
@@ -287,43 +360,218 @@ function LightningPostPage() {
                   </span>
                 )}
               </div>
-            </div>
-
-            {/* 최대 인원, 위치 선택 */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="form-control">
-                <label htmlFor="capacity" className="label">
+              <div className="form-control mx-auto">
+                <label
+                  htmlFor="capacity"
+                  className="label flex items-center gap-2 justify-start"
+                >
+                  <svg
+                    data-slot="icon"
+                    fill="grey"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path d="M7 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM14.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 7 18a9.953 9.953 0 0 1-5.385-1.572ZM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 0 0-1.588-3.755 4.502 4.502 0 0 1 5.874 2.636.818.818 0 0 1-.36.98A7.465 7.465 0 0 1 14.5 16Z" />
+                  </svg>
                   <span className="label-text">최대 참여가능 인원 (명)</span>
                 </label>
-                <input
-                  id="capacity"
-                  type="number"
-                  placeholder="예: 10"
-                  value={formData.capacity}
-                  onChange={(e) => {
-                    setFormData({ ...formData, capacity: e.target.value });
-                    setFormErrors((prev) => ({ ...prev, capacity: "" }));
-                  }}
-                  className="input input-bordered placeholder:text-sm"
-                />
+                <div className="join w-full">
+                  <button
+                    type="button"
+                    className="btn join-item"
+                    onClick={() => {
+                      const currentValue = parseInt(formData.capacity) || 0;
+                      if (currentValue > 1) {
+                        setFormData({
+                          ...formData,
+                          capacity: (currentValue - 1).toString(),
+                        });
+                      }
+                    }}
+                  >
+                    -
+                  </button>
+                  <input
+                    id="capacity"
+                    type="number"
+                    placeholder="예: 10"
+                    value={formData.capacity}
+                    onChange={(e) => {
+                      setFormData({ ...formData, capacity: e.target.value });
+                      setFormErrors((prev) => ({ ...prev, capacity: "" }));
+                    }}
+                    className="input mr-3 w-full join-item px-0 text-center focus:outline-none focus:border-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none "
+                  />
+                  <button
+                    type="button"
+                    className="btn join-item"
+                    onClick={() => {
+                      const currentValue = parseInt(formData.capacity) || 0;
+                      setFormData({
+                        ...formData,
+                        capacity: (currentValue + 1).toString(),
+                      });
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
                 {formErrors.capacity && (
                   <span className="text-red-500 mt-2 block">
                     {formErrors.capacity}
                   </span>
                 )}
               </div>
-              <label htmlFor="map_modal">
+            </div>
+
+            {/* 최대 인원, 위치 선택 */}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label
+                  htmlFor="map_modal"
+                  className="flex items-center gap-2 justify-start mb-2 ml-1"
+                >
+                  <svg
+                    data-slot="icon"
+                    fill="grey"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      clipRule="evenodd"
+                      fillRule="evenodd"
+                      d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
+                    />
+                  </svg>
+                  <div className="label-text">모임 시작 장소 선택하기</div>
+                </label>
                 <MeetingLocationSelector
                   onSelectLocation={handleLocationSelect}
                 />
-              </label>
+              </div>
+              <div className="-mt-2">
+                <label className="label flex items-center gap-2 justify-start">
+                  <svg
+                    data-slot="icon"
+                    fill="grey"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      clipRule="evenodd"
+                      fillRule="evenodd"
+                      d="M8.157 2.176a1.5 1.5 0 0 0-1.147 0l-4.084 1.69A1.5 1.5 0 0 0 2 5.25v10.877a1.5 1.5 0 0 0 2.074 1.386l3.51-1.452 4.26 1.762a1.5 1.5 0 0 0 1.146 0l4.083-1.69A1.5 1.5 0 0 0 18 14.75V3.872a1.5 1.5 0 0 0-2.073-1.386l-3.51 1.452-4.26-1.762ZM7.58 5a.75.75 0 0 1 .75.75v6.5a.75.75 0 0 1-1.5 0v-6.5A.75.75 0 0 1 7.58 5Zm5.59 2.75a.75.75 0 0 0-1.5 0v6.5a.75.75 0 0 0 1.5 0v-6.5Z"
+                    />
+                  </svg>
+                  <div className="label-text">번개 경로 선택하기</div>
+                </label>
+                <label htmlFor="route_modal" className="btn w-full">
+                  경로 등록
+                </label>
+              </div>
             </div>
 
-            {/* 지역 */}
-            <div className="mb-4">
-              <div className="form-control">
+            {/* 모집 유형 */}
+            <div className="mb-4 no-animation">
+              <label className="label flex items-center gap-2 justify-start">
+                <svg
+                  data-slot="icon"
+                  fill="grey"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="w-5 h-5"
+                >
+                  <path d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM1.49 15.326a.78.78 0 0 1-.358-.442 3 3 0 0 1 4.308-3.516 6.484 6.484 0 0 0-1.905 3.959c-.023.222-.014.442.025.654a4.97 4.97 0 0 1-2.07-.655ZM16.44 15.98a4.97 4.97 0 0 0 2.07-.654.78.78 0 0 0 .357-.442 3 3 0 0 0-4.308-3.517 6.484 6.484 0 0 1 1.907 3.96 2.32 2.32 0 0 1-.026.654ZM18 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5.304 16.19a.844.844 0 0 1-.277-.71 5 5 0 0 1 9.947 0 .843.843 0 0 1-.277.71A6.975 6.975 0 0 1 10 18a6.974 6.974 0 0 1-4.696-1.81Z" />
+                </svg>
+                <span className="label-text font-medium mr-auto">
+                  모집 유형
+                </span>
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                {RECRUIT_TYPE_OPTIONS.map((option) => (
+                  <div
+                    key={option}
+                    onClick={() => {
+                      setFormData({ ...formData, recruitType: option });
+                      setFormErrors((prev) => ({
+                        ...prev,
+                        recruitType: "",
+                      }));
+                    }}
+                    className={`card cursor-pointer min-h-[80px] bg-base-100 p-1 ${
+                      formData.recruitType === option
+                        ? "border-[1px] border-primary ring-1 ring-primary shadow-sm text-primary"
+                        : "border border-gray-300 "
+                    }`}
+                  >
+                    <div className="card-body p-4 flex flex-col justify-center">
+                      <h3 className="card-title text-center justify-center text-base">
+                        {option}
+                      </h3>
+                      <p className="text-sm text-center mt-2">
+                        {option === "참가형"
+                          ? "자유롭게 참가 할 수 있어요!"
+                          : "신청을 받고 승낙을 해야 해요!"}
+                      </p>
+                      {formData.recruitType === option && (
+                        <div className="absolute top-2 right-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-primary"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {formErrors.recruitType && (
+                <span className="text-red-500 mt-2 block">
+                  {formErrors.recruitType}
+                </span>
+              )}
+            </div>
+
+            {/* 통합 선택 옵션 섹션 */}
+            <div className="form-control mb-6 rounded-lg">
+              <div className="flex items-center gap-2 ">
+                <svg
+                  data-slot="icon"
+                  fill="grey"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="w-5 h-5"
+                >
+                  <path
+                    clipRule="evenodd"
+                    fillRule="evenodd"
+                    d="M4.5 2A2.5 2.5 0 0 0 2 4.5v3.879a2.5 2.5 0 0 0 .732 1.767l7.5 7.5a2.5 2.5 0 0 0 3.536 0l3.878-3.878a2.5 2.5 0 0 0 0-3.536l-7.5-7.5A2.5 2.5 0 0 0 8.38 2H4.5ZM5 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+                  />
+                </svg>
+                <h3 className="text-base font-medium">태그 선택</h3>
+              </div>
+              {/* 지역 */}
+              <div className="">
                 <label className="label">
-                  <span className="label-text">지역</span>
+                  <span className="label-text font-medium">지역</span>
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {REGION_OPTIONS.map((option) => (
@@ -350,13 +598,11 @@ function LightningPostPage() {
                   </span>
                 )}
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              {/* 성별 선택 */}
-              <div className="form-control">
+              {/* 성별 */}
+              <div className="">
                 <label className="label">
-                  <span className="label-text">성별</span>
+                  <span className="label-text font-medium">성별</span>
                 </label>
                 <div className="flex gap-2">
                   {GENDER_OPTIONS.map((option) => (
@@ -367,7 +613,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, gender: option });
                         setFormErrors((prev) => ({ ...prev, gender: "" }));
                       }}
-                      className={`btn ${
+                      className={`btn btn-sm ${
                         formData.gender === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -384,12 +630,12 @@ function LightningPostPage() {
                 )}
               </div>
 
-              {/* 레벨 선택 */}
-              <div className="form-control">
+              {/* 레벨 */}
+              <div className="">
                 <label className="label">
-                  <span className="label-text">레벨</span>
+                  <span className="label-text font-medium">레벨</span>
                 </label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   {LEVEL_OPTIONS.map((option) => (
                     <button
                       key={option}
@@ -398,7 +644,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, level: option });
                         setFormErrors((prev) => ({ ...prev, level: "" }));
                       }}
-                      className={`btn ${
+                      className={`btn btn-sm ${
                         formData.level === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -414,53 +660,11 @@ function LightningPostPage() {
                   </span>
                 )}
               </div>
-            </div>
 
-            {/* 모집 유형, 자전거 종류 */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="form-control">
+              {/* 자전거 종류 */}
+              <div className="">
                 <label className="label">
-                  <span className="label-text">모집 유형</span>
-                </label>
-                <div className="flex gap-2 flex-wrap">
-                  {RECRUIT_TYPE_OPTIONS.map((option) => (
-                    <div
-                      className="tooltip no-animation"
-                      data-tip={
-                        option === "참가형"
-                          ? "참가자가 자유롭게 참가 할 수 있어요!"
-                          : "참가자가 신청을 하면 승낙을 해야 해요!"
-                      }
-                    >
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFormData({ ...formData, recruitType: option });
-                          setFormErrors((prev) => ({
-                            ...prev,
-                            recruitType: "",
-                          }));
-                        }}
-                        className={`btn btn-sm ${
-                          formData.recruitType === option
-                            ? "btn-primary"
-                            : "btn-outline"
-                        }`}
-                      >
-                        {option}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                {formErrors.recruitType && (
-                  <span className="text-red-500 mt-2 block">
-                    {formErrors.recruitType}
-                  </span>
-                )}
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">자전거 종류</span>
+                  <span className="label-text font-medium">자전거 종류</span>
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {BIKE_TYPE_OPTIONS.map((option) => (
@@ -487,8 +691,35 @@ function LightningPostPage() {
                   </span>
                 )}
               </div>
-            </div>
 
+              {/* 태그 */}
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium">태그</span>
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {TAG_OPTIONS.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => handleTagToggle(option)}
+                      className={`btn btn-sm ${
+                        formData.tags.includes(option)
+                          ? "btn-primary"
+                          : "btn-outline"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+                {formErrors.tags && (
+                  <span className="text-red-500 mt-2 block">
+                    {formErrors.tags}
+                  </span>
+                )}
+              </div>
+            </div>
             {/* 거리, 경로 ID */}
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="form-control">
@@ -512,12 +743,9 @@ function LightningPostPage() {
                   </span>
                 )}
               </div>
-              <label htmlFor="route_modal" className="btn">
-                경로 등록
-              </label>
             </div>
 
-            {/* 주소 */}
+            {/* 주소
             <div className="form-control mb-4">
               <label htmlFor="address" className="label">
                 <span className="label-text">주소</span>
@@ -538,73 +766,7 @@ function LightningPostPage() {
                   {formErrors.address}
                 </span>
               )}
-            </div>
-
-            {/* 클럽 전용 여부 및 클럽 ID
-            <div className="form-control mb-4">
-              <label className="cursor-pointer label">
-                <span className="label-text">클럽 전용 이벤트</span>
-                <input
-                  type="checkbox"
-                  checked={formData.isClubOnly}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isClubOnly: e.target.checked })
-                  }
-                  className="checkbox checkbox-primary"
-                />
-              </label>
-              {formData.isClubOnly && (
-                <div className="mt-2">
-                  <label htmlFor="clubId" className="label">
-                    <span className="label-text">클럽 ID</span>
-                  </label>
-                  <input
-                    id="clubId"
-                    type="number"
-                    placeholder="클럽 ID 입력"
-                    value={formData.clubId}
-                    onChange={(e) => {
-                      setFormData({ ...formData, clubId: e.target.value });
-                      setFormErrors((prev) => ({ ...prev, clubId: "" }));
-                    }}
-                    className="input input-bordered placeholder:text-sm"
-                  />
-                  {formErrors.clubId && (
-                    <span className="text-red-500 mt-2 block">
-                      {formErrors.clubId}
-                    </span>
-                  )}
-                </div>
-              )}
             </div> */}
-
-            {/* 태그 */}
-            <div className="form-control mb-4">
-              <label className="label">
-                <span className="label-text">태그</span>
-              </label>
-              <div className="flex gap-2 flex-wrap">
-                {TAG_OPTIONS.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => handleTagToggle(option)}
-                    className={`btn btn-sm ${
-                      formData.tags.includes(option)
-                        ? "btn-primary"
-                        : "btn-outline"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-              {formErrors.tags && (
-                <span className="text-red-500 mt-2 block">
-                  {formErrors.tags}
-                </span>
-              )}
-            </div>
 
             {/* 제출 버튼 */}
             <div className="form-control mt-6 mb-16">
@@ -630,7 +792,7 @@ function LightningPostPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 

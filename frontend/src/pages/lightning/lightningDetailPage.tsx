@@ -480,7 +480,7 @@ function LightningDetailPage() {
               <div className="collapse collapse-arrow">
                 <input type="checkbox" />
                 <div className="collapse-title text-xl font-medium flex items-center">
-                  <span className="ml-1 text-lg font-extrabold">날씨 정보</span>
+                  <span className="ml-1 text-lg font-semibold">날씨 정보</span>
                   {weatherLoading ? (
                     <span className="loading loading-dots loading-sm ml-2"></span>
                   ) : (
@@ -506,7 +506,7 @@ function LightningDetailPage() {
           <div className="collapse collapse-arrow">
             <input type="checkbox" defaultChecked />
             <div className="collapse-title text-xl font-medium flex items-center">
-              <span className="ml-1 text-lg font-extrabold">
+              <span className="ml-1 text-lg font-semibold">
                 간략한 번개 정보
               </span>
             </div>

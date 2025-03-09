@@ -123,27 +123,31 @@ function LightningPage() {
       <DateCarousel onDateChange={(date) => setSelectedDate(date)} />
 
       <div className="flex-1 w-full mx-auto px-4 sm:px-6">
-        {/* 필터 드롭다운 섹션 */}
-        <div className="flex flex-wrap gap-2 ml-14 mt-4">
+        {/* 필터 드롭다운 섹션 - md 브레이크포인트 사용으로 모바일(md보다 작은 화면)에서만 변경 */}
+        <div className="flex flex-wrap md:gap-2 gap-1 md:ml-14 md:justify-start justify-center mt-4">
           {/* 태그 선택 버튼 (모달 오픈) */}
           <button
-            className="btn btn-sm m-1"
+            className="btn md:btn-sm btn-xs m-1"
             onClick={() => setIsTagModalOpen(true)}
           >
             태그
             {selectedAvailableTags.length > 0 && (
-              <span className="badge badge-sm badge-primary ml-1">
+              <span className="badge md:badge-sm badge-xs badge-primary ml-1">
                 {selectedAvailableTags.length}
               </span>
             )}
           </button>
 
           {/* 성별 드롭다운 (단일 선택) */}
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-sm m-1">
+          <div className="dropdown dropdown-bottom">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn md:btn-sm btn-xs m-1"
+            >
               성별
               {selectedGender && (
-                <span className="badge badge-sm badge-primary ml-1">
+                <span className="badge md:badge-sm badge-xs badge-primary ml-1">
                   {selectedGender}
                 </span>
               )}
@@ -168,12 +172,16 @@ function LightningPage() {
             </ul>
           </div>
 
-          {/* 자전거 타입 드롭다운 (단일 선택) */}
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-sm m-1">
+          {/* 자전거 타입 드롭다운 - 비슷한 방식으로 수정 */}
+          <div className="dropdown dropdown-bottom">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn md:btn-sm btn-xs m-1"
+            >
               자전거 타입
               {selectedBikeType && (
-                <span className="badge badge-sm badge-primary ml-1">
+                <span className="badge md:badge-sm badge-xs badge-primary ml-1">
                   {selectedBikeType}
                 </span>
               )}
@@ -199,11 +207,15 @@ function LightningPage() {
           </div>
 
           {/* 난이도 드롭다운 (단일 선택) */}
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-sm m-1">
+          <div className="dropdown dropdown-bottom">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn md:btn-sm btn-xs m-1"
+            >
               난이도
               {selectedLevel && (
-                <span className="badge badge-sm badge-primary ml-1">
+                <span className="badge md:badge-sm badge-xs badge-primary ml-1">
                   {selectedLevel}
                 </span>
               )}
@@ -229,11 +241,15 @@ function LightningPage() {
           </div>
 
           {/* 지역 드롭다운 (단일 선택) */}
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-sm m-1">
+          <div className="dropdown dropdown-bottom">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn md:btn-sm btn-xs m-1"
+            >
               지역
               {selectedLocation && (
-                <span className="badge badge-sm badge-primary ml-1">
+                <span className="badge md:badge-sm badge-xs badge-primary ml-1">
                   {selectedLocation}
                 </span>
               )}
@@ -265,15 +281,18 @@ function LightningPage() {
           selectedBikeType ||
           selectedLevel ||
           selectedLocation) && (
-          <div className="flex flex-wrap gap-2 mt-4 ml-14">
+          <div className="flex flex-wrap md:gap-2 gap-1 mt-4 md:ml-14 md:justify-start justify-center">
             {selectedAvailableTags.map((tag) => (
-              <span key={tag} className="badge badge-primary gap-1">
+              <span
+                key={tag}
+                className="badge badge-primary gap-1 md:text-sm text-xs"
+              >
                 {tag}
                 <button onClick={() => toggleAvailableTag(tag)}>×</button>
               </span>
             ))}
             {selectedGender && (
-              <span className="badge badge-primary gap-1">
+              <span className="badge badge-primary gap-1 md:text-sm text-xs">
                 성별: {selectedGender}
                 <button onClick={() => toggleGenderTag(selectedGender)}>
                   ×
@@ -281,7 +300,7 @@ function LightningPage() {
               </span>
             )}
             {selectedBikeType && (
-              <span className="badge badge-primary gap-1">
+              <span className="badge badge-primary gap-1 md:text-sm text-xs">
                 자전거: {selectedBikeType}
                 <button onClick={() => toggleBikeTypeTag(selectedBikeType)}>
                   ×
@@ -289,13 +308,13 @@ function LightningPage() {
               </span>
             )}
             {selectedLevel && (
-              <span className="badge badge-primary gap-1">
+              <span className="badge badge-primary gap-1 md:text-sm text-xs">
                 난이도: {selectedLevel}
                 <button onClick={() => toggleLevelTag(selectedLevel)}>×</button>
               </span>
             )}
             {selectedLocation && (
-              <span className="badge badge-primary gap-1">
+              <span className="badge badge-primary gap-1 md:text-sm text-xs">
                 지역: {selectedLocation}
                 <button onClick={() => toggleLocationTag(selectedLocation)}>
                   ×
@@ -304,29 +323,23 @@ function LightningPage() {
             )}
 
             {/* 전체 초기화 버튼 */}
-            {(selectedAvailableTags.length > 0 ||
-              selectedGender ||
-              selectedBikeType ||
-              selectedLevel ||
-              selectedLocation) && (
-              <button
-                className="badge badge-outline"
-                onClick={() => {
-                  setSelectedAvailableTags([]);
-                  setSelectedGender(null);
-                  setSelectedBikeType(null);
-                  setSelectedLevel(null);
-                  setSelectedLocation(null);
-                }}
-              >
-                전체 초기화
-              </button>
-            )}
+            <button
+              className="badge badge-outline md:text-sm text-xs"
+              onClick={() => {
+                setSelectedAvailableTags([]);
+                setSelectedGender(null);
+                setSelectedBikeType(null);
+                setSelectedLevel(null);
+                setSelectedLocation(null);
+              }}
+            >
+              전체 초기화
+            </button>
           </div>
         )}
 
+        {/* 번개 생성 버튼 */}
         <div className="fixed bottom-8 right-10 z-50 no-animation">
-          {/* 번개 생성 버튼 */}
           <Link to="/lightning/post" className="btn btn-primary btn-circle">
             <svg
               data-slot="icon"
@@ -341,7 +354,7 @@ function LightningPage() {
           </Link>
         </div>
 
-        {/* LightningList에 필터 옵션 전달 */}
+        {/* LightningList 컴포넌트 */}
         <LightningList
           sort={initialSort}
           gender={searchParams.get("gender") || ""}
@@ -353,10 +366,10 @@ function LightningPage() {
         />
       </div>
 
-      {/* 태그 모달 */}
+      {/* 태그 모달 - 모바일 최적화 */}
       {isTagModalOpen && (
         <div className="modal modal-open">
-          <div className="modal-box">
+          <div className="modal-box md:w-auto w-11/12 max-w-md">
             <h3 className="font-bold text-lg">태그 선택</h3>
             <div className="py-4">
               <div className="flex flex-wrap gap-2">
@@ -364,7 +377,7 @@ function LightningPage() {
                   <button
                     key={tag}
                     onClick={() => toggleAvailableTag(tag)}
-                    className={`btn btn-sm ${
+                    className={`btn md:btn-sm btn-xs ${
                       selectedAvailableTags.includes(tag)
                         ? "btn-primary"
                         : "btn-outline"
@@ -382,6 +395,10 @@ function LightningPage() {
               </button>
             </div>
           </div>
+          <div
+            className="modal-backdrop"
+            onClick={() => setIsTagModalOpen(false)}
+          ></div>
         </div>
       )}
     </div>
