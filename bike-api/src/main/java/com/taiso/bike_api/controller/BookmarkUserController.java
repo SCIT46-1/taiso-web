@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/users/me/bookmarks")
+@RequestMapping("/api/users/me/bookmarks/users")
 @Tag(name = "북마크 유저 컨트롤러", description = "북마크 유저 관련 API")
 public class BookmarkUserController {
 
@@ -38,9 +38,9 @@ public class BookmarkUserController {
     		@PathVariable(name = "userId") Long userId,
 			Authentication authentication
 			) {
-		
+
 		bookmarkUserService.bookmarkUserCreate(userId, authentication);
-		
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(null);
 	}
 	
