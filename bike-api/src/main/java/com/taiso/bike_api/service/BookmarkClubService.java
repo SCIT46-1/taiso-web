@@ -98,7 +98,7 @@ public class BookmarkClubService {
         );
 
         // 클럽 존재여부 확인
-        ClubEntity club = clubRepository.findByClubId(clubId).orElseThrow(() ->
+        clubRepository.findByClubId(clubId).orElseThrow(() ->
             new ClubNotFoundException("존재하지 않는 클럽입니다.")
         );
 
