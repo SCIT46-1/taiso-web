@@ -2,7 +2,6 @@ package com.taiso.bike_api.service;
 
 import com.taiso.bike_api.domain.*;
 import com.taiso.bike_api.dto.BookmarkLightningResponseDTO;
-import com.taiso.bike_api.dto.BookmarkUserListResponseDTO;
 import com.taiso.bike_api.exception.*;
 import com.taiso.bike_api.repository.BookmarkRepository;
 import com.taiso.bike_api.repository.LightningRepository;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -120,6 +118,8 @@ public class BookmarkLightningService {
         if (bookmarkEntity == null) {
             throw new BookmarkNotFoundException("존재하지 않는 북마크입니다.");
         }
+
+        // 해당방식으로 진행하는 경우 유저가 그 북마크의 주인인지도 검증하는 과정 필요해보임.
 
         // 삭제
         bookmarkRepository.delete(bookmarkEntity);

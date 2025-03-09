@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.LightningEntity.LightningStatus;
 
-public interface LightningRepository extends JpaRepository<LightningEntity, Long>, JpaSpecificationExecutor<LightningEntity>{
+public interface LightningRepository extends JpaRepository<LightningEntity, Long>, JpaSpecificationExecutor<LightningEntity> {
     Page<LightningEntity> findAll(Specification<LightningEntity> spec, Pageable pageable);
     
     // 특정 상태들과 날짜 기준으로 번개 이벤트 조회
