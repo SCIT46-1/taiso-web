@@ -53,7 +53,7 @@ public class AuthController {
     // 주입된 MemberService를 통해 회원가입을 처리
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private AuthService authService;
     
@@ -136,7 +136,7 @@ public class AuthController {
      */
     @PostMapping("/kakao")
     @Operation(summary = "카카오 로그인", description = "카카오 인증 및 JWT 발급")
-    public ResponseEntity<LoginResponseDTO> kakaoLogin(@RequestBody Map<String, String> body,
+    public ResponseEntity<KakaoAuthResultDTO> kakaoLogin(@RequestBody Map<String, String> body,
             HttpServletResponse response) {
         String code = body.get("code");
         if (code == null) {
@@ -155,11 +155,8 @@ public class AuthController {
         response.addCookie(jwtCookie);
 
         // LoginResponseDTO를 채워 응답으로 전달
-        LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
-        loginResponseDTO.setUserEmail(result.getUserEmail());
-        loginResponseDTO.setUserId(result.getUserId());
-        loginResponseDTO.setUserNickname(result.getUserNickname());
-        return ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
+        
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }    
 
     /**
@@ -214,6 +211,20 @@ public class AuthController {
     public ResponseEntity<UserInfoGetResponseDTO> getUserInfo(Authentication authentication) {
         UserInfoGetResponseDTO responseDTO = authService.getUserInfo(authentication);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+    }
+
+    //닉네임 중복 체크
+    @GetMapping("/check-nickname")
+    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 체크")
+    public ResponseEntity<Boolean> checkNickname(@RequestParam(name = "nickname") String nickname) {
+        return ResponseEntity.status(HttpStatus.OK).body(!userService.checkNickname(nickname));
+    }
+
+    //닉네임 반환
+    @GetMapping("/me/nickname")
+    @Operation(summary = "내 닉네임 조회", description = "내 닉네임 조회")
+    public ResponseEntity<String> getNickname(@AuthenticationPrincipal String userEmail) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserNicknameByEmail(userEmail));
     }
 
 }

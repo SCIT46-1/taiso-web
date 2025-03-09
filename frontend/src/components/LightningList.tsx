@@ -121,26 +121,35 @@ function LightningList({
     switch (status) {
       case "모집":
         return (
-          <button className="btn btn-outline btn-success sm:w-[150px] no-animation">
+          <button className="btn btn-outline btn-primary sm:w-[150px] no-animation">
             참가
           </button>
         );
       case "마감":
         return (
-          <button className="btn btn-outline btn-error sm:w-[150px] no-animation">
+          <button
+            className="btn btn-outline btn-error sm:w-[150px] no-animation"
+            disabled
+          >
             마감
           </button>
         );
       case "강제마감":
         return (
-          <button className="btn btn-outline btn-error sm:w-[150px] no-animation">
+          <button
+            className="btn btn-outline btn-error sm:w-[150px] no-animation"
+            disabled
+          >
             마감
           </button>
         );
       case "종료":
       default:
         return (
-          <button className="btn sm:w-[150px] no-animation" disabled>
+          <button
+            className="btn btn-outline btn-error sm:w-[150px] no-animation"
+            disabled
+          >
             종료
           </button>
         );
@@ -160,10 +169,10 @@ function LightningList({
               <div className="flex">
                 <Link
                   to={`/lightning/${lightning.lightningId}`}
-                  className="flex-1"
+                  className="flex-1 group"
                 >
                   <div className="bg-base-100 w-full flex items-center">
-                    <figure className="size-40 flex items-center justify-center ml-4 relative">
+                    <figure className="size-40 flex items-center justify-center ml-4 relative overflow-hidden">
                       <ImageWithSkeleton
                         src={lightning.routeImgId}
                         alt={lightning.title}

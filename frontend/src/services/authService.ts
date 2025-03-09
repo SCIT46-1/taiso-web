@@ -33,6 +33,7 @@ export interface KakaoAuthResultDTO {
   userId: number;
   userEmail: string;
   userNickname: string;
+  newUser: boolean;
 }
 
 export interface UpdateUserAuthInfoRequest {
@@ -61,7 +62,9 @@ const authTest = async (): Promise<AuthTestResponse> => {
 };
 
 const kakaoLogin = async (code: string): Promise<KakaoAuthResultDTO> => {
-  return await post("/auth/kakao", { code });
+  const response: KakaoAuthResultDTO = await post("/auth/kakao", { code });
+  console.log("kakaoLogin - response:", response);
+  return response;
 };
 
 const authCheck = async (): Promise<void> => {
@@ -78,6 +81,14 @@ const updateUserAuthInfo = async (
   return await patch("/auth/me", payload);
 };
 
+const checkNickname = async (nickname: string): Promise<boolean> => {
+  return await get(`/auth/check-nickname?nickname=${nickname}`);
+};
+
+const getNickname = async (): Promise<string> => {
+  return await get("/auth/me/nickname");
+};
+
 export default {
   login,
   register,
@@ -86,5 +97,7 @@ export default {
   kakaoLogin,
   authCheck,
   checkEmail,
+  checkNickname,
+  getNickname,
   updateUserAuthInfo,
 };

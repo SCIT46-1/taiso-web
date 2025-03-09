@@ -6,9 +6,14 @@ import authService, {
 import { useAuthStore } from "../stores/useAuthStore";
 import { useNavigate } from "react-router";
 
-function RegisterForm({ redirectPath = "/" }) {
+function RegisterForm({ redirectPath = "/", enableOnboarding = true }) {
   // 디버깅 로그 추가
-  console.log("RegisterForm - Redirect path:", redirectPath);
+  console.log(
+    "RegisterForm - Redirect path:",
+    redirectPath,
+    "Onboarding enabled:",
+    enableOnboarding
+  );
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [passwordConfirm, setPasswordConfirm] = useState<string>("");
@@ -70,7 +75,10 @@ function RegisterForm({ redirectPath = "/" }) {
     e.preventDefault();
 
     // 디버깅 로그 추가
-    console.log("RegisterForm - Submit with redirect to:", redirectPath);
+    console.log(
+      "RegisterForm - Submit with redirect to:",
+      enableOnboarding ? "/user-onboarding" : redirectPath
+    );
 
     // 기존 에러 초기화
     setEmailError("");
@@ -99,6 +107,8 @@ function RegisterForm({ redirectPath = "/" }) {
     try {
       setLoading(true);
       const response: RegisterResponse = await authService.register(payload);
+
+      // Save user data first
       setUser(
         {
           email: response.email,
@@ -107,12 +117,15 @@ function RegisterForm({ redirectPath = "/" }) {
         },
         false
       );
-      // 리다이렉트 전 로그 추가
-      console.log(
-        "RegisterForm - Registration successful, redirecting to:",
-        redirectPath
-      );
-      navigate(redirectPath);
+
+      // Define the target path
+      const targetPath = enableOnboarding ? "/user-onboarding" : redirectPath;
+
+      // Add a short delay to ensure user state is set before navigation
+      setTimeout(() => {
+        console.log("RegisterForm - Navigating to:", targetPath);
+        navigate(targetPath, { replace: true });
+      }, 100);
     } catch (err: any) {
       console.error(err);
       if (err.response && err.response.status === 409) {
@@ -198,7 +211,7 @@ function RegisterForm({ redirectPath = "/" }) {
           type="button"
           onClick={checkEmail}
           disabled={!email}
-          className="btn "
+          className="btn no-animation"
         >
           중복 체크
         </button>

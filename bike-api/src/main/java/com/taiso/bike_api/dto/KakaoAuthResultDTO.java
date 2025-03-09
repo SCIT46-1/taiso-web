@@ -16,4 +16,5 @@ public class KakaoAuthResultDTO {
     private Long userId;
     private String userEmail;
     private String userNickname;
+    private boolean isNewUser;
 } 

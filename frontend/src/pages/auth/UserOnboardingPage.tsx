@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import userDetailService, {
   UserDetailPostRequest,
 } from "../../services/userDetailService";
-import { useAuthStore } from "../../stores/useAuthStore";
+import authService from "../../services/authService";
 
 function UserOnboardingPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [knowsFTP, setKnowsFTP] = useState(true);
+  const [isNicknameValid, setIsNicknameValid] = useState<boolean | null>(null);
+  const [isCheckingNickname, setIsCheckingNickname] = useState(false);
+  const [nicknameErrorMessage, setNicknameErrorMessage] = useState("");
+  const [initialNickname, setInitialNickname] = useState("");
   const [userData, setUserData] = useState<UserDetailPostRequest>({
     userNickname: "",
     gender: "",
@@ -32,12 +36,39 @@ function UserOnboardingPage() {
   const [bikeTypeInput, setBikeTypeInput] = useState("");
   const [activityLocationInput, setActivityLocationInput] = useState("");
 
+  useEffect(() => {
+    const fetchNickname = async () => {
+      const nickname = await authService.getNickname();
+      setUserData((prev) => ({ ...prev, userNickname: nickname }));
+      setInitialNickname(nickname);
+      if (nickname && nickname.trim()) {
+        setIsNicknameValid(true);
+      }
+    };
+    fetchNickname();
+  }, []);
+
   // Create helper functions to handle step transitions
   const goToNextStep = () => {
-    if (step < 4) {
+    if (step === 1) {
+      if (!userData.userNickname.trim()) {
+        setIsNicknameValid(false);
+        setNicknameErrorMessage("닉네임은 필수 입력 항목입니다.");
+        return;
+      }
+
+      if (
+        userData.userNickname !== initialNickname &&
+        isNicknameValid !== true
+      ) {
+        return;
+      }
+    }
+
+    if (step < 5) {
       setStep((prevStep) => {
         const nextStep = prevStep + 1;
-        return nextStep as 1 | 2 | 3 | 4;
+        return nextStep as 1 | 2 | 3 | 4 | 5;
       });
     }
   };
@@ -46,7 +77,7 @@ function UserOnboardingPage() {
     if (step > 1) {
       setStep((prevStep) => {
         const nextStep = prevStep - 1;
-        return nextStep as 1 | 2 | 3 | 4;
+        return nextStep as 1 | 2 | 3 | 4 | 5;
       });
     }
   };
@@ -59,6 +90,15 @@ function UserOnboardingPage() {
   ) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "userNickname") {
+      if (value !== initialNickname) {
+        debouncedValidateNickname(value);
+      } else {
+        setIsNicknameValid(true);
+        setNicknameErrorMessage("");
+      }
+    }
   };
 
   // 숫자 타입 입력 처리
@@ -159,7 +199,7 @@ function UserOnboardingPage() {
   const handleSubmit = async () => {
     try {
       await userDetailService.registerUserDetail(userData);
-      navigate("/home"); // 온보딩 완료 후 메인 페이지로 이동
+      navigate("/"); // 온보딩 완료 후 메인 페이지로 이동
     } catch (error) {
       console.error("Failed to register user details:", error);
       alert("등록에 실패했습니다. 다시 시도해주세요.");
@@ -168,35 +208,133 @@ function UserOnboardingPage() {
 
   // 건너뛰기 함수
   const handleSkip = () => {
-    navigate("/home"); // 메인 페이지로 이동
+    navigate("/"); // 메인 페이지로 이동
   };
+
+  // Add a debounce function to avoid too many API calls
+  const debounce = (func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  };
+
+  // Nickname validation function
+  const validateNickname = async (nickname: string) => {
+    if (!nickname.trim()) {
+      setIsNicknameValid(null);
+      setNicknameErrorMessage("");
+      return;
+    }
+
+    if (nickname === initialNickname) {
+      setIsNicknameValid(true);
+      setNicknameErrorMessage("");
+      return;
+    }
+
+    if (nickname.length < 2) {
+      setIsNicknameValid(false);
+      setNicknameErrorMessage("닉네임은 최소 2자 이상이어야 합니다.");
+      return;
+    }
+
+    try {
+      setIsCheckingNickname(true);
+      const isAvailable = await authService.checkNickname(nickname);
+      setIsNicknameValid(isAvailable);
+      setNicknameErrorMessage(
+        isAvailable ? "" : "이미 사용 중인 닉네임입니다."
+      );
+    } catch (error) {
+      console.error("닉네임 중복 확인 중 오류 발생:", error);
+      setIsNicknameValid(false);
+      setNicknameErrorMessage("닉네임 중복 확인 중 오류가 발생했습니다.");
+    } finally {
+      setIsCheckingNickname(false);
+    }
+  };
+
+  // Debounced version of nickname validation
+  const debouncedValidateNickname = debounce(validateNickname, 500);
 
   return (
     <div className="flex flex-col items-center justify-center max-w-screen-sm mx-auto gap-4 p-4">
       <ul className="steps w-full mb-8">
-        <li className={`step ${step >= 1 ? "step-primary" : ""}`}>기본 정보</li>
-        <li className={`step ${step >= 2 ? "step-primary" : ""}`}>신체 정보</li>
-        <li className={`step ${step >= 3 ? "step-primary" : ""}`}>활동 정보</li>
-        <li className={`step ${step >= 4 ? "step-primary" : ""}`}>관심사</li>
+        <li className={`step ${step >= 1 ? "step-primary" : ""}`}>계정 정보</li>
+        <li className={`step ${step >= 2 ? "step-primary" : ""}`}>개인 정보</li>
+        <li className={`step ${step >= 3 ? "step-primary" : ""}`}>신체 정보</li>
+        <li className={`step ${step >= 4 ? "step-primary" : ""}`}>
+          라이딩 정보
+        </li>
+        <li className={`step ${step >= 5 ? "step-primary" : ""}`}>활동 정보</li>
       </ul>
 
       {step === 1 && (
         <div className="w-full flex flex-col gap-4">
-          <div className="text-2xl font-bold">기본 정보</div>
+          <div className="text-2xl font-bold">계정 정보</div>
 
           <div className="form-control">
             <label className="label">
               <span className="label-text">닉네임</span>
             </label>
-            <input
-              type="text"
-              name="userNickname"
-              value={userData.userNickname}
-              onChange={handleChange}
-              placeholder="닉네임을 입력하세요"
-              className="input input-ghost w-full input-bordered"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                name="userNickname"
+                value={userData.userNickname}
+                onChange={handleChange}
+                placeholder="닉네임을 입력하세요"
+                className={`input input-ghost w-full input-bordered ${
+                  isNicknameValid === false
+                    ? "input-error"
+                    : isNicknameValid === true
+                    ? "input-success"
+                    : ""
+                }`}
+              />
+              {isCheckingNickname && (
+                <span className="loading loading-spinner loading-xs absolute right-3 top-1/2 transform -translate-y-1/2"></span>
+              )}
+              {isNicknameValid === true && (
+                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-success">
+                  ✓
+                </span>
+              )}
+            </div>
+            {nicknameErrorMessage && (
+              <label className="label">
+                <span className="label-text-alt text-error">
+                  {nicknameErrorMessage}
+                </span>
+              </label>
+            )}
+            {isNicknameValid === true && (
+              <label className="label">
+                <span className="label-text-alt text-success">
+                  사용 가능한 닉네임입니다.
+                </span>
+              </label>
+            )}
           </div>
+
+          <div className="flex justify-between mt-4">
+            <div className="btn btn-outline" onClick={handleSkip}>
+              건너뛰기
+            </div>
+            <div className="btn btn-primary" onClick={goToNextStep}>
+              다음
+            </div>
+          </div>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div className="w-full flex flex-col gap-4">
+          <div className="text-2xl font-bold">개인 정보</div>
 
           <div className="form-control">
             <label className="label">
@@ -217,7 +355,7 @@ function UserOnboardingPage() {
               <span className="label-text">성별</span>
             </label>
             <div className="flex gap-2">
-              {["남성", "여성", "그외"].map((genderOption) => (
+              {["남자", "여자", "그외"].map((genderOption) => (
                 <div
                   key={genderOption}
                   className={`badge badge-lg p-4 cursor-pointer ${
@@ -276,6 +414,9 @@ function UserOnboardingPage() {
           </div>
 
           <div className="flex justify-between mt-4">
+            <div className="btn btn-outline" onClick={goToPreviousStep}>
+              이전
+            </div>
             <div className="btn btn-outline" onClick={handleSkip}>
               건너뛰기
             </div>
@@ -286,7 +427,7 @@ function UserOnboardingPage() {
         </div>
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <div className="w-full flex flex-col gap-4">
           <div className="text-2xl font-bold">신체 정보</div>
 
@@ -364,6 +505,24 @@ function UserOnboardingPage() {
             )}
           </div>
 
+          <div className="flex justify-between mt-4">
+            <div className="btn btn-outline" onClick={goToPreviousStep}>
+              이전
+            </div>
+            <div className="btn btn-outline" onClick={handleSkip}>
+              건너뛰기
+            </div>
+            <div className="btn btn-primary" onClick={goToNextStep}>
+              다음
+            </div>
+          </div>
+        </div>
+      )}
+
+      {step === 4 && (
+        <div className="w-full flex flex-col gap-4">
+          <div className="text-2xl font-bold">라이딩 정보</div>
+
           <div className="form-control">
             <label className="label">
               <span className="label-text">라이딩 레벨</span>
@@ -389,6 +548,34 @@ function UserOnboardingPage() {
             </div>
           </div>
 
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">자전거 종류</span>
+            </label>
+            <div className="grid grid-cols-4 gap-2">
+              {["로드", "따릉이", "하이브리드", "자유"].map((type) => (
+                <div
+                  key={type}
+                  className={`badge badge-lg p-4 cursor-pointer ${
+                    userData.bikeType.includes(type)
+                      ? "badge-primary"
+                      : "badge-outline"
+                  }`}
+                  onClick={() => {
+                    setUserData((prev) => ({
+                      ...prev,
+                      bikeType: prev.bikeType.includes(type)
+                        ? prev.bikeType.filter((t) => t !== type)
+                        : [...prev.bikeType, type],
+                    }));
+                  }}
+                >
+                  {type}
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="flex justify-between mt-4">
             <div className="btn btn-outline" onClick={goToPreviousStep}>
               이전
@@ -403,7 +590,7 @@ function UserOnboardingPage() {
         </div>
       )}
 
-      {step === 3 && (
+      {step === 5 && (
         <div className="w-full flex flex-col gap-4">
           <div className="text-2xl font-bold">활동 정보</div>
 
@@ -491,84 +678,6 @@ function UserOnboardingPage() {
                   }}
                 >
                   {location}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">자전거 종류</span>
-            </label>
-            <div className="grid grid-cols-4 gap-2">
-              {["로드", "따릉이", "하이브리드", "자유"].map((type) => (
-                <div
-                  key={type}
-                  className={`badge badge-lg p-4 cursor-pointer ${
-                    userData.bikeType.includes(type)
-                      ? "badge-primary"
-                      : "badge-outline"
-                  }`}
-                  onClick={() => {
-                    setUserData((prev) => ({
-                      ...prev,
-                      bikeType: prev.bikeType.includes(type)
-                        ? prev.bikeType.filter((t) => t !== type)
-                        : [...prev.bikeType, type],
-                    }));
-                  }}
-                >
-                  {type}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex justify-between mt-4">
-            <div className="btn btn-outline" onClick={goToPreviousStep}>
-              이전
-            </div>
-            <div className="btn btn-outline" onClick={handleSkip}>
-              건너뛰기
-            </div>
-            <div className="btn btn-primary" onClick={goToNextStep}>
-              다음
-            </div>
-          </div>
-        </div>
-      )}
-
-      {step === 4 && (
-        <div className="w-full flex flex-col gap-4">
-          <div className="text-2xl font-bold">관심사 및 태그</div>
-
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">관심 태그</span>
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                placeholder="관심 태그를 입력하세요"
-                className="input input-ghost w-full input-bordered"
-                onKeyDown={(e) => e.key === "Enter" && addTag()}
-              />
-              <button className="btn btn-square btn-outline" onClick={addTag}>
-                +
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {userData.tags.map((tag) => (
-                <div key={tag} className="badge badge-primary badge-lg gap-1">
-                  {tag}
-                  <button
-                    className="btn btn-xs btn-circle btn-ghost"
-                    onClick={() => removeTag(tag)}
-                  >
-                    ×
-                  </button>
                 </div>
               ))}
             </div>
