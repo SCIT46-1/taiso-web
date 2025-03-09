@@ -33,7 +33,7 @@ public class UserDetailController {
 
     @Operation(summary = "내 회원 디테일 등록", description = "내 회원 디테일 등록 API")
     @PostMapping("/me/details")
-    public ResponseEntity<Void> postMethodName(
+    public ResponseEntity<Void> postUserDetail(
         @RequestBody UserDetailPostRequestDTO requestDTO
         , @AuthenticationPrincipal String userEmail) {
         userDetailService2.saveUserDetail(requestDTO, userEmail);
