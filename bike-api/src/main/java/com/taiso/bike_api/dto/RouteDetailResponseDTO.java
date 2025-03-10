@@ -28,4 +28,8 @@ public class RouteDetailResponseDTO {
     private String fileType;          // optional (e.g., gpx, fit)
     private List<RoutePointDTO> routePoint;
     private boolean isLiked;
+    
+
+    @Builder.Default
+    private boolean isBookmarked = false;
 }
