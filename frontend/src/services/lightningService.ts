@@ -25,6 +25,7 @@ export interface Lightning {
   address: string;
   routeImgId: string;
   currentParticipants: number;
+  bookmarked: boolean;
 }
 
 // LightningGetResponse 타입 정의

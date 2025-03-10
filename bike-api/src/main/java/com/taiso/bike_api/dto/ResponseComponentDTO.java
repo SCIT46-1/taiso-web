@@ -37,4 +37,7 @@ public class ResponseComponentDTO {
     private List<String> tags;
     private String address;
     private String routeImgId;
+
+    @Builder.Default
+    private boolean isBookmarked = false;
 }

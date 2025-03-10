@@ -24,6 +24,7 @@ import ClubDetailPage from "./pages/club/ClubDetailPage";
 import ClubPostPage from "./pages/club/ClubPostPage";
 import UserAccountUpdatePage from "./pages/user/UserAccountUpdatePage";
 import UserAccountPage from "./pages/user/UserAccountPage";
+import BookMarkPage from "./pages/BookMarkPage";
 
 const router = createBrowserRouter([
   {
@@ -69,6 +70,7 @@ const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: "user-onboarding", element: <UserOnboardingPage /> },
+          { path: "bookmark", element: <BookMarkPage /> },
           {
             path: "lightning",
             children: [{ path: "post", element: <LightningPostPage /> }],

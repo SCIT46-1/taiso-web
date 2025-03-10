@@ -13,6 +13,7 @@ import KakaoMapRoute from "../../components/KakaoMap";
 import KakaolocationMap from "../../components/KakaolocationMap";
 import UserImage from "../../components/UserImage";
 import LightningSummaryInfo from "../../components/LightningSummaryInfo";
+import bookmarkService from "../../services/bookmarkService";
 
 interface ModalProps {
   id: string;
@@ -130,45 +131,8 @@ function LightningDetailPage() {
   );
   const [forecastDate, setForecastDate] = useState<string>("");
   const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
-
-  //테스트 ================================
-  //테스트용 모달 계속 열어 놓는 함수
-  // const testModalId = "join-modal"; // 테스트할 모달 ID 설정 (테스트 끝나면 빈 문자열로 변경)
-
-  // useEffect(() => {
-  //   // 테스트 모달 ID가 설정되어 있으면 실행
-  //   if (testModalId) {
-  //     // 모달 열기
-  //     const openTestModal = () => {
-  //       const modal = document.getElementById(testModalId) as HTMLDialogElement;
-  //       if (modal) {
-  //         modal.showModal();
-  //       }
-  //     };
-
-  //     // 페이지 로드 후 약간의 지연을 두고 모달 열기
-  //     const timer = setTimeout(openTestModal, 100);
-
-  //     // 모달이 닫힐 때 다시 열리도록 이벤트 리스너 추가
-  //     const handleDialogClose = () => {
-  //       setTimeout(openTestModal, 100);
-  //     };
-
-  //     const modal = document.getElementById(testModalId) as HTMLDialogElement;
-  //     if (modal) {
-  //       modal.addEventListener("close", handleDialogClose);
-  //     }
-
-  //     return () => {
-  //       clearTimeout(timer);
-  //       // 컴포넌트 언마운트 시 이벤트 리스너 제거
-  //       if (modal) {
-  //         modal.removeEventListener("close", handleDialogClose);
-  //       }
-  //     };
-  //   }
-  // }, [testModalId]);
-  //테스트 ================================
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState<boolean>(false);
 
   // 날씨 데이터 캐시: key를 이벤트 날짜, 위치, 지속시간 조합으로 생성
   const weatherCache = useRef<{
@@ -186,6 +150,11 @@ function LightningDetailPage() {
         Number(lightningId)
       );
       setLightningDetail(data);
+
+      // Set initial bookmark state
+      if (data && "bookmarked" in data) {
+        setIsBookmarked(!!data.bookmarked);
+      }
 
       if (data) {
         fetchWeatherData(data);
@@ -458,6 +427,42 @@ function LightningDetailPage() {
     }
   };
 
+  const handleBookmarkToggle = async () => {
+    if (!user) {
+      navigate("/auth/landing", {
+        state: { from: `/lightning/${lightningId}` },
+      });
+      return;
+    }
+
+    setBookmarkLoading(true);
+    try {
+      if (!isBookmarked) {
+        await bookmarkService.bookmarkLightning(Number(lightningId));
+      } else {
+        await bookmarkService.deleteBookmarkLightning(Number(lightningId));
+      }
+
+      // Update the bookmark state
+      setIsBookmarked(!isBookmarked);
+    } catch (error) {
+      console.error("북마크 작업 실패:", error);
+
+      // Check if it's a 401 error
+      if (
+        error instanceof Error &&
+        "response" in (error as any) &&
+        (error as any).response?.status === 401
+      ) {
+        navigate("/auth/landing", {
+          state: { from: `/lightning/${lightningId}` },
+        });
+      }
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -465,9 +470,11 @@ function LightningDetailPage() {
   return (
     <div className="w-screen grid grid-cols-[2fr,1fr] gap-4 max-w-screen-lg mb-10 no-animation">
       {/* 상단 지도 영역 */}
-      <div className="col-span-2 shadow-sm">
+      <div className="col-span-2 shadow-sm relative">
         {lightningDetail?.route.routePoints && (
-          <KakaoMapRoute routePoints={lightningDetail.route.routePoints} />
+          <>
+            <KakaoMapRoute routePoints={lightningDetail.route.routePoints} />
+          </>
         )}
       </div>
 
@@ -559,8 +566,52 @@ function LightningDetailPage() {
       </div>
 
       {/* 하단 우측 참여자 및 지도 영역 - self-start 클래스 추가 */}
-      <div className="flex flex-col items-center justify-center p-4 rounded-xl shadow-xl border border-base-300 self-start">
+      <div className="flex flex-col items-center justify-center p-4 rounded-xl shadow-xl border border-base-300 self-start relative">
         <div className="mb-4 mt-2">
+          {/* Add bookmark button */}
+          {user && (
+            <button
+              onClick={handleBookmarkToggle}
+              disabled={bookmarkLoading}
+              className="absolute top-6 right-6 z-10 "
+            >
+              {bookmarkLoading ? (
+                <span className=""></span>
+              ) : isBookmarked ? (
+                <svg
+                  data-slot="icon"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="size-6 "
+                >
+                  <path
+                    clipRule="evenodd"
+                    fillRule="evenodd"
+                    d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 0 0 1.075.676L10 15.082l5.925 2.844A.75.75 0 0 0 17 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0 0 10 2Z"
+                  ></path>
+                </svg>
+              ) : (
+                <svg
+                  data-slot="icon"
+                  fill="none"
+                  strokeWidth="1.75"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="size-6 text-gray-600"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                  ></path>
+                </svg>
+              )}
+            </button>
+          )}
           <div className="font-semibold">
             {lightningDetail?.eventDate
               ? new Date(lightningDetail.eventDate).toLocaleString("ko-KR", {

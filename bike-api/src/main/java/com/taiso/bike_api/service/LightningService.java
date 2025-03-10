@@ -3,6 +3,7 @@ package com.taiso.bike_api.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
 import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.LightningEntity.BikeType;
 import com.taiso.bike_api.domain.LightningEntity.Gender;
@@ -174,7 +176,7 @@ public class LightningService {
     }
 
     // 페이징 처리 된 리스트 조회
-    public LightningListResponseDTO getLightningList (int page, int size, String gender, String bikeType, String date, String region, String level, String tags, String sort) {
+    public LightningListResponseDTO getLightningList (int page, int size, String gender, String bikeType, String date, String region, String level, String tags, String sort, String userEmail) {
 
         // 정렬 기준 설정
         Sort sortObj = Sort.unsorted();
@@ -186,14 +188,15 @@ public class LightningService {
         Pageable pageable = PageRequest.of(page, size, sortObj);
         
         // 필터링 조건 생성
-        Specification<LightningEntity> spec = Specification.where(null);
+        AtomicReference<Specification<LightningEntity>> specRef = 
+            new AtomicReference<>(Specification.where(null));
         
         // 성별 필터
         if (gender != null && !gender.isEmpty()) {
             try {
                 Gender genderEnum = Gender.valueOf(gender);
-                spec = spec.and((root, query, criteriaBuilder) -> 
-                    criteriaBuilder.equal(root.get("gender"), genderEnum));
+                specRef.set(specRef.get().and((root, query, criteriaBuilder) -> 
+                    criteriaBuilder.equal(root.get("gender"), genderEnum)));
             } catch (IllegalArgumentException e) {
                 log.error("잘못된 성별 값: {}", e.getMessage());
             }
@@ -203,8 +206,8 @@ public class LightningService {
         if (bikeType != null && !bikeType.isEmpty()) {
             try {
                 BikeType bikeTypeEnum = BikeType.valueOf(bikeType);
-                spec = spec.and((root, query, criteriaBuilder) -> 
-                    criteriaBuilder.equal(root.get("bikeType"), bikeTypeEnum));
+                specRef.set(specRef.get().and((root, query, criteriaBuilder) -> 
+                    criteriaBuilder.equal(root.get("bikeType"), bikeTypeEnum)));
             } catch (IllegalArgumentException e) {
                 log.error("잘못된 자전거 타입 값: {}", e.getMessage());
             }
@@ -214,8 +217,8 @@ public class LightningService {
         if (region != null && !region.isEmpty()) {
             try {
                 Region regionEnum = Region.valueOf(region);
-                spec = spec.and((root, query, criteriaBuilder) -> 
-                    criteriaBuilder.equal(root.get("region"), regionEnum));
+                specRef.set(specRef.get().and((root, query, criteriaBuilder) -> 
+                    criteriaBuilder.equal(root.get("region"), regionEnum)));
             } catch (IllegalArgumentException e) {
                 log.error("잘못된 지역 값: {}", e.getMessage());
             }
@@ -225,8 +228,8 @@ public class LightningService {
         if (level != null && !level.isEmpty()) {
             try {
                 Level levelEnum = Level.valueOf(level);
-                spec = spec.and((root, query, criteriaBuilder) -> 
-                    criteriaBuilder.equal(root.get("level"), levelEnum));
+                specRef.set(specRef.get().and((root, query, criteriaBuilder) -> 
+                    criteriaBuilder.equal(root.get("level"), levelEnum)));
             } catch (IllegalArgumentException e) {
                 log.error("잘못된 레벨 값: {}", e.getMessage());
             }
@@ -235,10 +238,10 @@ public class LightningService {
         // 태그 필터
         if (tags != null && !tags.isEmpty()) {
             String[] tagArray = tags.split(",");
-            spec = spec.and((root, query, criteriaBuilder) -> {
+            specRef.set(specRef.get().and((root, query, criteriaBuilder) -> {
                 Join<LightningEntity, LightningTagCategoryEntity> tagJoin = root.join("tags");
                 return tagJoin.get("name").in((Object[]) tagArray);
-            });
+            }));
         }
         
         // 날짜 필터 
@@ -247,41 +250,65 @@ public class LightningService {
                 // LocalDate 형식으로 파싱 (예: "2023-12-25")
                 java.time.LocalDate parsedDate = java.time.LocalDate.parse(date);
                 
-                spec = spec.and((root, query, criteriaBuilder) -> {
+                specRef.set(specRef.get().and((root, query, criteriaBuilder) -> {
                     // eventDate는 LocalDateTime이므로 toLocalDate()로 날짜 부분만 비교
                     return criteriaBuilder.equal(
                         criteriaBuilder.function("date", java.sql.Date.class, root.get("eventDate")),
                         java.sql.Date.valueOf(parsedDate)
                     );
-                });
+                }));
             } catch (Exception e) {
                 log.error("Date parsing error: {}", e.getMessage());
             }
         }
-        
+
         // 필터링된 데이터로 페이징 조회
-        Page<LightningEntity> lightningPage = lightningRepository.findAll(spec, pageable);
+        Page<LightningEntity> lightningPage = lightningRepository.findAll(specRef.get(), pageable);
 
         // 응답 DTO생성 - 빌더 패턴 사용
         List<ResponseComponentDTO> lightningDTO = lightningPage.getContent().stream()
-                .map(lightning -> ResponseComponentDTO.builder()
-                        .lightningId(lightning.getLightningId())
-                        .creatorId(lightning.getCreatorId())
-                        .title(lightning.getTitle())
-                        .eventDate(lightning.getEventDate())
-                        .duration(lightning.getDuration())
-                        .createdAt(lightning.getCreatedAt())
-                        .status(lightning.getStatus())
-                        .capacity(lightning.getCapacity())
-                        .gender(lightning.getGender())
-                        .level(lightning.getLevel())
-                        .bikeType(lightning.getBikeType())
-                        .tags(lightning.getTags().stream()
-                                .map(LightningTagCategoryEntity::getName)
-                                .collect(Collectors.toList()))
-                        .address(lightning.getAddress())
-                        .routeImgId(lightning.getRoute() != null ? lightning.getRoute().getRouteImgId() : null)
-                        .build())
+                .map(lightning -> {
+                    // 기본 DTO 생성
+                    ResponseComponentDTO dto = ResponseComponentDTO.builder()
+                            .lightningId(lightning.getLightningId())
+                            .creatorId(lightning.getCreatorId())
+                            .title(lightning.getTitle())
+                            .eventDate(lightning.getEventDate())
+                            .duration(lightning.getDuration())
+                            .createdAt(lightning.getCreatedAt())
+                            .status(lightning.getStatus())
+                            .capacity(lightning.getCapacity())
+                            .gender(lightning.getGender())
+                            .level(lightning.getLevel())
+                            .bikeType(lightning.getBikeType())
+                            .tags(lightning.getTags().stream()
+                                    .map(LightningTagCategoryEntity::getName)
+                                    .collect(Collectors.toList()))
+                            .address(lightning.getAddress())
+                            .routeImgId(lightning.getRoute() != null ? lightning.getRoute().getRouteImgId() : null)
+                            .build();
+                    
+                    // 북마크 정보는 별도로 채워넣기
+                    if (userEmail != null && !userEmail.isEmpty()) {
+                        try {
+                            UserEntity user = userRepository.findByEmail(userEmail).orElse(null);
+                            if (user != null) {
+                                // 별도 쿼리로 북마크 여부 확인
+                                boolean isBookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(
+                                    user.getUserId(), 
+                                    lightning.getLightningId(),
+                                    BookmarkType.LIGHTNING
+                                );
+                                dto.setBookmarked(isBookmarked);
+                            }
+                        } catch (Exception e) {
+                            // 오류 무시 - 사용자에게 표시할 데이터에 영향을 주지 않음
+                            log.error("사용자 북마크 확인 중 오류: {}", e.getMessage());
+                        }
+                    }
+                    
+                    return dto;
+                })
                 .collect(Collectors.toList());
 
         // 현재 참여자 수 계산

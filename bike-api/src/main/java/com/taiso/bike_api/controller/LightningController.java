@@ -61,9 +61,10 @@ public class LightningController {
             , @RequestParam(name = "region", defaultValue = "") String region
             , @RequestParam(name = "level", defaultValue = "") String level
             , @RequestParam(name = "tags", defaultValue = "") String tags
-            , @RequestParam(name = "sort", defaultValue = "") String sort) {
+            , @RequestParam(name = "sort", defaultValue = "") String sort
+            , @AuthenticationPrincipal String userEmail) {
 
-        LightningListResponseDTO lightningListResponseDTO = lightningService.getLightningList(page, size, gender, bikeType, date, region, level, tags, sort);
+        LightningListResponseDTO lightningListResponseDTO = lightningService.getLightningList(page, size, gender, bikeType, date, region, level, tags, sort, userEmail);
 
         log.info("보내기 직전 : {}", lightningListResponseDTO);
 
