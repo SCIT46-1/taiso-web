@@ -24,4 +24,11 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> 
 
 	// 통합 북마크 삭제
 	BookmarkEntity findByBookmarkIdAndUser(Long bookmarkId, UserEntity user);
+
+	// Add this method matching your entity structure
+	boolean existsByUser_UserIdAndTargetIdAndTargetType(Long userId, Long lightningId, BookmarkType type);
+	
+	// 추가할 메서드 - 수정됨
+	boolean existsByTargetIdAndUser_UserId(Long targetId, Long userId);
+	
 }

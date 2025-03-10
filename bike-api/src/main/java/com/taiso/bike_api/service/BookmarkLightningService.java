@@ -1,11 +1,27 @@
 package com.taiso.bike_api.service;
 
-import com.taiso.bike_api.domain.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+
+import com.taiso.bike_api.domain.BookmarkEntity;
+import com.taiso.bike_api.domain.LightningEntity;
+import com.taiso.bike_api.domain.LightningTagCategoryEntity;
+import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.BookmarkLightningResponseDTO;
+import com.taiso.bike_api.exception.BookmarkAlreadyExistsException;
+import com.taiso.bike_api.exception.BookmarkNotFoundException;
+import com.taiso.bike_api.exception.LightningNotFoundException;
+import com.taiso.bike_api.exception.UserNotFoundException;
+
 import com.taiso.bike_api.exception.*;
 import com.taiso.bike_api.repository.BookmarkRepository;
 import com.taiso.bike_api.repository.LightningRepository;
 import com.taiso.bike_api.repository.UserRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,15 +122,14 @@ public class BookmarkLightningService {
 
     // 북마크 삭제
     @Transactional
-    public void bookmarkLightningDelete(Long bookmarkId, Authentication authentication) {
+    public void bookmarkLightningDelete(Long lightningId, Authentication authentication) {
 
         //유저 아이디 조회
         UserEntity user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new UserNotFoundException("로그인 사용자를 찾을 수 없습니다"));
 
         //해당 북마크 조회
-        BookmarkEntity bookmarkEntity = bookmarkRepository.
-                findByBookmarkIdAndUser(bookmarkId, user);
+        BookmarkEntity bookmarkEntity = bookmarkRepository.findByTargetIdAndUserAndTargetType(lightningId, user, BookmarkEntity.BookmarkType.LIGHTNING);
         if (bookmarkEntity == null) {
             throw new BookmarkNotFoundException("존재하지 않는 북마크입니다.");
         }
