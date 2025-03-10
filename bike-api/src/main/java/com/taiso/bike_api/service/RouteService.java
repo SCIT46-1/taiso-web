@@ -240,10 +240,7 @@ public RouteListResponseDTO getRouteList(int page, int size, String sort,
         spec = spec.and(buildTagSpecification(tag));
     }
 
-    if (userEmail != null) {
-        spec = spec.and((root, query, cb) -> cb.equal(root.get("userId"),
-                userRepository.findByEmail(userEmail).get().getUserId()));
-    }
+
     
     // 페이징 처리 및 결과 조회
     Page<RouteEntity> routePage = routeRepository.findAll(spec, pageable);
@@ -304,12 +301,7 @@ public RouteListResponseDTO getRouteList(int page, int size, String sort,
             .build();
 }
 
-public RouteListResponseDTO getRouteList(int page, int size, String sort,
-                                         String region, String distanceType,
-                                         String altitudeType, String roadType, String[] tag) {
-    // userEmail 없이 호출될 경우 null을 전달
-    return getRouteList(page, size, sort, region, distanceType, altitudeType, roadType, tag, null);
-}
+
     
     /** 
       @param routeId 루트 아이디

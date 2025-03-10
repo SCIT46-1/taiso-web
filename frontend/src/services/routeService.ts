@@ -60,6 +60,8 @@ export interface RouteListResponse {
   altitudeType: string;
   roadType: string;
   createdAt: string;
+  liked: boolean;
+  bookmarked: boolean;
 }
 
 const createRoute = async (

@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MyLightningResponse } from "../services/userDetailService";
 import ImageWithSkeleton from "./ImageWithSkeleton";
+import GlobalModal from "./GlobalModal";
+import KakaolocationMap from "./KakaolocationMap";
+import lightningService, {
+  CompletedLightningResponse,
+  LightningDetailGetResponse,
+} from "../services/lightningService";
 
 interface UserReservedLightningListProps {
   reservationLightning: MyLightningResponse[];
@@ -11,6 +17,10 @@ function UserReservedLightningList({
   reservationLightning,
 }: UserReservedLightningListProps) {
   const navigate = useNavigate();
+  const [lightningDetail, setLightningDetail] =
+    useState<LightningDetailGetResponse | null>(null);
+  const [completedLightning, setCompletedLightning] =
+    useState<CompletedLightningResponse | null>(null);
 
   // 시간 포맷팅
   const formatTime = (date: string | number | Date) => {
@@ -99,6 +109,35 @@ function UserReservedLightningList({
             종료
           </button>
         );
+    }
+  };
+
+  // 완료 처리 핸들러 추가
+  const handleJoinLightningComplete = () => {
+    const modal = document.getElementById(
+      "join-complete-modal"
+    ) as HTMLDialogElement;
+    modal?.close();
+    // 필요시 데이터 리프레시 로직 추가
+  };
+
+  // 번개 상세 정보 가져오기
+  const fetchLightningDetail = async (lightningId: number) => {
+    try {
+      const detail = await lightningService.getLightningDetail(lightningId);
+      setLightningDetail(detail);
+      const completed = await lightningService.getCompletedLightnings(
+        lightningId
+      );
+      setCompletedLightning(completed);
+
+      // 모달 표시 로직 추가
+      const modal = document.getElementById(
+        "join-complete-modal"
+      ) as HTMLDialogElement;
+      modal?.showModal();
+    } catch (error) {
+      console.error("데이터 불러오기 실패:", error);
     }
   };
 
@@ -195,7 +234,14 @@ function UserReservedLightningList({
                       </Link>
 
                       <div className="p-4 flex items-center justify-center md:mt-auto md:ml-0 mt-0 ml-auto">
-                        <button className="btn btn-outline btn-primary md:w-[150px] w-full no-animation">
+                        <button
+                          className="btn btn-outline btn-primary md:w-[150px] w-full no-animation"
+                          onClick={() =>
+                            fetchLightningDetail(
+                              lightning.lightning.lightningId
+                            )
+                          }
+                        >
                           예약내역 보기
                         </button>
                       </div>
@@ -210,6 +256,27 @@ function UserReservedLightningList({
           ))
         )}
       </div>
+      <GlobalModal
+        id="join-complete-modal"
+        title="참여 완료!"
+        actions={
+          <button className="btn" onClick={handleJoinLightningComplete}>
+            닫기
+          </button>
+        }
+      >
+        <KakaolocationMap
+          lat={lightningDetail?.latitude}
+          lng={lightningDetail?.longitude}
+        />
+        <div>번개 제목 : {completedLightning?.routeTitle}</div>
+        <div>번개 시작 시간 : {completedLightning?.eventDate}</div>
+        <div>번개 진행 시간 : {completedLightning?.duration}</div>
+        <div>정원 : {completedLightning?.capacity}</div>
+        <div>참여자 : {completedLightning?.currentParticipants}</div>
+        <div>참여 일시 : {completedLightning?.joinDate}</div>
+        <p>번개에 참여하셨습니다!</p>
+      </GlobalModal>
     </div>
   );
 }

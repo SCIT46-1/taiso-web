@@ -168,6 +168,18 @@ const getLightningList = async (
   );
 };
 
+export interface CompletedLightningResponse {
+  lightningId: number;
+  eventDate: string;
+  duration: number;
+  latitude: number;
+  longitude: number;
+  capacity: number;
+  currentParticipants: number;
+  routeTitle: string;
+  joinDate: string;
+}
+
 const getLightningDetail = async (
   lightningId: number
 ): Promise<LightningDetailGetResponse> => {
@@ -241,6 +253,13 @@ const deleteUserReview = async (
   return await del(`/lightnings/${lightningId}/reviews?userId=${userId}`);
 };
 
+// 번개 완료 조회
+const getCompletedLightnings = async (
+  lightningId: number
+): Promise<CompletedLightningResponse> => {
+  return await get(`/lightnings/${lightningId}/complete`);
+};
+
 export default {
   createLightning,
   getLightningList,
@@ -255,4 +274,5 @@ export default {
   getLightningReview,
   submitUserReview,
   deleteUserReview,
+  getCompletedLightnings,
 };
