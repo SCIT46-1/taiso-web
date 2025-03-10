@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
 import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.RouteLikeEntity;
 import com.taiso.bike_api.domain.RoutePointEntity;
@@ -27,6 +28,7 @@ import com.taiso.bike_api.exception.RouteLikeAlreadyExistsException;
 import com.taiso.bike_api.exception.RouteLikeNotFoundException;
 import com.taiso.bike_api.exception.RouteNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
+import com.taiso.bike_api.repository.BookmarkRepository;
 import com.taiso.bike_api.repository.RouteLikeRepository;
 import com.taiso.bike_api.repository.RoutePointRepository;
 import com.taiso.bike_api.repository.RouteRepository;
@@ -54,6 +56,8 @@ public class RouteService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BookmarkRepository bookmarkRepository;
 
     /** 
       @param routeId 루트 아이디
@@ -97,6 +101,15 @@ public class RouteService {
             liked = routeLikeRepository.existsByUser_UserIdAndRoute_RouteId(userEntity.getUserId(), routeId);
         }
 
+        UserEntity user = userRepository.findByEmail(userEmail).orElse(null);
+        
+        // 루트 북마크 여부 확인
+        boolean isBookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(
+                user.getUserId(), 
+                routeEntity.getRouteId(),
+                BookmarkType.ROUTE
+            );
+        
         // 루트 디테일 정보 반환
         return RouteDetailResponseDTO.builder()
                 .routeId(routeEntity.getRouteId())
@@ -117,6 +130,7 @@ public class RouteService {
                 .fileType(routeEntity.getFileType() != null ? routeEntity.getFileType().name() : null)
                 .routePoint(pointResponses)
                 .isLiked(liked)
+                .isBookmarked(isBookmarked)
                 .build();
     }
 

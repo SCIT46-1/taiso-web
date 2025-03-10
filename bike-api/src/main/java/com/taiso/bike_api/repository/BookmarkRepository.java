@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.taiso.bike_api.domain.BookmarkEntity;
 import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
+import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.UserEntity;
 
 @Repository
@@ -24,4 +25,8 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> 
 
 	// 통합 북마크 삭제
 	BookmarkEntity findByBookmarkIdAndUser(Long bookmarkId, UserEntity user);
+
+	// 루트 디테일 북마크 확인
+	boolean existsByUser_UserIdAndTargetIdAndTargetType(Long userId, Long routeId, BookmarkType route);
+
 }
