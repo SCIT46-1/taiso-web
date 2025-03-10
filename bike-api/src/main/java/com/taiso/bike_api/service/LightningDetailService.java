@@ -19,6 +19,7 @@ import com.taiso.bike_api.domain.LightningUserEntity;
 import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.RoutePointEntity;
 import com.taiso.bike_api.domain.UserDetailEntity;
+import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.LightningDetailClubDTO;
 import com.taiso.bike_api.dto.LightningDetailCreatorDTO;
 import com.taiso.bike_api.dto.LightningDetailGetResponseDTO;
@@ -31,6 +32,7 @@ import com.taiso.bike_api.exception.LightningFullMemberException;
 import com.taiso.bike_api.exception.LightningNotFoundException;
 import com.taiso.bike_api.exception.NotPermissionException;
 import com.taiso.bike_api.exception.UserNotFoundException;
+import com.taiso.bike_api.repository.BookmarkRepository;
 import com.taiso.bike_api.repository.ClubRepository;
 import com.taiso.bike_api.repository.LightningDetailRepository;
 import com.taiso.bike_api.repository.LightningTagCategoryRepository;
@@ -61,6 +63,9 @@ public class LightningDetailService {
 
     @Autowired
     LightningUserRepository lightningUserRepository;
+
+    @Autowired
+    BookmarkRepository bookmarkRepository;
 
     // 번개 수정 화면에 기존 정보 뿌리기
     public LightningDetailUpdateGetResponseDTO getUpdateLightningDetail(Long lightningId,
@@ -165,7 +170,7 @@ public class LightningDetailService {
     }
 
     // 번개 디테일 조회
-    public LightningDetailGetResponseDTO getLightningDetail(Long lightningId) {
+    public LightningDetailGetResponseDTO getLightningDetail(Long lightningId, String userEmail) {
 
         // DB에서 번개를 찾아옴
         LightningEntity temp = lightningDetailRepository.findById(lightningId)
@@ -277,6 +282,19 @@ public class LightningDetailService {
 
             log.info("최종직전: {}", temp);
 
+
+// 북마크 여부 기본값을 false로 선언
+Boolean bookmarked = false;
+
+// userEmail 이 null이 아닌 경우
+if (userEmail != null) {
+    Optional<UserEntity> userOpt = userRepository.findByEmail(userEmail);
+    if (userOpt.isPresent()) {
+        bookmarked = bookmarkRepository.existsByTargetIdAndUser_UserId(
+            temp.getLightningId(), userOpt.get().getUserId());
+    }
+}
+
         // entity -> dto
         LightningDetailGetResponseDTO lightningDetailGetResponseDTO = LightningDetailGetResponseDTO.builder()
                 .lightningId(temp.getLightningId())
@@ -306,6 +324,7 @@ public class LightningDetailService {
                 .lightningUserId(temp.getLightningId())
                 .member(memberDTOs)
                 .lightningTag(tagNames)
+                .bookmarked(bookmarked)
                 .build();
 
         log.info("최종 DTO: {}", lightningDetailGetResponseDTO);

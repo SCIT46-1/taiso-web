@@ -66,4 +66,7 @@ public class LightningDetailGetResponseDTO {
 
     // 번개 태그
     private Set<String> lightningTag;
+
+    // 북마크 여부
+    private Boolean bookmarked;
 }
