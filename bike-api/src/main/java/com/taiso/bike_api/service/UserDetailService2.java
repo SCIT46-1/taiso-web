@@ -135,42 +135,43 @@ public void saveUserDetail(UserDetailPostRequestDTO requestDTO, String userEmail
     @Transactional
     public void patchUserDetail(String userEmail, UserDetailPatchRequestDTO requestDTO) {
         // 사용자의 상세정보 가져오기
-        UserDetailEntity userDetail = userDetailRepository.findByUserId(userRepository.findByEmail(userEmail).get().getUserId()).get();
+        UserDetailEntity userDetail = userDetailRepository
+                .findByUserId(userRepository.findByEmail(userEmail).get().getUserId()).get();
 
         log.info("{}", requestDTO);
 
         // 수정하기
-        if(requestDTO.getNickname() != null) {
+        if (requestDTO.getNickname() != null) {
             userDetail.setUserNickname(requestDTO.getNickname());
         }
-        if(requestDTO.getUserProfileImg() != null) {
+        if (requestDTO.getUserProfileImg() != null) {
             userDetail.setUserProfileImg(requestDTO.getUserProfileImg());
         }
-        if(requestDTO.getUserBackgroundImg() != null) {
+        if (requestDTO.getUserBackgroundImg() != null) {
             userDetail.setUserBackgroundImg(requestDTO.getUserBackgroundImg());
         }
-        if(requestDTO.getPhoneNumber() != null) {
+        if (requestDTO.getPhoneNumber() != null) {
             userDetail.setPhoneNumber(requestDTO.getPhoneNumber());
         }
-        if(requestDTO.getBirthDate() != null) {
+        if (requestDTO.getBirthDate() != null) {
             userDetail.setBirthDate(requestDTO.getBirthDate());
         }
-        if(requestDTO.getBio() != null) {
+        if (requestDTO.getBio() != null) {
             userDetail.setBio(requestDTO.getBio());
         }
-        if(requestDTO.getGender() != null) {
+        if (requestDTO.getGender() != null) {
             userDetail.setGender(requestDTO.getGender());
         }
-        if(requestDTO.getLevel() != null) {
+        if (requestDTO.getLevel() != null) {
             userDetail.setLevel(requestDTO.getLevel());
         }
-        if(requestDTO.getHeight() != null) {
+        if (requestDTO.getHeight() != null) {
             userDetail.setHeight(requestDTO.getHeight());
         }
-        if(requestDTO.getWeight() != null) {
+        if (requestDTO.getWeight() != null) {
             userDetail.setWeight(requestDTO.getWeight());
         }
-        if(requestDTO.getFTP() != null) {
+        if (requestDTO.getFTP() != null) {
             userDetail.setFTP(requestDTO.getFTP());
         }
 
@@ -178,5 +179,12 @@ public void saveUserDetail(UserDetailPostRequestDTO requestDTO, String userEmail
 
         userDetailRepository.save(userDetail);
 
+    }
+    
+
+    // 프로필 이미지 주소 get
+    public String getProfileImg(String userEmail) {
+        UserDetailEntity userDetail = userDetailRepository.findByUserId(userRepository.findByEmail(userEmail).get().getUserId()).get();
+        return userDetail.getUserProfileImg();
     }
 }

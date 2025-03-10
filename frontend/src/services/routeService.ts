@@ -34,6 +34,7 @@ export interface RouteDetailResponse {
     elevation: number;
   }[];
   liked: boolean;
+  bookmarked: boolean;
 }
 
 export interface RouteListPageResponse {
@@ -59,6 +60,8 @@ export interface RouteListResponse {
   altitudeType: string;
   roadType: string;
   createdAt: string;
+  liked: boolean;
+  bookmarked: boolean;
 }
 
 const createRoute = async (

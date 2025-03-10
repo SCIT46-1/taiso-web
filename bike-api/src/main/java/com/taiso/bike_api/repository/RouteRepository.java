@@ -10,6 +10,7 @@ import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.UserEntity;
 
 public interface RouteRepository extends JpaRepository<RouteEntity, Long>, JpaSpecificationExecutor<RouteEntity> {
+  RouteEntity findByRouteId(Long routeId);
 
 	Optional<UserEntity> findByRouteId(Long targetId);
 }

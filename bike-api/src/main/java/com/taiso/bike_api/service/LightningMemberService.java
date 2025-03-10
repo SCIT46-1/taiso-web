@@ -15,7 +15,9 @@ import com.taiso.bike_api.domain.LightningEntity.LightningStatus;
 import com.taiso.bike_api.domain.LightningEntity.RecruitType;
 import com.taiso.bike_api.domain.LightningUserEntity;
 import com.taiso.bike_api.domain.LightningUserEntity.ParticipantStatus;
+import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.UserEntity;
+import com.taiso.bike_api.dto.LightningJoinCompleteResponseDTO;
 import com.taiso.bike_api.exception.EmailAlreadyExistsException;
 import com.taiso.bike_api.exception.LightningCreatorMismatchException;
 import com.taiso.bike_api.exception.LightningMemberIllegalParticipantStatusException;
@@ -28,6 +30,7 @@ import com.taiso.bike_api.exception.LightningUserStatusNotPendingException;
 import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.repository.LightningRepository;
 import com.taiso.bike_api.repository.LightningUserRepository;
+import com.taiso.bike_api.repository.RouteRepository;
 import com.taiso.bike_api.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -43,6 +46,9 @@ public class LightningMemberService {
 	
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RouteRepository routeRepository;
 	
     // 번개 참가 서비스 
     @Transactional
@@ -354,5 +360,45 @@ public class LightningMemberService {
             throw new LightningCreatorMismatchException("유저와 번개 생성자가 같지 않음");
         }
         lightningEntity.setStatus(LightningStatus.종료);
+    }
+
+
+    // 번개 신청 완료 정보 조회
+    public LightningJoinCompleteResponseDTO getLightningComplete(Long lightningId, Authentication authentication) {
+        // 번개 존재 확인
+        LightningEntity lightningEntity = lightningRepository.findById(lightningId)
+                .orElseThrow(() -> new LightningNotFoundException("번개를 찾을 수 없습니다."));
+        
+        // 유저 아이디로 유저 찾기
+        UserEntity userEntity = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // 번개Id와 유저Id로 member에서 조회
+        LightningUserEntity lightningUser = lightningUserRepository
+                .findByLightning_LightningIdAndUser_UserId(lightningId, userEntity.getUserId())
+                .orElseThrow(() -> new LightningMemberNotFoundException("해당 번개에 참여한 기록이 없습니다."));
+
+        //루트 조회
+        RouteEntity routeEntity = routeRepository.findByRouteId(lightningEntity.getRoute().getRouteId());
+        if (routeEntity == null) {
+            throw new RuntimeException("루트를 찾을 수 없습니다.");
+        }
+
+        // 참여 날짜
+        LocalDateTime joinDate = lightningUser.getJoinedAt();
+
+        LightningJoinCompleteResponseDTO responseDTO = LightningJoinCompleteResponseDTO.builder()
+                .lightningId(lightningEntity.getLightningId())
+                .eventDate(lightningEntity.getEventDate())
+                .duration(lightningEntity.getDuration())
+                .latitude(lightningEntity.getLatitude())
+                .longitude(lightningEntity.getLongitude())
+                .capacity(lightningEntity.getCapacity())
+                .currentParticipants(lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightningEntity.getLightningId()))
+                .routeTitle(routeEntity.getRouteName())
+                .joinDate(joinDate)
+                .build();
+
+        return responseDTO;
     }
 }

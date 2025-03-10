@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.taiso.bike_api.dto.JoinParticipantsPostResponseDTO;
+import com.taiso.bike_api.dto.LightningJoinCompleteResponseDTO;
 import com.taiso.bike_api.service.LightningMemberService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -126,4 +128,13 @@ public class LightningMemberController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(null);
 	}
 	
+
+	//번개 신청 완료 정보 조회
+	@Operation(summary = "번개 신청 완료 정보 조회", description = "번개 신청 완료 정보 조회 API")
+	@GetMapping("/{lightningId}/complete")
+	public ResponseEntity<LightningJoinCompleteResponseDTO> lightningComplete(
+			@PathVariable(name = "lightningId") Long lightningId,
+			Authentication authentication) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(lightningMemberService.getLightningComplete(lightningId, authentication));
+	}
 }

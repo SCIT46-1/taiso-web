@@ -30,6 +30,8 @@ public class RouteResponseDTO {
     private String altitudeType;      // e.g., 클라이밍, 평지, optional
     private String roadType;          // e.g., 자전거 도로, 국도, optional
     private String createdAt;         // ISO8601 또는 다른 DateTime 형식을 사용, required
-//    private String fileType;
+    //    private String fileType;
+    private Boolean liked;
+    private Boolean bookmarked;
 
 }

@@ -127,13 +127,14 @@ public class RouteController {
                                                     @RequestParam(name = "distanceType", defaultValue = "") String distanceType,
                                                     @RequestParam(name = "altitudeType", defaultValue = "") String altitudeType,
                                                     @RequestParam(name = "roadType", defaultValue = "") String roadType,
-                                                    @RequestParam(name="tag",defaultValue = "") String[] Tag) {
+                                                    @RequestParam(name="tag",defaultValue = "") String[] Tag,
+                                                    @AuthenticationPrincipal String userEmail) {
 
 
 
         // 루트 데이터들을 페이징된 형태로 불러옴
         RouteListResponseDTO routeListResponseDTO = routeService.getRouteList(page, size, sort, region, distanceType,
-                altitudeType, roadType, Tag);
+                altitudeType, roadType, Tag, userEmail);
 
         log.info("보내기 직전 : {}", routeListResponseDTO);
 

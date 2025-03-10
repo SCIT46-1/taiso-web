@@ -85,7 +85,7 @@ function RouteList({
   return (
     <div className="flex flex-col w-[95%] mx-auto">
       {/* grid layout 적용: 모바일은 1열, sm은 2열, md는 3열, lg는 4열 */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-">
         {routeList.map((route) => (
           <Link
             to={`/route/${route.routeId}`}
