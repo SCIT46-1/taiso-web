@@ -22,6 +22,8 @@ import lombok.ToString;
 public class BookmarkUserListResponseDTO {
 
 	// BookmarkEntity
+    private Long bookmarkId;
+    
 	private Long userId;
 	
 	private Long bookmarkedUserId;
@@ -29,7 +31,7 @@ public class BookmarkUserListResponseDTO {
 	private Integer totalBookmark;
 	
     private LocalDateTime createdAt;
-    
+
     // userDetail
  	private String userNickname;
  	

@@ -13,17 +13,14 @@ import com.taiso.bike_api.domain.UserEntity;
 @Repository
 public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> {
 
-	// 클럽 북마크 조회
-  List<BookmarkEntity> findAllByUserAndTargetType(UserEntity user, BookmarkType club);
-  
 	// 북마크 등록 검증
-	boolean existsByUserAndTargetIdAndTargetType(UserEntity currentUser, Long userId, BookmarkType type);
+	boolean existsByUserAndTargetIdAndTargetType(UserEntity currentUser, Long targetId, BookmarkType type);
 
 	// 북마크 조회
 	List<BookmarkEntity> findByUserAndTargetType(UserEntity currentUser, BookmarkType type);
 
 	// 북마크 삭제
-	BookmarkEntity findByTargetIdAndUserAndTargetType(Long userId, UserEntity currentUser, BookmarkType type);
+	BookmarkEntity findByTargetIdAndUserAndTargetType(Long targetId, UserEntity currentUser, BookmarkType type);
 
 	// 통합 북마크 삭제
 	BookmarkEntity findByBookmarkIdAndUser(Long bookmarkId, UserEntity user);
