@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ImageWithSkeleton from "./ImageWithSkeleton";
 import userDetailService, {
   MyLightningResponse,
@@ -12,7 +12,6 @@ function UserCompletedLightningList() {
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,7 +42,6 @@ function UserCompletedLightningList() {
   // 날짜 포맷팅 (YYYY년 MM월 DD일 형식)
   const formatDate = (date: string | number | Date) => {
     const dateObj = new Date(date);
-    const year = dateObj.getFullYear();
     const month = dateObj.getMonth() + 1;
     const day = dateObj.getDate();
 

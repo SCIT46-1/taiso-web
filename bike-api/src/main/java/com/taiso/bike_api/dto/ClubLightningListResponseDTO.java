@@ -50,6 +50,7 @@ public class ClubLightningListResponseDTO {
 	
 	private BikeType bikeType;
 	
+	@Builder.Default
 	private Set<LightningTagCategoryEntity> tags = new HashSet<>();
 	
 	private String address;

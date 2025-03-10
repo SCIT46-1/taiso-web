@@ -16,20 +16,12 @@ import com.taiso.bike_api.exception.BookmarkAlreadyExistsException;
 import com.taiso.bike_api.exception.BookmarkNotFoundException;
 import com.taiso.bike_api.exception.LightningNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
-
-import com.taiso.bike_api.exception.*;
 import com.taiso.bike_api.repository.BookmarkRepository;
 import com.taiso.bike_api.repository.LightningRepository;
 import com.taiso.bike_api.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
