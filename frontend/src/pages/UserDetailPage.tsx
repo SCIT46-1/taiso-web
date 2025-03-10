@@ -108,16 +108,44 @@ function UserDetailPage() {
     // 들어올땐 number 그러나 파라미터로 사용되며 string이 되었기 때문에..
     const userIdNumber = Number(userId);
 
-  const userProfileRequest: UserPageDetailRequest = {
-    userId: userIdNumber,
-    userNickname: nickName,
-    bio: bio,
-    profileImg: profileImg,
-    backgroundImg: backgroundImg,
-    gender: gender,
-    level: level,
-    tags: tags,
-  };
+    const userProfileRequest: UserPageDetailRequest = {
+      userId: userIdNumber,
+      userNickname: nickName,
+      bio: bio,
+      profileImg: profileImg,
+      backgroundImg: backgroundImg,
+      gender: gender,
+      level: level,
+      tags: tags,
+    };
+    
+    const patchUserPageDetail = async (payload: UserPageDetailRequest) => {
+      // FormData 생성
+      const formData = new FormData();
+
+      // 텍스트 데이터 추가
+      for (const key in payload) {
+        if (payload.hasOwnProperty(key)) {
+          formData.append(key, payload[key]);
+        }
+      }
+
+      // 이미지 파일이 있을 경우 추가
+      if (profileImg) {
+        formData.append("profileImg", profileImg); // profileImg는 File 객체여야 함
+      }
+
+      if (backgroundImg) {
+        formData.append("backgroundImg", backgroundImg); // backgroundImg도 File 객체여야 함
+      }
+
+      try {
+        return await patch("/users/me/details", formData); // FormData로 요청 전송
+      } catch (error) {
+        console.error("Failed to update user details:", error);
+      }
+    };
+    
     
     // 폼 데이터 서버 전송
     try {
@@ -125,6 +153,7 @@ function UserDetailPage() {
       await userDetailService.patchUserPageDetail(
         userProfileRequest
       );
+
       setIsLoading(false);
       // 변경 완료 후 모달 닫기
       alert("프로필이 업데이트되었습니다.");
