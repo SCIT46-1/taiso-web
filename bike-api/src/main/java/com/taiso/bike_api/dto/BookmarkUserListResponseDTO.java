@@ -2,7 +2,6 @@ package com.taiso.bike_api.dto;
 
 import java.time.LocalDateTime;
 
-import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.domain.UserDetailEntity.Gender;
 import com.taiso.bike_api.domain.UserDetailEntity.Level;
 

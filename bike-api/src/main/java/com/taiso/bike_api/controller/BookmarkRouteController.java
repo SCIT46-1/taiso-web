@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.taiso.bike_api.dto.BookmarkRouteListResponseDTO;
 import com.taiso.bike_api.dto.BookmarkRouteResponseDTO;
-import com.taiso.bike_api.dto.BookmarkUserListResponseDTO;
-import com.taiso.bike_api.dto.BookmarkUserResponseDTO;
 import com.taiso.bike_api.service.BookmarkRouteService;
-import com.taiso.bike_api.service.BookmarkUserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

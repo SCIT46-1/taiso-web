@@ -3,14 +3,13 @@ package com.taiso.bike_api.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import com.taiso.bike_api.domain.RouteTagCategoryEntity;
 import com.taiso.bike_api.domain.RouteEntity.AltitudeType;
 import com.taiso.bike_api.domain.RouteEntity.DistanceType;
 import com.taiso.bike_api.domain.RouteEntity.Region;
 import com.taiso.bike_api.domain.RouteEntity.RoadType;
+import com.taiso.bike_api.domain.RouteTagCategoryEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +45,7 @@ public class BookmarkRouteListResponseDTO {
     private String routeName;
 
     private Long likeCount;
+    @Builder.Default
     private Set<RouteTagCategoryEntity> tags = new HashSet<>();
     private BigDecimal distance;
     private BigDecimal altitude;

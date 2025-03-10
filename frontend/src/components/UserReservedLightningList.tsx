@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { MyLightningResponse } from "../services/userDetailService";
 import ImageWithSkeleton from "./ImageWithSkeleton";
 import GlobalModal from "./GlobalModal";
@@ -16,7 +16,6 @@ interface UserReservedLightningListProps {
 function UserReservedLightningList({
   reservationLightning,
 }: UserReservedLightningListProps) {
-  const navigate = useNavigate();
   const [lightningDetail, setLightningDetail] =
     useState<LightningDetailGetResponse | null>(null);
   const [completedLightning, setCompletedLightning] =
@@ -73,44 +72,44 @@ function UserReservedLightningList({
   // 날짜별로 그룹화된 데이터
   const groupedLightnings = groupByDate(reservationLightning);
 
-  const renderStatusButton = (status: string) => {
-    switch (status) {
-      case "모집":
-        return (
-          <button className="btn btn-outline btn-primary md:w-[150px] w-full no-animation">
-            참가
-          </button>
-        );
-      case "마감":
-        return (
-          <button
-            className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
-            disabled
-          >
-            마감
-          </button>
-        );
-      case "강제마감":
-        return (
-          <button
-            className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
-            disabled
-          >
-            마감
-          </button>
-        );
-      case "종료":
-      default:
-        return (
-          <button
-            className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
-            disabled
-          >
-            종료
-          </button>
-        );
-    }
-  };
+  // const renderStatusButton = (status: string) => {
+  //   switch (status) {
+  //     case "모집":
+  //       return (
+  //         <button className="btn btn-outline btn-primary md:w-[150px] w-full no-animation">
+  //           참가
+  //         </button>
+  //       );
+  //     case "마감":
+  //       return (
+  //         <button
+  //           className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
+  //           disabled
+  //         >
+  //           마감
+  //         </button>
+  //       );
+  //     case "강제마감":
+  //       return (
+  //         <button
+  //           className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
+  //           disabled
+  //         >
+  //           마감
+  //         </button>
+  //       );
+  //     case "종료":
+  //     default:
+  //       return (
+  //         <button
+  //           className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
+  //           disabled
+  //         >
+  //           종료
+  //         </button>
+  //       );
+  //   }
+  // };
 
   // 완료 처리 핸들러 추가
   const handleJoinLightningComplete = () => {
