@@ -1,10 +1,7 @@
 package com.taiso.bike_api.dto;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.taiso.bike_api.domain.ClubEntity;
-import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,18 +28,7 @@ public class ClubsGetResponseDTO {
     private Integer currentScale;
     private Set<String> tags;
 
-    public static ClubsGetResponseDTO toDTO(ClubEntity club) {
-        return ClubsGetResponseDTO.builder()
-            .clubId(club.getClubId())
-            .clubProfileImageId(club.getClubProfileImageId())
-            .clubName(club.getClubName())
-            .clubLeaderId(club.getClubLeader().getUserId())
-            .clubLeaderName(club.getClubLeader().getUserDetail().getUserNickname())
-            .clubLeaderProfileImageId(club.getClubLeader().getUserDetail().getUserProfileImg())
-            .clubShortDescription(club.getClubShortDescription())
-            .maxScale(club.getMaxUser())
-            .currentScale(club.getUsers().stream().filter(member -> member.getParticipantStatus() == ParticipantStatus.완료 || member.getParticipantStatus() == ParticipantStatus.승인).collect(Collectors.toList()).size())
-            .tags(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
-            .build();
-    }
+    @Builder.Default
+    private boolean isBookmarked = false;
+
 }

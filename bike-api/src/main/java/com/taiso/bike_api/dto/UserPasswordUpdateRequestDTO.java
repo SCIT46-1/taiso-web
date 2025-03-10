@@ -21,5 +21,5 @@ public class UserPasswordUpdateRequestDTO {
 
     @NotBlank
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9]).{8,25}$")
-    private String password;
+    private String newPassword;
 }

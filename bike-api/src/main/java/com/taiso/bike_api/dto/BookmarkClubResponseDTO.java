@@ -1,6 +1,6 @@
 package com.taiso.bike_api.dto;
 
-import java.util.List;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,23 +15,21 @@ import lombok.ToString;
 @Getter
 @ToString
 @Builder
-public class BookmarkClubsGetResponseDTO {
+public class BookmarkClubResponseDTO {
+    private Long clubId;
+    private String clubProfileImageId;
+    private String clubName;
+    private Long clubLeaderId;
+    private String clubLeaderName;
+    private String clubLeaderProfileImageId;
+    private String clubShortDescription;
+    private Integer maxScale;
+    private Integer currentScale;
+    private Set<String> tags;
+    private boolean isBookmarked;
 
-    private List<BookmarkClubResponseDTO> content;
-
-    // 현재 페이지 넘버
-    private int pageNo;
-    // 한 페이지의 컨텐츠 수
-    private int pageSize;
-    // 총 컨텐츠 수
-    private long totalElements;
-    // 총 페이지 수
-    private int totalPages;
-    // 마지막 페이지 여부
-    private boolean last;
-
-    // public static BookmarkClubsGetResponseDTO toDTO(ClubEntity club) {
-    //     return BookmarkClubsGetResponseDTO.builder()
+    // public static BookmarkClubResponseDTO toDTO(ClubEntity club) {
+    //     return BookmarkClubResponseDTO.builder()
     //         .clubId(club.getClubId())
     //         .clubProfileImageId(club.getClubProfileImageId())
     //         .clubName(club.getClubName())

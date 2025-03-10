@@ -8,7 +8,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -178,19 +177,19 @@ public class AuthService {
         }
 
         // 새 비밀번호로 세팅
-        user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
+        user.setPassword(passwordEncoder.encode(requestDTO.getNewPassword()));
 
     }
 
-    public UserInfoGetResponseDTO getUserInfo(Authentication authentication) {
+    public UserInfoGetResponseDTO getUserInfo(String userEmail) {
         // Authentication이 null이거나 권한이 없을 경우의 예외처리
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new NotPermissionException("인증정보가 존재하지 않습니다.");
+        if (userEmail == null || userEmail.isEmpty()) {
+            throw new NotPermissionException("인증정보가 잘못되었거나 존재하지 않습니다.");
         }
 
         // 유저가 존재하지 않을 경우의 예외처리
-        UserEntity user = userRepository.findByEmail(authentication.getName())
-        .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+        UserEntity user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
 
         // UserInfoGetResponseDTO 빌드
         return UserInfoGetResponseDTO.builder()
