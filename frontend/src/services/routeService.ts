@@ -34,6 +34,7 @@ export interface RouteDetailResponse {
     elevation: number;
   }[];
   liked: boolean;
+  bookmarked: boolean;
 }
 
 export interface RouteListPageResponse {

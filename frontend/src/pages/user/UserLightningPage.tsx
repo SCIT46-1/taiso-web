@@ -34,8 +34,6 @@ function UserLightningPage() {
       <UserLightningVar />
 
       <div className="p-4">
-        <h2 className="text-2xl font-bold mb-4">예약된 라이트닝</h2>
-
         {error && (
           <div className="alert alert-error shadow-lg mb-4">
             <div>

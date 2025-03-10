@@ -725,6 +725,11 @@ function LightningDetailPage() {
           참가인원 {lightningDetail?.currentMemberCount} /{" "}
           {lightningDetail?.capacity}{" "}
         </div>
+        <progress
+          className="progress progress-primary w-[95%] mt-1 mb-4"
+          value={lightningDetail?.currentMemberCount}
+          max={lightningDetail?.capacity}
+        ></progress>
 
         <div className="w-full">
           {lightningDetail?.member

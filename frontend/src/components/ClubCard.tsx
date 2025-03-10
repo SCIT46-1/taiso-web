@@ -1,23 +1,25 @@
 import { Link } from "react-router";
 import { ClubListResponse } from "../services/clubService";
-import ImageWithSkeleton from "./ImageWithSkeleton";
 
 function ClubCard({ club }: { club: ClubListResponse }) {
   return (
     <div className="mx-auto">
-      <div className="flex">
+      <div className="flex mb-1">
         <Link to={`/club/${club.clubId}`} className="flex-1">
-          <div className="bg-base-100 w-full flex items-center">
-            <figure className="size-40 flex items-center justify-center ml-4 relative">
-              <ImageWithSkeleton
+          <div className="w-full flex items-center ml-8 p-4">
+            {club.clubProfileImageId === null ? (
+              <div className="h-24 w-24 rounded-lg bg-gray-200"></div>
+            ) : (
+              <img
                 src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${club.clubProfileImageId}`}
                 alt={club.clubName}
+                className="h-24 w-24 rounded-lg"
               />
-            </figure>
-            <div className="flex flex-col p-2 ml-6">
+            )}
+            <div className="flex flex-col p-2 ml-2">
               <div className="flex flex-col">
                 <div className="text-lg font-semibold">{club.clubName}</div>
-                <div className="text-sm text-gray-500 mt-1">
+                <div className="text-sm text-gray-500 mt-1 max-w-[300px] truncate">
                   {club.clubShortDescription}
                 </div>
                 <div className="text-sm text-gray-500 flex items-center gap-1 mt-2">
@@ -33,7 +35,7 @@ function ClubCard({ club }: { club: ClubListResponse }) {
                   </svg>
                   {club.currentScale}/{club.maxScale}명
                 </div>
-                <div className="flex flex-wrap gap-1 mt-2 max-w-[400px]">
+                <div className="flex flex-wrap gap-1 max-w-[400px]">
                   {club.tags.map((tag, index) => (
                     <div
                       key={index}
@@ -48,7 +50,7 @@ function ClubCard({ club }: { club: ClubListResponse }) {
           </div>
         </Link>
 
-        <div className="p-4 mt-auto flex items-center justify-center">
+        <div className="p-4 mt-auto flex items-center justify-center mr-8">
           <Link to={`/club/${club.clubId}`} className="group">
             <button className="btn btn-outline btn-primary sm:w-[150px] no-animation">
               상세보기
@@ -56,7 +58,6 @@ function ClubCard({ club }: { club: ClubListResponse }) {
           </Link>
         </div>
       </div>
-      <div className="divider w-full -my-2"></div>
     </div>
   );
 }

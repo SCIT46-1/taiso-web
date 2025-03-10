@@ -129,35 +129,48 @@ public class UserService {
         lightningUserEntityList.sort((e1, e2) -> e1.getLightning().getEventDate().compareTo(e2.getLightning().getEventDate()));
 
         // LightningUserEntity 리스트를 UserLightningsGetResponseDTO 리스트로 변환
-        List<UserLightningsGetResponseDTO> userLightningsGetResponseDTOList = lightningUserEntityList.stream().map(
-            lightningUserEntity -> UserLightningsGetResponseDTO.builder()
-                .lightning(UserLightningsGetResponseLightningDTO.builder()
-                    .lightningId(lightningUserEntity.getLightning().getLightningId())
-                    .title(lightningUserEntity.getLightning().getTitle())
-                    .eventDate(lightningUserEntity.getLightning().getEventDate())
-                    .creatorId(lightningUserEntity.getLightning().getCreatorId())
-                    .status(lightningUserEntity.getLightning().getStatus())
-                    .duration(lightningUserEntity.getLightning().getDuration())
-                    .capacity(lightningUserEntity.getLightning().getCapacity())
-                    .build())
-                .users(lightningUserRepository.findByLightningAndParticipantStatusIn(
-                    lightningUserEntity.getLightning(),
-                    new ArrayList<>(Arrays.asList(ParticipantStatus.승인, ParticipantStatus.완료, ParticipantStatus.신청대기)))
-                    .stream()
-                    .map(entity -> UserLightningsGetResponseUserDTO.builder()
-                        .userId(entity.getUser().getUserId())
-                        .userNickname(entity.getUser().getUserDetail().getUserNickname())
-                        .userProfileImg(entity.getUser().getUserDetail().getUserProfileImg())
-                        .build())
-                    .collect(Collectors.toSet()))
-                .tags(UserLightningsGetResponseTagsDTO.builder()
-                    .tags(lightningUserEntity.getLightning().getTags().stream().map(
-                        tag -> tag.getName())
-                        .collect(Collectors.toSet()))
-                    .build())
-                .status(lightningUserEntity.getParticipantStatus())
-                .build())
-            .collect(Collectors.toList());
+        List<UserLightningsGetResponseDTO> userLightningsGetResponseDTOList = lightningUserEntityList.stream()
+            .<UserLightningsGetResponseDTO>map(
+                lightningUserEntity -> {
+                    // 현재 참여자 수 조회
+                    List<LightningUserEntity> currentParticipants = lightningUserRepository.findByLightningAndParticipantStatusIn(
+                        lightningUserEntity.getLightning(),
+                        new ArrayList<>(Arrays.asList(ParticipantStatus.승인, ParticipantStatus.완료, ParticipantStatus.신청대기)));
+                    
+                    int participantCount = currentParticipants.size();
+                    
+                    return UserLightningsGetResponseDTO.builder()
+                        .lightning(UserLightningsGetResponseLightningDTO.builder()
+                            .lightningId(lightningUserEntity.getLightning().getLightningId())
+                            .title(lightningUserEntity.getLightning().getTitle())
+                            .eventDate(lightningUserEntity.getLightning().getEventDate())
+                            .creatorId(lightningUserEntity.getLightning().getCreatorId())
+                            .status(lightningUserEntity.getLightning().getStatus())
+                            .duration(lightningUserEntity.getLightning().getDuration())
+                            .address(lightningUserEntity.getLightning().getAddress())
+                            .capacity(lightningUserEntity.getLightning().getCapacity())
+                            .routeImgId(lightningUserEntity.getLightning().getRoute().getRouteImgId())
+                            .currentParticipants(participantCount)
+                            .build())
+                        .users(lightningUserRepository.findByLightningAndParticipantStatusIn(
+                            lightningUserEntity.getLightning(),
+                            new ArrayList<>(Arrays.asList(ParticipantStatus.승인, ParticipantStatus.완료, ParticipantStatus.신청대기)))
+                            .stream()
+                            .map(entity -> UserLightningsGetResponseUserDTO.builder()
+                                .userId(entity.getUser().getUserId())
+                                .userNickname(entity.getUser().getUserDetail().getUserNickname())
+                                .userProfileImg(entity.getUser().getUserDetail().getUserProfileImg())
+                                .build())
+                            .collect(Collectors.toSet()))
+                        .tags(UserLightningsGetResponseTagsDTO.builder()
+                            .tags(lightningUserEntity.getLightning().getTags().stream().map(
+                                tag -> tag.getName())
+                                .collect(Collectors.toSet()))
+                            .build())
+                        .status(lightningUserEntity.getParticipantStatus())
+                        .build();
+                })
+                .collect(Collectors.toList());
     
         return userLightningsGetResponseDTOList;
     }

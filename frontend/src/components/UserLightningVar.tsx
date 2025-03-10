@@ -5,7 +5,7 @@ function UserLightningVar() {
 
   return (
     <div>
-      <div className="flex gap-4 w-full">
+      <div className="flex gap-4 w-full justify-center mt-10">
         <Link to="/user/me/lightning-reservation">
           <div
             className={`badge badge-primary badge-lg ${

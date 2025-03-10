@@ -573,7 +573,7 @@ function LightningPostPage() {
                 <label className="label">
                   <span className="label-text font-medium">지역</span>
                 </label>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-3 flex-wrap">
                   {REGION_OPTIONS.map((option) => (
                     <button
                       type="button"
@@ -604,7 +604,7 @@ function LightningPostPage() {
                 <label className="label">
                   <span className="label-text font-medium">성별</span>
                 </label>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   {GENDER_OPTIONS.map((option) => (
                     <button
                       key={option}
@@ -635,7 +635,7 @@ function LightningPostPage() {
                 <label className="label">
                   <span className="label-text font-medium">레벨</span>
                 </label>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-3 flex-wrap">
                   {LEVEL_OPTIONS.map((option) => (
                     <button
                       key={option}
@@ -666,7 +666,7 @@ function LightningPostPage() {
                 <label className="label">
                   <span className="label-text font-medium">자전거 종류</span>
                 </label>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-3 flex-wrap">
                   {BIKE_TYPE_OPTIONS.map((option) => (
                     <button
                       key={option}
@@ -697,7 +697,7 @@ function LightningPostPage() {
                 <label className="label">
                   <span className="label-text font-medium">태그</span>
                 </label>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-3 flex-wrap">
                   {TAG_OPTIONS.map((option) => (
                     <button
                       key={option}
@@ -706,7 +706,7 @@ function LightningPostPage() {
                       className={`btn btn-sm ${
                         formData.tags.includes(option)
                           ? "btn-primary"
-                          : "btn-outline"
+                          : "btn-outline "
                       }`}
                     >
                       {option}

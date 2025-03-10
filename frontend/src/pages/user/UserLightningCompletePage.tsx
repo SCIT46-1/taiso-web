@@ -7,7 +7,6 @@ function UserLightningCompletePage() {
       <UserLightningVar />
 
       <div className="p-4">
-        <h2 className="text-2xl font-bold mb-4">완료된 라이트닝</h2>
         <UserCompletedLightningList />
       </div>
     </div>

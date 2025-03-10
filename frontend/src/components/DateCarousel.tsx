@@ -88,87 +88,89 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
   }, [selectedDate, dateList]);
 
   return (
-    <div className="flex items-center justify-center space-x-2 sm:space-x-4 mt-4 px-2 sm:px-0 w-[90%] mx-auto">
-      {/* 왼쪽 화살표 버튼 (과거 이동) */}
-      <button
-        className="btn btn-circle btn-sm sm:btn-md no-animation"
-        onClick={handlePrev}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 sm:h-5 sm:w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+    <div className="relative w-screen left-[50%] right-[50%] py-7 -mx-[50vw] bg-base-300">
+      <div className="flex items-center justify-center space-x-2 sm:space-x-4 mt-4 px-2 sm:px-0 max-w-screen-xl mx-auto ">
+        {/* 왼쪽 화살표 버튼 (과거 이동) */}
+        <button
+          className="btn btn-circle btn-sm sm:btn-md no-animation"
+          onClick={handlePrev}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 sm:h-5 sm:w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
 
-      {/* 날짜 목록 - 스크롤 가능한 컨테이너 */}
-      <div
-        ref={scrollContainerRef}
-        className="flex items-center overflow-x-auto hide-scrollbar"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        {dateList.map((d, index) => {
-          const dayIndex = d.getDay(); // 0: 일, 1: 월, ... 6: 토
-          const dayNumber = d.getDate();
-          const dayName = daysOfWeek[dayIndex];
+        {/* 날짜 목록 - 스크롤 가능한 컨테이너 */}
+        <div
+          ref={scrollContainerRef}
+          className="flex items-center overflow-x-auto hide-scrollbar"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {dateList.map((d, index) => {
+            const dayIndex = d.getDay(); // 0: 일, 1: 월, ... 6: 토
+            const dayNumber = d.getDate();
+            const dayName = daysOfWeek[dayIndex];
 
-          // 기본 원형 스타일
-          let circleClasses =
-            "w-16 sm:w-24 h-8 sm:h-10 flex items-center justify-center rounded-full transition-colors no-animation mx-1";
-          // 토/일이면 텍스트 빨간색, 아니면 검정색
-          const textClasses = isWeekend(d) ? "text-red-500" : "text-black";
+            // 기본 원형 스타일
+            let circleClasses =
+              "w-16 sm:w-24 h-8 sm:h-10 flex items-center justify-center rounded-full transition-colors no-animation mx-1";
+            // 토/일이면 텍스트 빨간색, 아니면 검정색
+            const textClasses = isWeekend(d) ? "text-red-500" : "text-black";
 
-          // 선택된 날짜면 파란색 배경, 흰색 글자, 굵은 글씨 적용
-          if (selectedDate.toDateString() === d.toDateString()) {
-            circleClasses += " bg-blue-400 text-white font-bold no-animation";
-          }
+            // 선택된 날짜면 파란색 배경, 흰색 글자, 굵은 글씨 적용
+            if (selectedDate.toDateString() === d.toDateString()) {
+              circleClasses += " bg-blue-400 text-white font-bold no-animation";
+            }
 
-          return (
-            <div
-              key={index}
-              className="flex flex-col items-center flex-shrink-0 cursor-pointer"
-              onClick={() => handleDateClick(d)}
-            >
-              <div className={`${circleClasses} ${textClasses}`}>
-                <span className="text-sm sm:text-base">{dayNumber}</span>
+            return (
+              <div
+                key={index}
+                className="flex flex-col items-center flex-shrink-0 cursor-pointer"
+                onClick={() => handleDateClick(d)}
+              >
+                <div className={`${circleClasses} ${textClasses}`}>
+                  <span className="text-sm sm:text-base">{dayNumber}</span>
+                </div>
+                <div className={`${textClasses} text-xs sm:text-sm`}>
+                  {dayName}
+                </div>
               </div>
-              <div className={`${textClasses} text-xs sm:text-sm`}>
-                {dayName}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+
+        {/* 오른쪽 화살표 버튼 (미래 이동) */}
+        <button
+          className="btn btn-circle btn-sm sm:btn-md no-animation"
+          onClick={handleNext}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 sm:h-5 sm:w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
       </div>
-
-      {/* 오른쪽 화살표 버튼 (미래 이동) */}
-      <button
-        className="btn btn-circle btn-sm sm:btn-md no-animation"
-        onClick={handleNext}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 sm:h-5 sm:w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </button>
     </div>
   );
 }

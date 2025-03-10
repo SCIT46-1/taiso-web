@@ -1,5 +1,5 @@
 import { useParams, useSearchParams } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import clubService, {
   ClubDetailResponse,
   ClubBoardListResponse,
@@ -11,9 +11,10 @@ import { useAuthStore } from "../../stores/useAuthStore";
 
 function ClubDetailPage() {
   const { clubId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _setSearchParams] = useSearchParams();
   const { user } = useAuthStore();
-  console.log(setSearchParams);
+  const modalRef = useRef<HTMLDialogElement>(null);
+  const deleteModalRef = useRef<HTMLDialogElement>(null);
 
   // Club detail states
   const [clubDetail, setClubDetail] = useState<ClubDetailResponse | null>(null);
@@ -32,12 +33,12 @@ function ClubDetailPage() {
 
   // Form states for creating/editing posts
   const [isEditing, setIsEditing] = useState(false);
-  const [showPostForm, setShowPostForm] = useState(false);
   const [postForm, setPostForm] = useState<ClubBoardPostRequest>({
     postTitle: "",
     postContent: "",
     isNotice: false,
   });
+  const [postIdToDelete, setPostIdToDelete] = useState<number | null>(null);
 
   // Membership states
   const [pendingMembers, setPendingMembers] = useState<
@@ -144,8 +145,8 @@ function ClubDetailPage() {
     setIsBoardLoading(true);
     try {
       await clubService.createClubBoard(Number(clubId), postForm);
-      setShowPostForm(false);
       setPostForm({ postTitle: "", postContent: "", isNotice: false });
+      modalRef.current?.close();
       fetchBoardList();
     } catch (error) {
       console.error("게시글 작성에 실패했습니다.", error);
@@ -165,6 +166,7 @@ function ClubDetailPage() {
         postForm
       );
       setIsEditing(false);
+      modalRef.current?.close();
       fetchPostDetail(selectedPost.postId);
     } catch (error) {
       console.error("게시글 수정에 실패했습니다.", error);
@@ -173,20 +175,20 @@ function ClubDetailPage() {
     }
   };
 
-  const handleDeletePost = async (postId: number) => {
-    if (!clubId) return;
-
-    if (!window.confirm("정말 게시글을 삭제하시겠습니까?")) return;
+  const handleDeletePost = async () => {
+    if (!clubId || !postIdToDelete) return;
 
     setIsBoardLoading(true);
     try {
-      await clubService.deleteClubBoard(Number(clubId), postId);
+      await clubService.deleteClubBoard(Number(clubId), postIdToDelete);
       setSelectedPost(null);
+      deleteModalRef.current?.close();
       fetchBoardList();
     } catch (error) {
       console.error("게시글 삭제에 실패했습니다.", error);
     } finally {
       setIsBoardLoading(false);
+      setPostIdToDelete(null);
     }
   };
 
@@ -199,11 +201,18 @@ function ClubDetailPage() {
       isNotice: selectedPost.isNotice,
     });
     setIsEditing(true);
+    modalRef.current?.showModal();
   };
 
   const handleNewPostClick = () => {
     setPostForm({ postTitle: "", postContent: "", isNotice: false });
-    setShowPostForm(true);
+    setIsEditing(false);
+    modalRef.current?.showModal();
+  };
+
+  const handleDeleteClick = (postId: number) => {
+    setPostIdToDelete(postId);
+    deleteModalRef.current?.showModal();
   };
 
   // Function to fetch pending membership requests
@@ -319,6 +328,7 @@ function ClubDetailPage() {
     }
   };
 
+  // 로딩 상태
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -327,6 +337,7 @@ function ClubDetailPage() {
     );
   }
 
+  // 클럽이 없을 경우
   if (!clubDetail) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
@@ -350,28 +361,7 @@ function ClubDetailPage() {
   // 멤버 비율 계산
   const memberPercentage = (clubDetail.currentScale / clubDetail.maxUser) * 100;
 
-  // Tab UI
-  const renderTabs = () => (
-    <div className="tabs tabs-boxed mb-4">
-      <a
-        className={`tab ${activeTab === "info" ? "tab-active" : ""}`}
-        onClick={() => setActiveTab("info")}
-      >
-        클럽 정보
-      </a>
-      <a
-        className={`tab ${activeTab === "board" ? "tab-active" : ""}`}
-        onClick={() => {
-          setActiveTab("board");
-          if (!boardList) fetchBoardList();
-        }}
-      >
-        게시판
-      </a>
-    </div>
-  );
-
-  // Board list UI
+  // 게시글 목록 렌더링
   const renderBoardList = () => {
     if (isBoardLoading && !boardList) {
       return (
@@ -384,16 +374,19 @@ function ClubDetailPage() {
     if (!boardList) return null;
 
     return (
-      <div className="card bg-base-100 shadow-xl">
+      <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
         <div className="card-body">
           <div className="flex justify-between items-center mb-4">
             <h2 className="card-title">게시판</h2>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={handleNewPostClick}
-            >
-              글쓰기
-            </button>
+            {membershipStatus === "member" ||
+            clubDetail.clubLeader.leaderId === user?.userId ? (
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={handleNewPostClick}
+              >
+                글쓰기
+              </button>
+            ) : null}
           </div>
 
           {boardList.content.length === 0 ? (
@@ -460,16 +453,12 @@ function ClubDetailPage() {
     );
   };
 
-  // Post detail UI
+  // 게시글 상세 렌더링
   const renderPostDetail = () => {
     if (!selectedPost) return null;
 
-    if (isEditing) {
-      return renderPostForm(handleUpdatePost, "수정하기", true);
-    }
-
     return (
-      <div className="card bg-base-100 shadow-xl">
+      <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
         <div className="card-body">
           <div className="flex justify-between items-center mb-2">
             <div>
@@ -505,7 +494,7 @@ function ClubDetailPage() {
                 {selectedPost.canDelete && (
                   <button
                     className="btn btn-error btn-sm"
-                    onClick={() => handleDeletePost(selectedPost.postId)}
+                    onClick={() => handleDeleteClick(selectedPost.postId)}
                   >
                     삭제
                   </button>
@@ -521,30 +510,18 @@ function ClubDetailPage() {
             {selectedPost.postTitle}
           </h2>
 
-          <div className="flex items-center mb-4">
-            <div className="avatar mr-2">
-              <div className="w-8 h-8 rounded-full">
-                {selectedPost.writerProfileImg ? (
-                  <ImageWithSkeleton
-                    src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${selectedPost.writerProfileImg}`}
-                    alt={selectedPost.writerNickname}
-                  />
-                ) : (
-                  <div className="bg-base-300 w-full h-full flex items-center justify-center text-sm font-bold">
-                    {selectedPost.writerNickname.substring(0, 1)}
-                  </div>
-                )}
+          <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+            <div>작성자: {selectedPost.writerNickname}</div>
+            <div className="flex gap-4">
+              <div>
+                작성일: {new Date(selectedPost.createdAt).toLocaleString()}
               </div>
             </div>
-            <span className="font-medium">{selectedPost.writerNickname}</span>
-            <span className="text-base-content/60 text-sm ml-4">
-              {new Date(selectedPost.createdAt).toLocaleString()}
-            </span>
           </div>
 
-          <div className="divider my-1"></div>
+          <div className="divider my-0"></div>
 
-          <div className="py-4 min-h-32 whitespace-pre-line">
+          <div className="py-4 whitespace-pre-line min-h-[200px]">
             {selectedPost.postContent}
           </div>
         </div>
@@ -552,102 +529,7 @@ function ClubDetailPage() {
     );
   };
 
-  // Post form UI (for creating and editing)
-  const renderPostForm = (
-    submitHandler: () => void,
-    submitText: string,
-    isEdit = false
-  ) => {
-    return (
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="card-title">
-              {isEdit ? "게시글 수정" : "새 게시글 작성"}
-            </h2>
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => {
-                if (isEdit) {
-                  setIsEditing(false);
-                } else {
-                  setShowPostForm(false);
-                }
-              }}
-            >
-              취소
-            </button>
-          </div>
-
-          <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text">제목</span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              value={postForm.postTitle}
-              onChange={(e) =>
-                setPostForm({ ...postForm, postTitle: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text">내용</span>
-            </label>
-            <textarea
-              className="textarea textarea-bordered h-40"
-              value={postForm.postContent}
-              onChange={(e) =>
-                setPostForm({ ...postForm, postContent: e.target.value })
-              }
-            ></textarea>
-          </div>
-
-          <div className="form-control mb-4">
-            <label className="label cursor-pointer justify-start gap-2">
-              <input
-                type="checkbox"
-                className="checkbox checkbox-primary"
-                checked={postForm.isNotice}
-                onChange={(e) =>
-                  setPostForm({ ...postForm, isNotice: e.target.checked })
-                }
-              />
-              <span className="label-text">공지글로 등록</span>
-            </label>
-          </div>
-
-          <div className="card-actions justify-end">
-            <button
-              className="btn btn-primary"
-              onClick={submitHandler}
-              disabled={!postForm.postTitle || !postForm.postContent}
-            >
-              {submitText}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Determine what to render in the board tab
-  const renderBoardContent = () => {
-    if (showPostForm) {
-      return renderPostForm(handleCreatePost, "등록하기");
-    }
-
-    if (selectedPost) {
-      return renderPostDetail();
-    }
-
-    return renderBoardList();
-  };
-
-  // Render membership action buttons based on user status
+  // 멤버십 액션 렌더링
   const renderMembershipActions = () => {
     if (!user) {
       return (
@@ -721,12 +603,12 @@ function ClubDetailPage() {
     }
   };
 
-  // Render pending membership requests panel
+  // 가입 신청 목록 렌더링
   const renderPendingMembers = () => {
     if (!showPendingMembers) return null;
 
     return (
-      <div className="card bg-base-100 shadow-xl mb-8">
+      <div className="card bg-base-100 shadow-md mb-8 rounded-xl border border-base-300">
         <div className="card-body">
           <div className="flex justify-between items-center mb-4">
             <h2 className="card-title">가입 신청 현황</h2>
@@ -806,98 +688,174 @@ function ClubDetailPage() {
     );
   };
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* 탭 네비게이션 */}
-      {renderTabs()}
+  // 게시판 컨텐츠 렌더링
+  const renderBoardContent = () => {
+    if (!selectedPost) {
+      return renderBoardList();
+    }
+    return renderPostDetail();
+  };
 
-      {activeTab === "info" ? (
-        <>
-          {/* 클럽 헤더 */}
-          <div className="card bg-base-100 shadow-xl mb-8">
+  return (
+    <div className="w-screen mx-auto mb-10 max-w-screen-lg no-animation">
+      {/* 클럽 헤더 - 전체 너비를 차지하는 컴포넌트 */}
+      <div className="card bg-base-100 shadow-md rounded-xl border border-base-300 mb-4">
+        <div className="card-body">
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* 클럽 이미지 */}
+            <div className="w-full md:w-64 flex-shrink-0">
+              {clubDetail.clubProfileImageId ? (
+                <ImageWithSkeleton
+                  src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${clubDetail.clubProfileImageId}`}
+                  alt={clubDetail.clubName}
+                  className="rounded-lg"
+                />
+              ) : (
+                <div className="bg-base-300 rounded-lg w-full h-64 flex items-center justify-center">
+                  <span className="text-3xl font-bold opacity-30">
+                    {clubDetail.clubName.substring(0, 2).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* 클럽 기본 정보 */}
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold mb-2">{clubDetail.clubName}</h1>
+
+              <div className="flex items-center mb-2">
+                <div className="badge badge-primary mr-2">리더</div>
+                <span>{clubDetail.clubLeader.leaderName}</span>
+              </div>
+
+              <div className="mb-4">
+                <p className="text-sm text-base-content/70">
+                  생성일: {formattedDate}
+                </p>
+              </div>
+
+              <div className="tags flex flex-wrap gap-1 mb-4">
+                {clubDetail.tags.map((tag, index) => (
+                  <div
+                    key={index}
+                    className="badge badge-primary badge-outline"
+                  >
+                    {tag}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mb-4 w-full">
+                <p
+                  className="whitespace-pre-line break-all"
+                  style={{
+                    wordBreak: "break-all",
+                    overflowWrap: "break-word",
+                    maxWidth: "100%",
+                  }}
+                >
+                  {clubDetail.clubDescription}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 나머지 컨텐츠를 그리드로 배치 */}
+      <div className="grid grid-cols-[2fr,1fr] gap-4">
+        {/* 좌측 컨텐츠 영역 */}
+        <div className="flex flex-col gap-4">
+          {/* 탭 네비게이션 */}
+          <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
             <div className="card-body">
-              <div className="flex flex-col md:flex-row gap-6">
-                {/* 클럽 이미지 */}
-                <div className="w-full md:w-64 flex-shrink-0">
-                  {clubDetail.clubProfileImageId ? (
-                    <ImageWithSkeleton
-                      src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${clubDetail.clubProfileImageId}`}
-                      alt={clubDetail.clubName}
-                    />
-                  ) : (
-                    <div className="bg-base-300 rounded-lg w-full h-64 flex items-center justify-center">
-                      <span className="text-3xl font-bold opacity-30">
-                        {clubDetail.clubName.substring(0, 2).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+              <div className="tabs tabs-boxed w-fit mb-2">
+                <a
+                  className={`tab ${activeTab === "info" ? "tab-active" : ""}`}
+                  onClick={() => setActiveTab("info")}
+                >
+                  클럽 정보
+                </a>
+                <a
+                  className={`tab ${activeTab === "board" ? "tab-active" : ""}`}
+                  onClick={() => {
+                    setActiveTab("board");
+                    if (!boardList) fetchBoardList();
+                  }}
+                >
+                  게시판
+                </a>
+              </div>
+
+              <p className="text-sm text-gray-500">
+                {activeTab === "info"
+                  ? "클럽의 상세 정보와 멤버 목록을 확인하세요."
+                  : "클럽 게시판에서 멤버들과 소통하세요."}
+              </p>
+            </div>
+          </div>
+
+          {/* 컨텐츠 영역 - 활성 탭에 따라 다른 내용 표시 */}
+          {activeTab === "board" ? (
+            renderBoardContent()
+          ) : (
+            <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
+              <div className="card-body">
+                <h2 className="card-title mb-4">클럽 상세 소개</h2>
+                <div className="w-full">
+                  <p
+                    className="whitespace-pre-line break-all"
+                    style={{
+                      wordBreak: "break-all",
+                      overflowWrap: "break-word",
+                      maxWidth: "100%",
+                    }}
+                  >
+                    {clubDetail.clubDescription || "상세 설명이 없습니다."}
+                  </p>
                 </div>
 
-                {/* 클럽 기본 정보 */}
-                <div className="flex-1">
-                  <h1 className="text-3xl font-bold mb-2">
-                    {clubDetail.clubName}
-                  </h1>
-
-                  <div className="flex items-center mb-2">
-                    <div className="badge badge-primary mr-2">리더</div>
-                    <span>{clubDetail.clubLeader.leaderName}</span>
-                  </div>
-
-                  <div className="mb-4">
-                    <p className="text-sm text-base-content/70">
-                      생성일: {formattedDate}
-                    </p>
-                  </div>
-
-                  <div className="tags flex flex-wrap gap-2 mb-4">
-                    {clubDetail.tags.map((tag, index) => (
-                      <div key={index} className="badge badge-outline">
-                        {tag}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mb-4">
-                    <p className="whitespace-pre-line">
-                      {clubDetail.clubDescription}
-                    </p>
-                  </div>
-
-                  {/* Add membership action buttons */}
-                  <div className="mt-4">{renderMembershipActions()}</div>
+                <h3 className="font-bold text-lg mt-6 mb-2">클럽 태그</h3>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {clubDetail.tags.map((tag, index) => (
+                    <div key={index} className="badge badge-lg">
+                      #{tag}
+                    </div>
+                  ))}
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* 우측 사이드바 영역 */}
+        <div className="flex flex-col items-start justify-start gap-4 self-start">
+          {/* 멤버십 액션 부분 */}
+          <div className="card bg-base-100 shadow-md rounded-xl border border-base-300 w-full">
+            <div className="card-body">
+              <h2 className="card-title mb-4">클럽 참여</h2>
+              <div className="my-2">{renderMembershipActions()}</div>
             </div>
           </div>
 
           {/* Pending Membership Requests (only visible to club leader) */}
           {renderPendingMembers()}
 
-          {/* 멤버십 정보 */}
-          <div className="card bg-base-100 shadow-xl mb-8">
+          {/* 멤버 목록 (멤버십 현황 포함) */}
+          <div className="card bg-base-100 shadow-md rounded-xl border border-base-300 w-full">
             <div className="card-body">
-              <h2 className="card-title mb-4">멤버십 현황</h2>
+              <h2 className="card-title mb-2">멤버십 현황 및 멤버 목록</h2>
 
-              <div className="flex items-center gap-4 mb-2">
-                <div className="stats shadow flex-1">
-                  <div className="stat">
-                    <div className="stat-title">현재 인원</div>
-                    <div className="stat-value">{clubDetail.currentScale}</div>
+              {/* 멤버십 현황 정보 추가 */}
+              <div className="mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="font-medium">인원 현황</div>
+                  <div className="text-sm font-medium">
+                    {clubDetail.currentScale} / {clubDetail.maxUser} 명
+                    <span className="ml-2">
+                      ({memberPercentage.toFixed(0)}%)
+                    </span>
                   </div>
-                  <div className="stat">
-                    <div className="stat-title">최대 인원</div>
-                    <div className="stat-value">{clubDetail.maxUser}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-full">
-                <div className="flex justify-between mb-1">
-                  <span className="text-base font-medium">인원 현황</span>
-                  <span className="text-sm font-medium">
-                    {memberPercentage.toFixed(0)}%
-                  </span>
                 </div>
                 <progress
                   className="progress progress-primary w-full"
@@ -905,58 +863,143 @@ function ClubDetailPage() {
                   max="100"
                 ></progress>
               </div>
-            </div>
-          </div>
 
-          {/* 멤버 목록 */}
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <h2 className="card-title mb-4">멤버 목록</h2>
+              <div className="divider my-2"></div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {clubDetail.users.map((user) => (
-                  <div
-                    key={user.userId}
-                    className="card card-side bg-base-200 shadow-sm"
-                  >
-                    <figure className="pl-4">
+              {/* 멤버 목록 */}
+              {clubDetail.users.map((user) => (
+                <div key={user.userId} className="flex items-center gap-2 p-2">
+                  <div className="avatar">
+                    <div className="w-10 h-10 rounded-full">
                       {user.userProfileImage ? (
-                        <div className="avatar">
-                          <div className="w-16 h-16 rounded-full">
-                            <ImageWithSkeleton
-                              src={`/api/images/${user.userProfileImage}`}
-                              alt={user.userNickname}
-                            />
-                          </div>
-                        </div>
+                        <ImageWithSkeleton
+                          src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${user.userProfileImage}`}
+                          alt={user.userNickname}
+                        />
                       ) : (
-                        <div className="avatar placeholder">
-                          <div className="bg-neutral-focus text-neutral-content rounded-full w-16 h-16">
-                            <span className="text-xl">
-                              {user.userNickname.substring(0, 2).toUpperCase()}
-                            </span>
-                          </div>
+                        <div className="bg-base-300 w-full h-full flex items-center justify-center font-bold">
+                          {user.userNickname.substring(0, 1)}
                         </div>
                       )}
-                    </figure>
-                    <div className="card-body py-4">
-                      <h3 className="card-title text-base">
-                        {user.userNickname}
-                      </h3>
-                      <p className="text-sm truncate">
-                        {user.bio || "소개글이 없습니다."}
-                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
+                  <div className="flex flex-col">
+                    <div className="font-medium">{user.userNickname}</div>
+                    {user.userId === clubDetail.clubLeader.leaderId && (
+                      <div className="text-xs text-primary">클럽 리더</div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </>
-      ) : (
-        // Show board content when board tab is active
-        renderBoardContent()
-      )}
+        </div>
+      </div>
+
+      {/* 게시글 작성/수정 모달 */}
+      <dialog ref={modalRef} className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg mb-4">
+            {isEditing ? "게시글 수정" : "새 게시글 작성"}
+          </h3>
+          <div className="form-control mb-4">
+            <label className="label">
+              <span className="label-text">제목</span>
+            </label>
+            <input
+              type="text"
+              className="input input-bordered w-full"
+              value={postForm.postTitle}
+              onChange={(e) =>
+                setPostForm({ ...postForm, postTitle: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="form-control mb-4">
+            <label className="label">
+              <span className="label-text">내용</span>
+            </label>
+            <textarea
+              className="textarea textarea-bordered h-40"
+              value={postForm.postContent}
+              onChange={(e) =>
+                setPostForm({ ...postForm, postContent: e.target.value })
+              }
+            ></textarea>
+          </div>
+
+          <div className="form-control mb-4">
+            <label className="label cursor-pointer justify-start gap-2">
+              <input
+                type="checkbox"
+                className="checkbox checkbox-primary"
+                checked={postForm.isNotice}
+                onChange={(e) =>
+                  setPostForm({ ...postForm, isNotice: e.target.checked })
+                }
+              />
+              <span className="label-text">공지글로 등록</span>
+            </label>
+          </div>
+
+          <div className="modal-action">
+            <button
+              className="btn btn-primary"
+              onClick={isEditing ? handleUpdatePost : handleCreatePost}
+              disabled={
+                !postForm.postTitle || !postForm.postContent || isBoardLoading
+              }
+            >
+              {isBoardLoading ? (
+                <span className="loading loading-spinner loading-sm"></span>
+              ) : isEditing ? (
+                "수정하기"
+              ) : (
+                "등록하기"
+              )}
+            </button>
+            <button className="btn" onClick={() => modalRef.current?.close()}>
+              취소
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>닫기</button>
+        </form>
+      </dialog>
+
+      {/* 게시글 삭제 확인 모달 */}
+      <dialog ref={deleteModalRef} className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">게시글 삭제</h3>
+          <p className="py-4">
+            정말로 이 게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+          </p>
+          <div className="modal-action">
+            <button
+              className="btn btn-error"
+              onClick={handleDeletePost}
+              disabled={isBoardLoading}
+            >
+              {isBoardLoading ? (
+                <span className="loading loading-spinner loading-sm"></span>
+              ) : (
+                "삭제하기"
+              )}
+            </button>
+            <button
+              className="btn"
+              onClick={() => deleteModalRef.current?.close()}
+            >
+              취소
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>닫기</button>
+        </form>
+      </dialog>
     </div>
   );
 }

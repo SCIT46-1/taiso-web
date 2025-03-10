@@ -1,10 +1,9 @@
 package com.taiso.bike_api.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,6 +17,8 @@ import com.taiso.bike_api.dto.UserDetailPatchRequestDTO;
 import com.taiso.bike_api.dto.UserDetailPostRequestDTO;
 import com.taiso.bike_api.service.UserDetailService2;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -48,10 +49,17 @@ public class UserDetailController {
 
     @Operation(summary = "내 회원 디테일 수정", description = "내 회원 디테일 수정 API")
     @PatchMapping("/me/detail")
-    public ResponseEntity<Void> patchUserDetail(@AuthenticationPrincipal String userEmail, @RequestBody UserDetailPatchRequestDTO requestDTO) {
+    public ResponseEntity<Void> patchUserDetail(@AuthenticationPrincipal String userEmail,
+            @RequestBody UserDetailPatchRequestDTO requestDTO) {
         log.info("{}", requestDTO);
         userDetailService2.patchUserDetail(userEmail, requestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @Operation(summary = "내 회원 디테일 프로필 이미지 조회", description = "내 회원 디테일 프로필 이미지 조회 API")
+    @GetMapping("/me/details/profileImg")
+    public ResponseEntity<String> getUserDetailProfileImg(Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK).body(userDetailService2.getProfileImg(authentication.getName()));
     }
     
 }
