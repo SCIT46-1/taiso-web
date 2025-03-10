@@ -101,8 +101,8 @@ export interface UserPageDetailResponse {
   userId: number;
   userNickname: string;
   bio: string;
-  userProfileImg: string;
-  userBackgroundImg: string;
+  profileImg: string;
+  backgroundImg: string;
   level: string;
   gender: string;
   tags: string[];
