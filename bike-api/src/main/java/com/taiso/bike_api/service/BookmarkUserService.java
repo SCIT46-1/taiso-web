@@ -94,6 +94,7 @@ public class BookmarkUserService {
                             .orElseThrow(() -> new UserNotFoundException("북마크된 사용자의 상세 정보를 찾을 수 없습니다."));
                         
                 return  BookmarkUserListResponseDTO.builder()
+    		        .bookmarkId(bookmark.getBookmarkId())
     				.userId(currentUser.getUserId())
     				.bookmarkedUserId(bookmark.getTargetId())
     				.totalBookmark(totalBookmarkCount)

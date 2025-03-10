@@ -45,7 +45,7 @@ public class BookmarkUserController {
 	}
 	
 	// 북마크 회원 조회
-	@GetMapping("/{userId}")
+	@GetMapping("")
   	@Operation(summary = "북마크 회원 조회", description = "북마크 회원 조회 API")
 	public ResponseEntity<List<BookmarkUserListResponseDTO>> BookmarkUserList(
 			Authentication authentication
