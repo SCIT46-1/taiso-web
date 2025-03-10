@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.taiso.bike_api.domain.BookmarkEntity;
+import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
 import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.RouteLikeEntity;
 import com.taiso.bike_api.domain.RoutePointEntity;
@@ -102,6 +103,15 @@ public class RouteService {
             liked = routeLikeRepository.existsByUser_UserIdAndRoute_RouteId(userEntity.getUserId(), routeId);
         }
 
+        UserEntity user = userRepository.findByEmail(userEmail).orElse(null);
+        
+        // 루트 북마크 여부 확인
+        boolean isBookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(
+                user.getUserId(), 
+                routeEntity.getRouteId(),
+                BookmarkType.ROUTE
+            );
+        
         // 루트 디테일 정보 반환
         return RouteDetailResponseDTO.builder()
                 .routeId(routeEntity.getRouteId())
@@ -122,6 +132,7 @@ public class RouteService {
                 .fileType(routeEntity.getFileType() != null ? routeEntity.getFileType().name() : null)
                 .routePoint(pointResponses)
                 .isLiked(liked)
+                .isBookmarked(isBookmarked)
                 .build();
     }
 
