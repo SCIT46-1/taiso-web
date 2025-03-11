@@ -75,7 +75,6 @@ public class BookmarkClubService {
                             .maxScale(club.getMaxUser())
                             .currentScale(club.getUsers().stream().filter(member -> member.getParticipantStatus() == ParticipantStatus.완료 || member.getParticipantStatus() == ParticipantStatus.승인).collect(Collectors.toList()).size())
                             .tags(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
-                            .isBookmarked(true)
                             .build();
 
                     return dto;

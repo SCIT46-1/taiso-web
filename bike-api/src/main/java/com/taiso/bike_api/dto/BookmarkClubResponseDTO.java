@@ -26,7 +26,6 @@ public class BookmarkClubResponseDTO {
     private Integer maxScale;
     private Integer currentScale;
     private Set<String> tags;
-    private boolean isBookmarked;
 
     // public static BookmarkClubResponseDTO toDTO(ClubEntity club) {
     //     return BookmarkClubResponseDTO.builder()
