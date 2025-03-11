@@ -32,4 +32,7 @@ public class RouteResponseDTO {
     private String createdAt;         // ISO8601 또는 다른 DateTime 형식을 사용, required
 //    private String fileType;
 
+    @Builder.Default
+    private Boolean isBookmarked = false;
+
 }
