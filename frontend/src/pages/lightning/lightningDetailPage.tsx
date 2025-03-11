@@ -16,6 +16,7 @@ import UserImage from "../../components/UserImage";
 import LightningSummaryInfo from "../../components/LightningSummaryInfo";
 import bookmarkService from "../../services/bookmarkService";
 import GlobalModal from "../../components/GlobalModal";
+import DateFormat from "../../components/DateFormat";
 
 interface WeatherDisplayProps {
   weatherInfo: WeatherInfo | null;
@@ -116,6 +117,7 @@ function LightningDetailPage() {
   // (2) LightningDetailPage 컴포넌트 내부에 완료 조회 데이터를 위한 state 추가
   const [completedLightning, setCompletedLightning] =
     useState<CompletedLightningResponse | null>(null);
+  
 
   // 날씨 데이터 캐시: key를 이벤트 날짜, 위치, 지속시간 조합으로 생성
   const weatherCache = useRef<{
@@ -466,8 +468,33 @@ function LightningDetailPage() {
           </>
         )}
       </div>
+
       {/* 하단 좌측 영역을 두 개의 컨테이너로 분할 */}
       <div className="flex flex-col gap-4">
+
+        {/* 새로운 아코디언 컴포넌트 추가 */}
+        <div className="rounded-xl shadow-md border border-base-300">
+          <div className="collapse collapse-arrow">
+            <input type="checkbox" defaultChecked />
+            <div className="collapse-title text-xl font-medium flex items-center">
+              <span className="ml-1 text-lg font-semibold">
+                간략 번개
+              </span>
+            </div>
+            <div className="collapse-content">
+              <div className="flex flex-col p-2">
+                {/* 여기에 코스 정보 내용을 추가하세요 */}
+                <LightningSummaryInfo
+                  gender={lightningDetail?.gender || ""}
+                  level={lightningDetail?.level || ""}
+                  recruitType={lightningDetail?.recruitType || ""}
+                  bikeType={lightningDetail?.bikeType || ""}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* 좌측 상단 컨테이너: 날씨 정보 영역 - 아코디언 적용 */}
         <div className="rounded-xl shadow-md border border-base-300">
           {lightningDetail?.status !== "종료" &&
@@ -494,29 +521,6 @@ function LightningDetailPage() {
                 </div>
               </div>
             )}
-        </div>
-
-        {/* 새로운 아코디언 컴포넌트 추가 */}
-        <div className="rounded-xl shadow-md border border-base-300">
-          <div className="collapse collapse-arrow">
-            <input type="checkbox" defaultChecked />
-            <div className="collapse-title text-xl font-medium flex items-center">
-              <span className="ml-1 text-lg font-semibold">
-                간략한 번개 정보
-              </span>
-            </div>
-            <div className="collapse-content">
-              <div className="flex flex-col p-2">
-                {/* 여기에 코스 정보 내용을 추가하세요 */}
-                <LightningSummaryInfo
-                  gender={lightningDetail?.gender || ""}
-                  level={lightningDetail?.level || ""}
-                  recruitType={lightningDetail?.recruitType || ""}
-                  bikeType={lightningDetail?.bikeType || ""}
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* 좌측 하단 컨테이너: 상세 정보 영역 */}
@@ -547,326 +551,343 @@ function LightningDetailPage() {
               <span>{lightningDetail?.creator.creatorNickname}</span>
             </div>
             <p className="mt-4">{lightningDetail?.description}</p>
+            <div className="divider"></div>
             <div className="mt-2 font-bold">주의사항</div>
             <p>주의사항 내용을 여기에 작성합니다.</p>
           </div>
         </div>
       </div>
       {/* 하단 우측 참여자 및 지도 영역 - self-start 클래스 추가 */}
-      <div className="flex flex-col items-center justify-center p-4 rounded-xl shadow-xl border border-base-300 self-start relative">
-        <div className="mb-4 mt-2">
-          {/* Add bookmark button */}
-          {user && (
-            <button
-              onClick={handleBookmarkToggle}
-              disabled={bookmarkLoading}
-              className="absolute top-6 right-6 z-10 "
-            >
-              {bookmarkLoading ? (
-                <span className=""></span>
-              ) : isBookmarked ? (
-                <svg
-                  data-slot="icon"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                  className="size-6 "
-                >
-                  <path
-                    clipRule="evenodd"
-                    fillRule="evenodd"
-                    d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 0 0 1.075.676L10 15.082l5.925 2.844A.75.75 0 0 0 17 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0 0 10 2Z"
-                  ></path>
-                </svg>
-              ) : (
-                <svg
-                  data-slot="icon"
-                  fill="none"
-                  strokeWidth="1.75"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                  className="size-6 text-gray-600"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
-                  ></path>
-                </svg>
-              )}
-            </button>
-          )}
-          <div className="font-semibold">
-            {lightningDetail?.eventDate
-              ? new Date(lightningDetail.eventDate).toLocaleString("ko-KR", {
-                  month: "long",
-                  day: "numeric",
-                  weekday: "long",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : ""}{" "}
-          </div>
-          <div className="text-sm text-gray-500 mb-4">
-            {lightningDetail?.duration
-              ? lightningDetail.duration >= 60
-                ? `${Math.floor(lightningDetail.duration / 60)}시간${
-                    lightningDetail.duration % 60 > 0
-                      ? ` ${lightningDetail.duration % 60}분`
-                      : ""
-                  }`
-                : `${lightningDetail.duration}분`
-              : ""}{" "}
-            동안 진행됩니다.
-          </div>
-          <KakaolocationMap
-            lat={lightningDetail?.latitude}
-            lng={lightningDetail?.longitude}
-          />
-          <div className="font-semibold text-sm mt-1">
-            {lightningDetail?.address}
-          </div>
-        </div>
-        {!user && (
-          <div
-            className="btn  w-full no-animation btn-primary"
-            onClick={() =>
-              navigate("/auth/landing", {
-                state: { from: `/lightning/${lightningId}` },
-              })
-            }
-          >
-            로그인 하고 번개 참여하기!
-          </div>
-        )}
-        {user &&
-          !isCreator &&
-          !currentMemberStatus &&
-          lightningDetail?.recruitType === "참가형" &&
-          lightningDetail?.status === "모집" && (
-            <button
-              className="btn w-full no-animation btn-primary"
-              onClick={() => showModal("join-modal")}
-            >
-              참여하기
-            </button>
-          )}
-        {lightningDetail?.recruitType === "수락형" &&
-          user &&
-          !isCreator &&
-          !currentMemberStatus &&
-          lightningDetail?.status === "모집" && (
-            <button
-              className="btn w-full"
-              onClick={() => showModal("accept-modal")}
-            >
-              신청하기
-            </button>
-          )}
-        {user &&
-          !isCreator &&
-          currentMemberStatus?.participantStatus === "완료" &&
-          lightningDetail?.status === "모집" && (
-            <button
-              className="btn w-full no-animation"
-              onClick={() => showModal("leave-modal")}
-            >
-              번개 나가기
-            </button>
-          )}
-        {user &&
-          !isCreator &&
-          (lightningDetail?.status === "마감" ||
-            lightningDetail?.status === "강제마감") &&
-          currentMemberStatus == null && (
-            <button className="btn  w-full no-animation btn-disabled">
-              이미 마감되었습니다!
-            </button>
-          )}
-        {user &&
-          !isCreator &&
-          currentMemberStatus?.participantStatus === "탈퇴" && (
-            <button className="btn  w-full no-animation btn-disabled">
-              탈퇴한 번개에 참여할 수 없습니다!
-            </button>
-          )}
-        {user &&
-          !isCreator &&
-          currentMemberStatus?.participantStatus === "신청대기" && (
-            <button className="btn  w-full no-animation btn-disabled">
-              신청 대기 중입니다!
-            </button>
-          )}
-        <div className="divider"></div>
-        <div className=" mr-auto ml-3 font-bold">
-          참가 인원 마감까지{" "}
-          {lightningDetail?.capacity &&
-            lightningDetail.currentMemberCount &&
-            lightningDetail.capacity - lightningDetail.currentMemberCount}
-          명 남았습니다!
-        </div>
-        <div className="mr-auto ml-3 mt-1 text-sm text-gray-500 mb-2">
-          참가인원 {lightningDetail?.currentMemberCount} /{" "}
-          {lightningDetail?.capacity}{" "}
-        </div>
-        <progress
-          className="progress progress-primary w-[95%] mt-1 mb-4"
-          value={lightningDetail?.currentMemberCount}
-          max={lightningDetail?.capacity}
-        ></progress>
-
-        <div className="w-full">
-          {lightningDetail?.member
-            .filter(
-              (member) =>
-                member.participantStatus === "완료" ||
-                member.participantStatus === "승인"
-            )
-            .map((member, index) => (
-              <div
-                key={index}
-                className="flex flex-row items-center gap-2 p-2 "
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col items-center justify-center p-4 rounded-xl shadow-xl border border-base-300 p-1 self-start relative">
+          <div className="mb-4 mt-1">
+            {/* Add bookmark button */}
+            {user && (
+              <button
+                onClick={handleBookmarkToggle}
+                disabled={bookmarkLoading}
+                className="absolute top-6 right-6 z-10 "
               >
-                <UserImage profileImage={member.memberProfileImg as string} />
-                <div className="font-medium ">{member.memberNickname}</div>
-                {member.role === "번개생성자" && (
+                {bookmarkLoading ? (
+                  <span className=""></span>
+                ) : isBookmarked ? (
                   <svg
+                    data-slot="icon"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="rgba(255,215,0,1)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-crown"
+                    aria-hidden="true"
+                    className="size-6 "
                   >
-                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
-                    <path d="M5 21h14" />
+                    <path
+                      clipRule="evenodd"
+                      fillRule="evenodd"
+                      d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 0 0 1.075.676L10 15.082l5.925 2.844A.75.75 0 0 0 17 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0 0 10 2Z"
+                    ></path>
+                  </svg>
+                ) : (
+                  <svg
+                    data-slot="icon"
+                    fill="none"
+                    strokeWidth="1.75"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="size-6 text-gray-600"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                    ></path>
                   </svg>
                 )}
-              </div>
-            ))}
-        </div>
-        {isCreator && lightningDetail?.recruitType === "수락형" && (
-          <div className="w-full mt-4">
-            <h3 className="font-bold mb-2 ml-2">신청 대기 중인 참가자</h3>
+              </button>
+            )}
+            <div className="font-semibold text-lg my-1">
+              {lightningDetail?.eventDate
+                ? new Date(lightningDetail.eventDate).toLocaleString("ko-KR", {
+                    month: "long",
+                    day: "numeric",
+                    weekday: "long",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : ""}{" "}
+            </div>
+            <div className="flex gap-1 text-m text-gray-500 mb-4">
+              <p className="font-semibold">
+              {lightningDetail?.duration
+                ? lightningDetail.duration >= 60
+                  ? `${Math.floor(lightningDetail.duration / 60)}시간${
+                      lightningDetail.duration % 60 > 0
+                        ? ` ${lightningDetail.duration % 60}분`
+                        : ""
+                    }`
+                  : `${lightningDetail.duration}분`
+                  : ""}{" "}
+              </p>
+              <p> 동안 진행됩니다!</p>
+            </div>
+            <div className="divider"></div>
+            <KakaolocationMap
+              lat={lightningDetail?.latitude}
+              lng={lightningDetail?.longitude}
+            />
+            <div className="flex text-base mt-4">
+              <svg data-Slot="icon" fill="none" strokeWidth={2} stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                className="size-6 mr-2"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+              </svg>
+              {lightningDetail?.address}
+            </div>
+          </div>
+          {!user && (
+            <div
+              className="btn  w-full no-animation btn-primary"
+              onClick={() =>
+                navigate("/auth/landing", {
+                  state: { from: `/lightning/${lightningId}` },
+                })
+              }
+            >
+              로그인 하고 번개 참여하기!
+            </div>
+          )}
+          {user &&
+            !isCreator &&
+            !currentMemberStatus &&
+            lightningDetail?.recruitType === "참가형" &&
+            lightningDetail?.status === "모집" && (
+              <button
+                className="btn w-full no-animation btn-primary"
+                onClick={() => showModal("join-modal")}
+              >
+                참여하기
+              </button>
+            )}
+          {lightningDetail?.recruitType === "수락형" &&
+            user &&
+            !isCreator &&
+            !currentMemberStatus &&
+            lightningDetail?.status === "모집" && (
+              <button
+                className="btn w-full"
+                onClick={() => showModal("accept-modal")}
+              >
+                신청하기
+              </button>
+            )}
+          {user &&
+            !isCreator &&
+            currentMemberStatus?.participantStatus === "완료" &&
+            lightningDetail?.status === "모집" && (
+              <button
+                className="btn w-full no-animation"
+                onClick={() => showModal("leave-modal")}
+              >
+                번개 나가기
+              </button>
+            )}
+          {user &&
+            !isCreator &&
+            (lightningDetail?.status === "마감" ||
+              lightningDetail?.status === "강제마감") &&
+            currentMemberStatus == null && (
+              <button className="btn  w-full no-animation btn-disabled">
+                이미 마감되었습니다!
+              </button>
+            )}
+          {user &&
+            !isCreator &&
+            currentMemberStatus?.participantStatus === "탈퇴" && (
+              <button className="btn  w-full no-animation btn-disabled">
+                탈퇴한 번개에 참여할 수 없습니다!
+              </button>
+            )}
+          {user &&
+            !isCreator &&
+            currentMemberStatus?.participantStatus === "신청대기" && (
+              <button className="btn  w-full no-animation btn-disabled">
+                신청 대기 중입니다!
+              </button>
+            )}
+          <div className="divider mt-0"></div>
+          <div className=" mr-auto ml-3 font-bold">
+            참가 인원 마감까지{" "}
+            {lightningDetail?.capacity &&
+              lightningDetail.currentMemberCount &&
+              lightningDetail.capacity - lightningDetail.currentMemberCount}
+            명 남았습니다!
+          </div>
+          <div className="mr-auto ml-3 mt-1 text-sm text-gray-500 mb-2">
+            참가인원 {lightningDetail?.currentMemberCount} /{" "}
+            {lightningDetail?.capacity}{" "}
+          </div>
+          <progress
+            className="progress progress-primary w-[95%] mt-1 mb-4"
+            value={lightningDetail?.currentMemberCount}
+            max={lightningDetail?.capacity}
+          ></progress>
+
+          <div className="w-full">
             {lightningDetail?.member
-              .filter((member) => member.participantStatus === "신청대기")
+              .filter(
+                (member) =>
+                  member.participantStatus === "완료" ||
+                  member.participantStatus === "승인"
+              )
               .map((member, index) => (
-                <div key={index} className="flex items-center gap-2 p-2">
+                <div
+                  key={index}
+                  className="flex flex-row items-center gap-2 p-2 "
+                >
                   <UserImage profileImage={member.memberProfileImg as string} />
-                  <div>{member.memberNickname}</div>
-                  <div className="flex gap-2 ml-auto items-center">
-                    <button
-                      className="btn btn-sm"
-                      disabled={
-                        loadingParticipantActions[member.lightningUserId]
-                          ?.accept
-                      }
-                      onClick={() =>
-                        handleAcceptParticipant(member.lightningUserId)
-                      }
+                  <div className="font-medium ">{member.memberNickname}</div>
+                  {member.role === "번개생성자" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="rgba(255,215,0,1)"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-crown"
                     >
-                      {loadingParticipantActions[member.lightningUserId]?.accept
-                        ? "수락 중..."
-                        : "수락하기"}
-                    </button>
-                    <button
-                      className="btn btn-sm"
-                      disabled={
-                        loadingParticipantActions[member.lightningUserId]
-                          ?.reject
-                      }
-                      onClick={() =>
-                        handleRejectParticipant(member.lightningUserId)
-                      }
-                    >
-                      {loadingParticipantActions[member.lightningUserId]?.reject
-                        ? "거절 중..."
-                        : "거절하기"}
-                    </button>
-                  </div>
+                      <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
+                      <path d="M5 21h14" />
+                    </svg>
+                  )}
                 </div>
               ))}
-            {lightningDetail?.status === "모집" && (
-              <button
-                className="btn mt-4 w-full"
-                disabled={loadingLightningClose}
-                onClick={() => showModal("lightning-close-modal")}
-              >
-                {loadingLightningClose ? "마감 중..." : "번개 마감하기"}
-              </button>
-            )}
-            {(lightningDetail?.status === "마감" ||
-              lightningDetail?.status === "강제마감") && (
-              <button
-                className="btn mt-4 w-full"
-                disabled={loadingLightningEnd}
-                onClick={() => showModal("lightning-end-modal")}
-              >
-                {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
-              </button>
-            )}
           </div>
-        )}
-        {isCreator && lightningDetail?.recruitType === "참가형" && (
-          <div className="w-full mt-4">
-            {lightningDetail?.status === "모집" && (
-              <button
-                className="btn mt-4 w-full"
-                disabled={loadingLightningClose}
-                onClick={() => showModal("lightning-close-modal")}
-              >
-                {loadingLightningClose ? "마감 중..." : "번개 마감하기"}
-              </button>
-            )}
-            {(lightningDetail?.status === "마감" ||
-              lightningDetail?.status === "강제마감") && (
-              <button
-                className="btn mt-4 w-full"
-                disabled={loadingLightningEnd}
-                onClick={() => showModal("lightning-end-modal")}
-              >
-                {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
-              </button>
-            )}
-          </div>
-        )}
-        {!isCreator && lightningDetail?.recruitType === "수락형" && (
-          <div className="w-full mt-4">
-            <h3 className="font-bold mb-2 ml-2">신청 대기 중인 참가자</h3>
-            {lightningDetail?.member
-              .filter((member) => member.participantStatus === "신청대기")
-              .map((member, index) => (
-                <div key={index} className="flex items-center gap-2 p-2 ">
-                  <UserImage profileImage={member.memberProfileImg as string} />
-                  <div className="flex flex-col">
-                    <div className="font-medium">{member.memberNickname}</div>
-                    <div className="text-sm text-gray-500">
-                      상태: {member.participantStatus}
+          {isCreator && lightningDetail?.recruitType === "수락형" && (
+            <div className="w-full mt-4">
+              <h3 className="font-bold mb-2 ml-2">신청 대기 중인 참가자</h3>
+              {lightningDetail?.member
+                .filter((member) => member.participantStatus === "신청대기")
+                .map((member, index) => (
+                  <div key={index} className="flex items-center gap-2 p-2">
+                    <UserImage profileImage={member.memberProfileImg as string} />
+                    <div>{member.memberNickname}</div>
+                    <div className="flex gap-2 ml-auto items-center">
+                      <button
+                        className="btn btn-sm"
+                        disabled={
+                          loadingParticipantActions[member.lightningUserId]
+                            ?.accept
+                        }
+                        onClick={() =>
+                          handleAcceptParticipant(member.lightningUserId)
+                        }
+                      >
+                        {loadingParticipantActions[member.lightningUserId]?.accept
+                          ? "수락 중..."
+                          : "수락하기"}
+                      </button>
+                      <button
+                        className="btn btn-sm"
+                        disabled={
+                          loadingParticipantActions[member.lightningUserId]
+                            ?.reject
+                        }
+                        onClick={() =>
+                          handleRejectParticipant(member.lightningUserId)
+                        }
+                      >
+                        {loadingParticipantActions[member.lightningUserId]?.reject
+                          ? "거절 중..."
+                          : "거절하기"}
+                      </button>
                     </div>
                   </div>
+                ))}
+              {lightningDetail?.status === "모집" && (
+                <button
+                  className="btn mt-4 w-full"
+                  disabled={loadingLightningClose}
+                  onClick={() => showModal("lightning-close-modal")}
+                >
+                  {loadingLightningClose ? "마감 중..." : "번개 마감하기"}
+                </button>
+              )}
+              {(lightningDetail?.status === "마감" ||
+                lightningDetail?.status === "강제마감") && (
+                <button
+                  className="btn mt-4 w-full"
+                  disabled={loadingLightningEnd}
+                  onClick={() => showModal("lightning-end-modal")}
+                >
+                  {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
+                </button>
+              )}
+            </div>
+          )}
+          {isCreator && lightningDetail?.recruitType === "참가형" && (
+            <div className="w-full mt-4">
+              {lightningDetail?.status === "모집" && (
+                <button
+                  className="btn mt-4 w-full"
+                  disabled={loadingLightningClose}
+                  onClick={() => showModal("lightning-close-modal")}
+                >
+                  {loadingLightningClose ? "마감 중..." : "번개 마감하기"}
+                </button>
+              )}
+              {(lightningDetail?.status === "마감" ||
+                lightningDetail?.status === "강제마감") && (
+                <button
+                  className="btn mt-4 w-full"
+                  disabled={loadingLightningEnd}
+                  onClick={() => showModal("lightning-end-modal")}
+                >
+                  {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
+                </button>
+              )}
+            </div>
+          )}
+          {!isCreator && lightningDetail?.recruitType === "수락형" && (
+            <div className="w-full mt-4">
+              <h3 className="font-bold mb-2 ml-2">신청 대기 중인 참가자</h3>
+              {lightningDetail?.member
+                .filter((member) => member.participantStatus === "신청대기")
+                .map((member, index) => (
+                  <div key={index} className="flex items-center gap-2 p-2 ">
+                    <UserImage profileImage={member.memberProfileImg as string} />
+                    <div className="flex flex-col">
+                      <div className="font-medium">{member.memberNickname}</div>
+                      <div className="text-sm text-gray-500">
+                        상태: {member.participantStatus}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              {lightningDetail?.member.filter(
+                (member) => member.participantStatus === "신청대기"
+              ).length === 0 && (
+                <div className="text-center py-2 text-gray-500">
+                  신청 대기 중인 참가자가 없습니다
                 </div>
-              ))}
-            {lightningDetail?.member.filter(
-              (member) => member.participantStatus === "신청대기"
-            ).length === 0 && (
-              <div className="text-center py-2 text-gray-500">
-                신청 대기 중인 참가자가 없습니다
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
+        </div>
       </div>
       {/* 모달 컴포넌트들 */}
       <GlobalModal
         id="join-modal"
-        title="정말로 참여하시겠어요?"
+        imgType="success"
+        title="번개 참여 확인"
+        middle="번개에 참여하시겠어요?"
         actions={
           <>
             <button
@@ -883,30 +904,33 @@ function LightningDetailPage() {
         }
       >
         <>
-          <p className="font-bold mb-2">
-            아래 사항을 다시 한 번 확인해 주세요!
-          </p>
-          <div>시작 시간: {lightningDetail?.eventDate}</div>
-          <div className="">
-            진행 시간:{" "}
-            {lightningDetail?.duration
-              ? lightningDetail.duration >= 60
-                ? `${Math.floor(lightningDetail.duration / 60)}시간${
-                    lightningDetail.duration % 60 > 0
-                      ? ` ${lightningDetail.duration % 60}분`
-                      : ""
+          <h4 className="mb-2">
+            아래 사항을 확인해 주세요!
+          </h4>
+          <div className="bg-gray-100 border p-6 w-full max-w-full my-6">
+            <div>시작 시간 : 
+              {lightningDetail?.eventDate
+                ? DateFormat(lightningDetail?.eventDate) : lightningDetail?.eventDate}</div>
+            <div className="">
+              진행 시간 :{" "}
+              {lightningDetail?.duration
+                ? lightningDetail.duration >= 60
+                  ? `${Math.floor(lightningDetail.duration / 60)}시간${lightningDetail.duration % 60 > 0
+                    ? ` ${lightningDetail.duration % 60}분`
+                    : ""
                   }`
-                : `${lightningDetail.duration}분`
-              : ""}{" "}
+                  : `${lightningDetail.duration}분`
+                : ""}{" "}
+            </div>
+            <div>진행 장소 : {lightningDetail?.address}</div>
           </div>
-          <div>진행 장소: {lightningDetail?.address}</div>
-          <div className="mt-2 font-extrabold">주의사항</div>
-          <p>참여하기 이후 번개를 나가면 다시 참여할 수 없어요!</p>
+          <p className="text-red-500">한번 참여 후 번개를 나가면 다시 참여 할 수 없어요!</p>
         </>
       </GlobalModal>
 
       <GlobalModal
         id="join-fail-modal"
+        imgType="error"
         title="번개 참여 실패"
         actions={
           <button className="btn" onClick={() => closeModal("join-fail-modal")}>
@@ -915,12 +939,13 @@ function LightningDetailPage() {
         }
       >
         <p>
-          번개 참여에 실패했습니다. 이미 참여한 번개이거나, 이미 완료된
-          번개입니다!
+          번개 참여에 실패했습니다.<br />
+          이미 참여한 번개이거나, 이미 완료된 번개입니다!
         </p>
       </GlobalModal>
       <GlobalModal
         id="leave-modal"
+        imgType="warning"
         title="번개 나가기"
         actions={
           <>
@@ -937,10 +962,12 @@ function LightningDetailPage() {
           </>
         }
       >
-        <p>정말 번개를 나가시겠습니까? 한 번 나가면 재신청이 불가합니다.</p>
+        <p>정말 번개를 나가시겠습니까?</p><br />
+        <p className="text-red-500">한 번 나가면 재신청이 불가합니다.</p>
       </GlobalModal>
       <GlobalModal
         id="leave-fail-modal"
+        imgType="error"
         title="번개 나가기 실패"
         actions={
           <button
@@ -952,12 +979,14 @@ function LightningDetailPage() {
         }
       >
         <p>
-          나가기 실패했습니다. 참여하지 않은 번개이거나, 이미 나간 번개입니다!
+          나가기 실패했습니다.<br />
+          참여하지 않은 번개이거나, 이미 나간 번개입니다!
         </p>
       </GlobalModal>
       <GlobalModal
         id="lightning-close-modal"
-        title="번개 마감"
+        imgType="warning"
+        title="번개 모집 마감"
         actions={
           <>
             <button
@@ -965,7 +994,7 @@ function LightningDetailPage() {
               disabled={loadingLightningClose}
               onClick={handleLightningClose}
             >
-              {loadingLightningClose ? "마감 중..." : "번개 마감하기"}
+              {loadingLightningClose ? "마감 중..." : "마감하기"}
             </button>
             <button
               className="btn"
@@ -976,13 +1005,14 @@ function LightningDetailPage() {
           </>
         }
       >
-        <p>
-          번개를 마감하시겠습니까? 한번 마감한 번개는 다시 활성화 할 수
-          없습니다!
+        <p>번개 모집을 마감하시겠습니까?</p><br />
+        <p className="text-red-500">
+          한번 마감한 번개는 다시 활성화 할 수 없습니다!
         </p>
       </GlobalModal>
       <GlobalModal
         id="lightning-end-modal"
+        imgType="question"
         title="번개 종료"
         actions={
           <>
@@ -1006,7 +1036,8 @@ function LightningDetailPage() {
       </GlobalModal>
       <GlobalModal
         id="accept-modal"
-        title="번개 신청"
+        imgType="question"
+        title="번개 참여 신청"
         actions={
           <>
             <button
@@ -1024,15 +1055,16 @@ function LightningDetailPage() {
       >
         <>
           <p>번개에 참여하시겠습니까?</p>
-          <p>
-            본 번개는 수락형 번개로, 신청 이후 생성자가 수락해야지만 참여할 수
-            있습니다.
+          <p className="text-red-500">
+            본 번개는 수락형 번개로,<br />
+            신청 이후 생성자가 수락해야지만 참여할 수 있습니다.
           </p>
         </>
       </GlobalModal>
 
       <GlobalModal
         id="join-complete-modal"
+        imgType="success"
         title="참여 완료!"
         actions={
           <button className="btn" onClick={handleJoinLightningComplete}>
@@ -1044,12 +1076,17 @@ function LightningDetailPage() {
           lat={lightningDetail?.latitude}
           lng={lightningDetail?.longitude}
         />
-        <div>번개 제목 : {completedLightning?.routeTitle}</div>
-        <div>번개 시작 시간 : {completedLightning?.eventDate}</div>
-        <div>번개 진행 시간 : {completedLightning?.duration}</div>
-        <div>정원 : {completedLightning?.capacity}</div>
-        <div>참여자 : {completedLightning?.currentParticipants}</div>
-        <div>참여 일시 : {completedLightning?.joinDate}</div>
+        <div className="bg-gray-100 border p-6 w-full max-w-full my-6">
+          <div>번개 제목 : {completedLightning?.routeTitle}</div>
+          <div>번개 시작 시간 : 
+            {lightningDetail?.eventDate
+            ? DateFormat(lightningDetail?.eventDate) : lightningDetail?.eventDate}</div>
+          <div>번개 진행 시간 : {completedLightning?.duration}</div>
+          <div>정원 : {completedLightning?.capacity}</div>
+          <div>참여자 : {completedLightning?.currentParticipants}</div>
+          <div>참여 일시 : {completedLightning?.joinDate
+            ? DateFormat(completedLightning?.joinDate) : completedLightning?.joinDate}</div>
+        </div>
         <p>번개에 참여하셨습니다!</p>
       </GlobalModal>
     </div>
