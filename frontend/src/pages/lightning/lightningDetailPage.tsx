@@ -907,12 +907,46 @@ function LightningDetailPage() {
           <h4 className="mb-2">
             아래 사항을 확인해 주세요!
           </h4>
-          <div className="bg-gray-100 border p-6 w-full max-w-full my-6">
-            <div>시작 시간 : 
+          <div className="bg-gray-100 border px-16 py-6 w-full max-w-full my-6 flex flex-col gap-1">
+            {/* 시작 시간 */}
+            <div className="flex gap-1 items-center">
+              <svg
+                data-Slot="icon"
+                fill="none"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                className="w-5 h-5 stroke-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
               {lightningDetail?.eventDate
-                ? DateFormat(lightningDetail?.eventDate) : lightningDetail?.eventDate}</div>
-            <div className="">
-              진행 시간 :{" "}
+                ? DateFormat(lightningDetail?.eventDate) : lightningDetail?.eventDate}
+            </div>
+            {/* 진행 시간 */}
+            <div className="flex gap-1 items-center">
+              <svg
+                data-Slot="icon"
+                fill="none"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                className="w-5 h-5 stroke-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
+                />
+              </svg>
+              {" "}
               {lightningDetail?.duration
                 ? lightningDetail.duration >= 60
                   ? `${Math.floor(lightningDetail.duration / 60)}시간${lightningDetail.duration % 60 > 0
@@ -922,7 +956,30 @@ function LightningDetailPage() {
                   : `${lightningDetail.duration}분`
                 : ""}{" "}
             </div>
-            <div>진행 장소 : {lightningDetail?.address}</div>
+            {/* 만남 장소 */}
+            <div className="flex gap-1 items-center">
+              <svg
+                data-Slot="icon"
+                fill="none"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                className="w-5 h-5 stroke-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                />
+              </svg>
+              {lightningDetail?.address}</div>
           </div>
           <p className="text-red-500">한번 참여 후 번개를 나가면 다시 참여 할 수 없어요!</p>
         </>
@@ -1076,12 +1133,80 @@ function LightningDetailPage() {
           lat={lightningDetail?.latitude}
           lng={lightningDetail?.longitude}
         />
-        <div className="bg-gray-100 border p-6 w-full max-w-full my-6">
+        <div className="bg-gray-100 border p-6 w-full max-w-full my-6 flex flex-col gap-1">
           <div>번개 제목 : {completedLightning?.routeTitle}</div>
-          <div>번개 시작 시간 : 
+          {/* 시작 시간 */}
+          <div className="flex gap-1 items-center">
+            <svg
+              data-Slot="icon"
+              fill="none"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+              className="w-5 h-5 stroke-2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
             {lightningDetail?.eventDate
-            ? DateFormat(lightningDetail?.eventDate) : lightningDetail?.eventDate}</div>
-          <div>번개 진행 시간 : {completedLightning?.duration}</div>
+              ? DateFormat(lightningDetail?.eventDate) : lightningDetail?.eventDate}
+          </div>
+          {/* 진행 시간 */}
+          <div className="flex gap-1 items-center">
+            <svg
+              data-Slot="icon"
+              fill="none"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              className="w-5 h-5 stroke-2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
+              />
+            </svg>
+            {" "}
+            {lightningDetail?.duration
+              ? lightningDetail.duration >= 60
+                ? `${Math.floor(lightningDetail.duration / 60)}시간${lightningDetail.duration % 60 > 0
+                  ? ` ${lightningDetail.duration % 60}분`
+                  : ""
+                }`
+                : `${lightningDetail.duration}분`
+              : ""}{" "}
+          </div>
+          {/* 만남 장소 */}
+          <div className="flex gap-1 items-center">
+            <svg
+              data-Slot="icon"
+              fill="none"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              className="w-5 h-5 stroke-2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+              />
+            </svg>
+            {lightningDetail?.address}</div>
           <div>정원 : {completedLightning?.capacity}</div>
           <div>참여자 : {completedLightning?.currentParticipants}</div>
           <div>참여 일시 : {completedLightning?.joinDate

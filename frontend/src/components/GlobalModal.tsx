@@ -53,7 +53,7 @@ const getIcon = (type?: "success" | "warning" | "error" | "question") => {
         <svg
           fill="none"
           strokeWidth={1.5}
-          stroke="#FFEB3B"
+          stroke="#F44336"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
