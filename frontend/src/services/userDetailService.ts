@@ -128,18 +128,18 @@ const patchUserPageDetail = async (
 
   // FormData에 JSON 데이터 추가
   formData.append(
-    "clubData",
+    "userDetailData",
     new Blob([JSON.stringify(userProfileRequest)], { type: "application/json" })
   );
 
   // profileImg가 있을 경우에만 FormData에 추가
   if (profileImg) {
-    formData.append("clubProfileImage", profileImg);
+    formData.append("profileImg", profileImg);
   }
 
   // backgroundImg가 있을 경우에만 FormData에 추가
   if (backgroundImg) {
-    formData.append("clubBackgroundImage", backgroundImg);
+    formData.append("backgroundImg", backgroundImg);
   }
 
   // axios는 FormData 객체를 자동으로 처리
