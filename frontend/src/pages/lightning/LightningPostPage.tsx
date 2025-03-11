@@ -68,7 +68,7 @@ function LightningPostPage() {
     bikeType: "",
     region: "",
     distance: "",
-    routeId: "1",
+    routeId: "",
     address: "",
     isClubOnly: false,
     clubId: "",
@@ -80,6 +80,16 @@ function LightningPostPage() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  // Add new state for selected route name and distance
+  const [selectedRoute, setSelectedRoute] = useState({
+    id: "",
+    name: "",
+    distance: "",
+  });
+
+  // Add state to track if form has been submitted once (for showing errors)
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   console.log(formData);
   console.log(formErrors);
@@ -135,9 +145,29 @@ function LightningPostPage() {
     });
   };
 
+  // Add a new handler for route selection
+  const handleRouteSelect = (
+    routeId: number,
+    routeName: string,
+    distance: number
+  ) => {
+    setFormData({
+      ...formData,
+      routeId: routeId.toString(),
+      distance: distance.toString(),
+    });
+    setSelectedRoute({
+      id: routeId.toString(),
+      name: routeName,
+      distance: distance.toString(),
+    });
+    setFormErrors((prev) => ({ ...prev, routeId: "", distance: "" }));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setServerError("");
+    setFormSubmitted(true); // Set this to true on form submission attempt
 
     if (!validateForm()) return;
 
@@ -185,10 +215,15 @@ function LightningPostPage() {
       <input type="checkbox" id="route_modal" className="modal-toggle" />
       <div className="modal" role="dialog">
         <div className="modal-box">
-          <RouteModal />
+          <RouteModal
+            onSelectRoute={handleRouteSelect}
+            selectedRouteId={
+              formData.routeId ? Number(formData.routeId) : undefined
+            }
+          />
           <div className="modal-action">
             <label htmlFor="route_modal" className="btn">
-              Close!
+              닫기
             </label>
           </div>
         </div>
@@ -451,7 +486,13 @@ function LightningPostPage() {
                 </label>
                 <MeetingLocationSelector
                   onSelectLocation={handleLocationSelect}
+                  selectedAddress={formData.address || ""}
                 />
+                {formSubmitted && formErrors.address && (
+                  <span className="text-red-500 mt-2 block">
+                    {formErrors.address}
+                  </span>
+                )}
               </div>
               <div className="-mt-2">
                 <label className="label flex items-center gap-2 justify-start">
@@ -472,8 +513,15 @@ function LightningPostPage() {
                   <div className="label-text">번개 경로 선택하기</div>
                 </label>
                 <label htmlFor="route_modal" className="btn w-full">
-                  경로 등록
+                  {selectedRoute.id
+                    ? `${selectedRoute.name} (${selectedRoute.distance}km)`
+                    : "경로 등록"}
                 </label>
+                {formSubmitted && formErrors.routeId && (
+                  <span className="text-red-500 mt-2 block">
+                    {formErrors.routeId}
+                  </span>
+                )}
               </div>
             </div>
 

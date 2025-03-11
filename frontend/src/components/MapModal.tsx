@@ -18,17 +18,20 @@ interface MeetingLocationSelectorProps {
     coords: LatLng,
     locationName?: string
   ) => void;
+  selectedAddress?: string;
 }
 
 const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
   onSelectLocation,
+  selectedAddress,
 }) => {
   const modalRef = useRef<HTMLDialogElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
   const markerRef = useRef<any>(null);
   const [inputAddress, setInputAddress] = useState<string>("");
-  const [selectedAddress, setSelectedAddress] = useState<string>("");
+  const [internalSelectedAddress, setInternalSelectedAddress] =
+    useState<string>("");
   const [selectedCoords, setSelectedCoords] = useState<LatLng | null>(null);
   const [addressError, setAddressError] = useState<string>("");
   const [locationName, setLocationName] = useState<string>("");
@@ -90,7 +93,7 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
                 result[0]
               ) {
                 const addressName = result[0].address.address_name;
-                setSelectedAddress(addressName);
+                setInternalSelectedAddress(addressName);
                 setLocationName(addressName);
               }
             }
@@ -116,7 +119,7 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
         map.setCenter(coords);
         setSelectedCoords({ lat, lng });
         const addressName = result[0].address_name;
-        setSelectedAddress(addressName);
+        setInternalSelectedAddress(addressName);
         setLocationName(addressName);
 
         if (markerRef.current) {
@@ -136,11 +139,11 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
 
   // 선택한 장소를 등록하고 부모 컴포넌트에 전달
   const handleRegisterLocation = () => {
-    if (selectedCoords && selectedAddress) {
+    if (selectedCoords && internalSelectedAddress) {
       onSelectLocation(
-        selectedAddress,
+        internalSelectedAddress,
         selectedCoords,
-        locationName || selectedAddress
+        locationName || internalSelectedAddress
       );
       modalRef.current?.close();
     } else {
@@ -150,13 +153,13 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
 
   return (
     <>
-      {/* 모달 열기 버튼 */}
+      {/* 모달 열기 버튼 - Show selected address if available */}
       <button
         className="btn w-full"
         onClick={() => modalRef.current?.showModal()}
         type="button"
       >
-        모임 장소 선택
+        {selectedAddress ? selectedAddress : "모임 장소 선택"}
       </button>
 
       {/* 모달 */}
