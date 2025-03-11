@@ -208,8 +208,8 @@ public class AuthController {
 
     @GetMapping("/me/account")
     @Operation(summary = "내 계정 정보 조회", description = "내 계정 정보 조회")
-    public ResponseEntity<UserInfoGetResponseDTO> getUserInfo(Authentication authentication) {
-        UserInfoGetResponseDTO responseDTO = authService.getUserInfo(authentication);
+    public ResponseEntity<UserInfoGetResponseDTO> getUserInfo(@AuthenticationPrincipal String userEmail) {
+        UserInfoGetResponseDTO responseDTO = authService.getUserInfo(userEmail);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 

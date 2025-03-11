@@ -216,8 +216,8 @@ private Specification<RouteEntity> buildTagSpecification(String[] tags) {
 
 public RouteListResponseDTO getRouteList(int page, int size, String sort,
                                          String region, String distanceType,
-                                         String altitudeType, String roadType, String[] tag, 
-                                         String userEmail) {
+                                         String altitudeType, String roadType, String[] tag
+                                         , String userEmail) {
     // 정렬 기준 설정
     Sort sortObj = Sort.unsorted();
     if (sort != null && !sort.isEmpty()) {
@@ -250,8 +250,6 @@ public RouteListResponseDTO getRouteList(int page, int size, String sort,
     if (tag != null && Arrays.stream(tag).anyMatch(t -> t != null && !t.isEmpty())) {
         spec = spec.and(buildTagSpecification(tag));
     }
-
-
     
     // 페이징 처리 및 결과 조회
     Page<RouteEntity> routePage = routeRepository.findAll(spec, pageable);

@@ -4,16 +4,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.taiso.bike_api.domain.BookmarkEntity;
 import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
-import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 import com.taiso.bike_api.domain.ClubEntity;
+import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.BookmarkClubCreateResponseDTO;
 import com.taiso.bike_api.dto.BookmarkClubDeleteResponseDTO;
+import com.taiso.bike_api.dto.BookmarkClubResponseDTO;
 import com.taiso.bike_api.dto.BookmarkClubsGetResponseDTO;
 import com.taiso.bike_api.exception.BookmarkAlreadyExistsException;
 import com.taiso.bike_api.exception.BookmarkNotFoundException;
@@ -35,31 +40,55 @@ public class BookmarkClubService {
     @Autowired
     private ClubRepository clubRepository;
 
-    public List<BookmarkClubsGetResponseDTO> getBookmarkClubs(Authentication authentication) {
+    public BookmarkClubsGetResponseDTO getBookmarkClubs(int page, int size, String sort, String userEmail) {
+
+        // 정렬 기준 설정
+        Sort sortObj = Sort.unsorted();
+        if (!sort.isEmpty()) {
+            sortObj = Sort.by(sort).ascending();
+        }
+
+        // 페이지 요청 생성
+        Pageable pageable = PageRequest.of(page, size, sortObj);
 
         // 사용자 조회
-        UserEntity user = userRepository.findByEmail(authentication.getName()).get();
+        UserEntity user = userRepository.findByEmail(userEmail).get();
 
         // 사용자가 북마크한 클럽리스트 조회
-        List<BookmarkEntity> bookmarkList = bookmarkRepository.findByUserAndTargetType(user, BookmarkType.CLUB);
+        Page<BookmarkEntity> bookmarkPage = bookmarkRepository.findByUserAndTargetType(user, BookmarkType.CLUB, pageable);
 
         // 북마크한 클럽상세리스트 조회
-        List<ClubEntity> clubList = clubRepository.findAllByClubIdIn(bookmarkList.stream().map(bookmark -> bookmark.getTargetId()).collect(Collectors.toList()));
+        Page<ClubEntity> clubPage = clubRepository.findAllByClubIdIn(bookmarkPage.stream().map(bookmark -> bookmark.getTargetId()).collect(Collectors.toList()), pageable);
 
-        // responseDTO 빌드
-        return clubList.stream().map(club -> BookmarkClubsGetResponseDTO.builder()
-                                                        .clubId(club.getClubId())
-                                                        .clubProfileImageId(club.getClubProfileImageId())
-                                                        .clubName(club.getClubName())
-                                                        .clubLeaderId(club.getClubLeader().getUserId())
-                                                        .clubLeaderName(club.getClubLeader().getUserDetail().getUserNickname())
-                                                        .clubLeaderProfileImageId(club.getClubLeader().getUserDetail().getUserProfileImg())
-                                                        .clubShortDescription(club.getClubShortDescription())
-                                                        .maxScale(club.getMaxUser())
-                                                        .currentScale(club.getUsers().stream().filter(member -> member.getParticipantStatus() == ParticipantStatus.완료 || member.getParticipantStatus() == ParticipantStatus.승인).collect(Collectors.toList()).size())
-                                                        .tags(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
-                                                        .build())
-                                                        .collect(Collectors.toList());
+        // 응답 DTO생성 - 빌더 패턴 사용
+        List<BookmarkClubResponseDTO> clubDTO = clubPage.getContent().stream()
+                .map(club -> {
+                    // 기본 DTO 생성
+                    BookmarkClubResponseDTO dto = BookmarkClubResponseDTO.builder()
+                            .clubId(club.getClubId())
+                            .clubProfileImageId(club.getClubProfileImageId())
+                            .clubName(club.getClubName())
+                            .clubLeaderId(club.getClubLeader().getUserId())
+                            .clubLeaderName(club.getClubLeader().getUserDetail().getUserNickname())
+                            .clubLeaderProfileImageId(club.getClubLeader().getUserDetail().getUserProfileImg())
+                            .clubShortDescription(club.getClubShortDescription())
+                            .maxScale(club.getMaxUser())
+                            .currentScale(club.getUsers().stream().filter(member -> member.getParticipantStatus() == ParticipantStatus.완료 || member.getParticipantStatus() == ParticipantStatus.승인).collect(Collectors.toList()).size())
+                            .tags(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
+                            .build();
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return BookmarkClubsGetResponseDTO.builder()
+                .content(clubDTO)
+                .pageNo(clubPage.getNumber() + 1)
+                .pageSize(clubPage.getSize())
+                .totalElements(clubPage.getTotalElements())
+                .totalPages(clubPage.getTotalPages())
+                .last(clubPage.isLast())
+                .build();
     }
 
     public BookmarkClubCreateResponseDTO createBookmarkClub(Long clubId, Authentication authentication) {

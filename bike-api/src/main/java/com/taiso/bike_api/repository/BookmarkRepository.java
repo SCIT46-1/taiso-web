@@ -3,6 +3,8 @@ package com.taiso.bike_api.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -32,5 +34,7 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> 
 	
 	// 추가할 메서드 - 수정됨
 	boolean existsByTargetIdAndUser_UserId(Long targetId, Long userId);
+
+    Page<BookmarkEntity> findByUserAndTargetType(UserEntity user, BookmarkType club, Pageable pageable);
 	
 }
