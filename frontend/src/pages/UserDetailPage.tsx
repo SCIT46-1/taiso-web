@@ -56,37 +56,36 @@ function UserDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
 
-  //데이터 관리
+  console.log(isLoading, user);
+
+  // 데이터 관리
   const [nickName, setNickName] = useState<string>("");
   const [bio, setBio] = useState<string>("");
   const [gender, setGender] = useState<string>("");
   const [level, setLevel] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
-  const [profileImg, setProfileImg] = useState<string>("");
-  const [backgroundImg, setBackgroundImg] = useState<string>("");
+  const [profileImg, setProfileImg] = useState<string | null>("");
+  const [backgroundImg, setBackgroundImg] = useState<string | null>("");
+  const [profileImgPatch, setProfileImgPatch] = useState<File | null>();
+  const [backgroundImgPatch, setBackgroundImgPatch] = useState<File | null>();
 
-  console.log(isLoading, user);
-
-  // 데이터 로딩
   useEffect(() => {
     const fetchUserDetail = async () => {
       setIsLoading(true);
       try {
-        const userDetailData = await userDetailService.getUserPageDetail(
-          Number(userId)
-        );
-        // userDetailData를 제대로 받아왔을 때만 상태 업데이트
+        const userDetailData = await userDetailService.getUserPageDetail(Number(userId));
+
         if (userDetailData) {
           setUserDetail(userDetailData);
           setNickName(userDetailData.userNickname || "");
-          setProfileImg(userDetailData.profileImg || "");
+          setProfileImg(userDetailData.profileImg || ""); // 기존 S3 URL
           setBackgroundImg(userDetailData.backgroundImg || "");
           setBio(userDetailData.bio || "");
           setGender(userDetailData.gender || "");
           setLevel(userDetailData.level || "");
           setTags(userDetailData.tags || []);
         } else {
-          setUserDetail(null); // 데이터가 없으면 null 처리
+          setUserDetail(null);
         }
       } catch (error) {
         console.error("데이터 로딩 실패:", error);
@@ -96,7 +95,20 @@ function UserDetailPage() {
     };
 
     fetchUserDetail();
-  }, [userId]); // userId가 변경될 때마다 실행
+  }, [userId]);
+
+  // 파일 업로드 핸들러
+  const handleProfileImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfileImgPatch(e.target.files[0]); // 새 파일로 업데이트
+    }
+  };
+
+  const handleBackgroundImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setBackgroundImgPatch(e.target.files[0]);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!nickName || !bio || !gender || !level || !tags.length) {
@@ -104,64 +116,31 @@ function UserDetailPage() {
       return;
     }
 
-    // userId를 number로 변환
-    // 들어올땐 number 그러나 파라미터로 사용되며 string이 되었기 때문에..
     const userIdNumber = Number(userId);
 
+    // userProfileRequest 객체 생성 (파일을 제외한 데이터만)
     const userProfileRequest: UserPageDetailRequest = {
       userId: userIdNumber,
       userNickname: nickName,
       bio: bio,
-      profileImg: profileImg,
-      backgroundImg: backgroundImg,
       gender: gender,
       level: level,
       tags: tags,
     };
-    
-    const patchUserPageDetail = async (payload: UserPageDetailRequest) => {
-      // FormData 생성
-      const formData = new FormData();
 
-      // 텍스트 데이터 추가
-      for (const key in payload) {
-        if (payload.hasOwnProperty(key)) {
-          formData.append(key, payload[key]);
-        }
-      }
-
-      // 이미지 파일이 있을 경우 추가
-      if (profileImg) {
-        formData.append("profileImg", profileImg); // profileImg는 File 객체여야 함
-      }
-
-      if (backgroundImg) {
-        formData.append("backgroundImg", backgroundImg); // backgroundImg도 File 객체여야 함
-      }
-
-      try {
-        return await patch("/users/me/details", formData); // FormData로 요청 전송
-      } catch (error) {
-        console.error("Failed to update user details:", error);
-      }
-    };
-    
-    
-    // 폼 데이터 서버 전송
     try {
       setIsLoading(true);
-      await userDetailService.patchUserPageDetail(
-        userProfileRequest
-      );
-
+      await userDetailService.patchUserPageDetail(userProfileRequest, profileImgPatch, backgroundImgPatch);
+     
       setIsLoading(false);
-      // 변경 완료 후 모달 닫기
       alert("프로필이 업데이트되었습니다.");
     } catch (error) {
-      console.error("Failed to submit :", error);
+      console.error("Failed to submit:", error);
       setIsLoading(false);
     }
   };
+
+
 
   // 로딩 중일 때 처리
   if (isLoading) {
@@ -358,6 +337,26 @@ function UserDetailPage() {
             onChange={(e) => setBio(e.target.value)}
             className="textarea textarea-bordered w-full"
           ></textarea>
+
+          <div>
+            <label className="block mb-2">프로필 이미지</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleProfileImgChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2">배경화면 이미지</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleBackgroundImgChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
 
           {/* 성별 선택 */}
           <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="gender">
