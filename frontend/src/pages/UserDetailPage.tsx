@@ -1,10 +1,28 @@
 import userDetailService, {
   UserPageDetailResponse,
+  UserPageDetailRequest,
 } from "../services/userDetailService";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
 import ReviewList from "../components/ReviewList";
 import { useParams } from "react-router";
+
+// 태그 정의
+const GENDER_OPTIONS = ["남자", "여자", "그외"];
+const LEVEL_OPTIONS = ["무경력", "초보자", "입문자", "중수", "고수"];
+const ACTIVITYTIME_OPTION = ["새벽", "오전", "오후", "저녁", "밤", "종일"];
+const ACTIVITYDAY_OPTION = ["월", "화", "수", "목", "금", "토", "일"];
+const ACTIVITYLOCATION_OPTION = ["서울", "경기", "인천", "부산", "대구", "광주",
+  "대전", "울산", "경상북도", "경상남도", "전라남도", 
+  "전라북도", "충청남도", "충청북도", "강원도", "제주도"];
+
+// 태그 통합
+const categories = [
+  { title: "레벨", options: LEVEL_OPTIONS, key: "level" },
+  { title: "활동 시간", options: ACTIVITYTIME_OPTION, key: "activityTime" },
+  { title: "활동 요일", options: ACTIVITYDAY_OPTION, key: "activityDay" },
+  { title: "활동 지역", options: ACTIVITYLOCATION_OPTION, key: "activityLocation" },
+];
 
 // 모달
 interface ModalProps {
@@ -14,6 +32,7 @@ interface ModalProps {
   actions: React.ReactNode;
 }
 
+// 모달 구조 설정
 export function Modal({ id, title, children, actions }: ModalProps) {
   return (
     <dialog id={id} className="modal">
@@ -36,50 +55,37 @@ function UserDetailPage() {
   );
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
-  //로딩 상태 관리
-  const [loadingEdit, setLoadingEdit] = useState(false);
-  //데이터 관리
+
+  console.log(isLoading, user);
+
+  // 데이터 관리
   const [nickName, setNickName] = useState<string>("");
   const [bio, setBio] = useState<string>("");
   const [gender, setGender] = useState<string>("");
   const [level, setLevel] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
-  const [inputTag, setInputTag] = useState<string>("");
-  const [availableTags, setAvailableTags] = useState<string[]>([
-    "React",
-    "JavaScript",
-    "Node.js",
-    "CSS",
-    "HTML",
-  ]); // 예시 태그들
+  const [profileImg, setProfileImg] = useState<string | null>("");
+  const [backgroundImg, setBackgroundImg] = useState<string | null>("");
+  const [profileImgPatch, setProfileImgPatch] = useState<File | null>();
+  const [backgroundImgPatch, setBackgroundImgPatch] = useState<File | null>();
 
-  console.log(
-    setLoadingEdit,
-    nickName,
-    bio,
-    gender,
-    level,
-    tags,
-    inputTag,
-    availableTags,
-    setAvailableTags
-  );
-
-  console.log(isLoading, user);
-
-  // 데이터 로딩
   useEffect(() => {
     const fetchUserDetail = async () => {
       setIsLoading(true);
       try {
-        const userDetailData = await userDetailService.getUserPageDetail(
-          Number(userId)
-        );
-        // userDetailData를 제대로 받아왔을 때만 상태 업데이트
+        const userDetailData = await userDetailService.getUserPageDetail(Number(userId));
+
         if (userDetailData) {
           setUserDetail(userDetailData);
+          setNickName(userDetailData.userNickname || "");
+          setProfileImg(userDetailData.profileImg || ""); // 기존 S3 URL
+          setBackgroundImg(userDetailData.backgroundImg || "");
+          setBio(userDetailData.bio || "");
+          setGender(userDetailData.gender || "");
+          setLevel(userDetailData.level || "");
+          setTags(userDetailData.tags || []);
         } else {
-          setUserDetail(null); // 데이터가 없으면 null 처리
+          setUserDetail(null);
         }
       } catch (error) {
         console.error("데이터 로딩 실패:", error);
@@ -89,46 +95,61 @@ function UserDetailPage() {
     };
 
     fetchUserDetail();
-  }, [userId]); // userId가 변경될 때마다 실행
+  }, [userId]);
+
+  // 파일 업로드 핸들러
+  const handleProfileImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfileImgPatch(e.target.files[0]); // 새 파일로 업데이트
+    }
+  };
+
+  const handleBackgroundImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setBackgroundImgPatch(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!nickName || !bio || !gender || !level || !tags.length) {
+      alert("모든 값을 입력해주세요.");
+      return;
+    }
+
+    const userIdNumber = Number(userId);
+
+    // userProfileRequest 객체 생성 (파일을 제외한 데이터만)
+    const userProfileRequest: UserPageDetailRequest = {
+      userId: userIdNumber,
+      userNickname: nickName,
+      bio: bio,
+      gender: gender,
+      level: level,
+      tags: tags,
+    };
+
+    try {
+      setIsLoading(true);
+      await userDetailService.patchUserPageDetail(userProfileRequest, profileImgPatch, backgroundImgPatch);
+     
+      setIsLoading(false);
+      alert("프로필이 업데이트되었습니다.");
+    } catch (error) {
+      console.error("Failed to submit:", error);
+      setIsLoading(false);
+    }
+  };
+
+
 
   // 로딩 중일 때 처리
   if (isLoading) {
     return <div className="font-semibold">Loading...</div>;
   }
-
-  // 태그 추가 함수
-  const handleAddTag = () => {
-    if (inputTag && !tags.includes(inputTag)) {
-      setTags([...tags, inputTag]);
-      setInputTag(""); // 입력 필드 초기화
-    }
-  };
-
-  // 태그 삭제 함수
-  const handleTagRemove = (tag: string) => {
-    setTags(tags.filter((t) => t !== tag));
-  };
-
-  // 태그 입력 값 변화 처리
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputTag(e.target.value);
-  };
-
-  // // 로딩 핸들링
-  // const handleEditProfile = async () => {
-  //   setLoadingEdit(true);
-  //   try {
-  //     await userDetailService.patchUserPageDetail(Number(userId));
-  //     closeModal("profile-edit-modal");
-  //   } catch (error) {
-  //     console.error("참여 실패:", error);
-  //     closeModal("profile-edit-modal");
-  //   } finally {
-  //     setLoadingEdit(false);
-  //   }
-  // };
+ 
 
   // 모달 동작
+  // 버튼에서 onClick으로 동작
   const closeModal = (id: string) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
     modal?.close();
@@ -144,12 +165,12 @@ function UserDetailPage() {
       {/* 배경이미지 & 프로필 이미지 */}
       <div className="flex flex-col relative">
         <img
-          src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.userBackgroundImg}`}
+          src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.backgroundImg}`}
           alt="background"
           className="w-full h-64 bg-gray-100 object-cover rounded-t-xl"
         />
         <img
-          src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.userProfileImg}`}
+          src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.profileImg}`}
           alt="profile"
           className="size-24 rounded-full bg-blue-200 absolute -bottom-12 sm:left-14 left-6"
         />
@@ -279,190 +300,123 @@ function UserDetailPage() {
       {/* 모달 컴포넌트들 */}
       <Modal
         id="profile-edit-modal"
-        title="profile edit"
+        title="Profile Edit"
         actions={
           <>
-            <button
-              className="btn btn-primary"
-              disabled={loadingEdit}
-              // onClick={handleEditProfile}
-            >
-              {loadingEdit ? "수정중..." : "수정"}
+            <button type="submit" disabled={isLoading} onClick={handleSubmit} className="btn btn-primary">
+              {isLoading ? "업데이트 중..." : "프로필 변경"}
             </button>
-            <button
-              className="btn"
-              onClick={() => closeModal("profile-edit-modal")}
-            >
+            <button className="btn" onClick={() => closeModal("profile-edit-modal")}>
               취소
             </button>
           </>
         }
       >
-        <>
+        <form className="flex flex-col items-center justify-center max-w-sm mx-auto relative w-[20rem]">
+          {/* 닉네임 */}
+          <label className="label text-sm text-gray-500 mr-auto" htmlFor="nickName">
+            닉네임
+          </label>
+          <input
+            id="nickName"
+            type="text"
+            placeholder="닉네임"
+            value={nickName}
+            onChange={(e) => setNickName(e.target.value)}
+            className="input input-bordered w-full"
+          />
+
+          {/* 자기소개 */}
+          <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="bio">
+            자기소개
+          </label>
+          <textarea
+            id="bio"
+            placeholder="자기소개를 입력하세요."
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            className="textarea textarea-bordered w-full"
+          ></textarea>
+
           <div>
-            <form
-              // onSubmit={handleFormSubmit}
-              className="flex flex-col items-center justify-center max-w-sm mx-auto relative w-[20rem]"
-            >
-              {/* 닉네임 */}
-              <label
-                className="label text-sm text-gray-500 mr-auto"
-                htmlFor="nickName"
-              >
-                닉네임
-              </label>
-              <input
-                id="nickName"
-                type="text"
-                placeholder="닉네임"
-                value={userDetail?.userNickname || ""}
-                onChange={(e) => setNickName(e.target.value)}
-                className="input input-bordered w-full"
-              />
+            <label className="block mb-2">프로필 이미지</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleProfileImgChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
 
-              {/* 자기소개 */}
-              <label
-                className="label text-sm text-gray-500 mt-4 mr-auto"
-                htmlFor="bio"
-              >
-                자기소개
-              </label>
-              <textarea
-                id="bio"
-                placeholder="자기소개를 입력하세요."
-                value={userDetail?.bio || ""}
-                onChange={(e) => setBio(e.target.value)}
-                className="textarea textarea-bordered w-full"
-              ></textarea>
+          <div>
+            <label className="block mb-2">배경화면 이미지</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleBackgroundImgChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
 
-              {/* 성별 선택 */}
-              <label
-                className="label text-sm text-gray-500 mt-4 mr-auto"
-                htmlFor="gender"
-              >
-                성별
-              </label>
-              <select
-                id="gender"
-                value={userDetail?.gender || "그외"} // default로 'none'을 설정
-                onChange={(e) => setGender(e.target.value)}
-                className="select select-bordered w-full"
-              >
-                <option value="그외">선택 안 함</option>
-                <option value="남자">남성</option>
-                <option value="여자">여성</option>
-              </select>
+          {/* 성별 선택 */}
+          <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="gender">
+            성별
+          </label>
+          <select
+            id="gender"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            className="select select-bordered w-full"
+          >
+            {GENDER_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
 
-              {/* 레벨 선택 */}
-              <label
-                className="label text-sm text-gray-500 mt-4 mr-auto"
-                htmlFor="level"
-              >
-                레벨
-              </label>
-              <select
-                id="level"
-                value={userDetail?.level || ""}
-                onChange={(e) => setLevel(e.target.value)}
-                className="select select-bordered w-full"
-              >
-                <option value="무경력자">무경력자</option>
-                <option value="초보자">초보자</option>
-                <option value="입문자">입문자</option>
-                <option value="중수">중수</option>
-                <option value="고수">고수</option>
-              </select>
+          {/* 레벨 선택 */}
+          <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="level">
+            레벨
+          </label>
+          <select
+            id="level"
+            value={level}
+            onChange={(e) => setLevel(e.target.value)}
+            className="select select-bordered w-full"
+          >
+            {LEVEL_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
 
-              {/* 태그 입력 */}
-              <div>
-                <label className="label text-sm text-gray-500 mt-4 mr-auto">
-                  태그
-                </label>
-                <div className="flex w-full items-center">
-                  <input
-                    type="text"
-                    placeholder="태그 추가"
-                    value={inputTag}
-                    onChange={handleInputChange}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleAddTag(); // 엔터 키로 태그 추가
-                      }
-                    }}
-                    className="input input-bordered w-full"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddTag}
-                    className="btn btn-sm ml-2"
-                  >
-                    추가
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mt-2 w-full">
-                  {/* 이미 선택된 태그 표시 */}
-                  {tags.map((tag, index) => (
-                    <div
-                      key={index}
-                      className="badge badge-primary flex items-center"
+          {/* 태그 선택 */}
+          <div>
+            {categories.map(({ title, options, key }) => (
+              <div key={key} className="mb-4">
+                <p className="text-sm font-semibold text-gray-600">{title}</p>
+                <div className="flex gap-2 flex-wrap">
+                  {options.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => {
+                        setTags((prevTags) =>
+                          prevTags.includes(option) ? prevTags.filter((tag) => tag !== option) : [...prevTags, option]
+                        );
+                      }}
+                      className={`btn btn-sm ${tags.includes(option) ? "btn-primary" : "btn-outline"}`}
                     >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => handleTagRemove(tag)}
-                        className="ml-1 text-white"
-                      >
-                        ✕
-                      </button>
-                    </div>
+                      {option}
+                    </button>
                   ))}
                 </div>
-
-                {/* 선택할 수 있는 태그 리스트 */}
-                <div className="mt-2">
-                  <label className="label text-sm text-gray-500">
-                    선택 가능한 태그
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {availableTags
-                      .filter((availableTag) => !tags.includes(availableTag)) // 이미 선택된 태그는 제외
-                      .map((availableTag, index) => (
-                        <div
-                          key={index}
-                          className="badge badge-outline cursor-pointer"
-                        >
-                          {availableTag}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTags([...tags, availableTag]);
-                            }}
-                            className="ml-1 text-white"
-                          >
-                            + 태그 추가
-                          </button>
-                        </div>
-                      ))}
-                  </div>
-                </div>
               </div>
-
-              {/* 에러 메시지 */}
-              {/* {error && <span className="mt-2 text-sm text-red-400 w-full">{error}</span>}
-              {successMessage && <span className="mt-2 text-sm text-green-500 w-full">{successMessage}</span>} */}
-
-              {/* 제출 버튼 */}
-              <button
-                type="submit"
-                //     disabled={loading}
-                //     className={btn btn-primary w-[20rem] mt-6 ${loading ? "disabled" : ""}}
-              >
-                {/* {loading ? "업데이트 중..." : "프로필 변경"} */}
-              </button>
-            </form>
+            ))}
           </div>
-        </>
+        </form>
       </Modal>
     </div>
   );

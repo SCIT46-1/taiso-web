@@ -49,10 +49,10 @@ public class UserController {
 
     @PatchMapping("/me/details")
     @Operation(summary = "내 페이지 정보 수정", description = "상세 프로필 페이지 정보 수정")
-    public ResponseEntity<UserDetailResponseDTO> updateUserDetail(@RequestPart(value = "userDetailData") UserDetailRequestDTO userDetailRequestDTO
-                                                                , @RequestPart(value = "profileImg", required = false) MultipartFile profileImg
-                                                                , @RequestPart(value = "backgroundImg", required = false) MultipartFile backgroundImg
-                                                                , HttpServletResponse httpServletResponse){
+    public ResponseEntity<UserDetailResponseDTO> updateUserDetail(@RequestPart(value = "userDetailData") UserDetailRequestDTO userDetailRequestDTO,
+                                                                  @RequestPart(value = "profileImg", required = false) MultipartFile profileImg,
+                                                                  @RequestPart(value = "backgroundImg", required = false) MultipartFile backgroundImg,
+                                                                  HttpServletResponse httpServletResponse){
 
         log.info("로직 시작 : {}", userDetailRequestDTO.toString());
         log.info("profileImg : {}",profileImg.getOriginalFilename());

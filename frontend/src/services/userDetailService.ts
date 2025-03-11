@@ -92,8 +92,6 @@ export interface UserPageDetailRequest {
   userId: number;
   userNickname: string;
   bio: string;
-  profileImg: string;
-  backgroundImg: string;
   level: string;
   gender: string;
   tags: string[];
@@ -103,8 +101,8 @@ export interface UserPageDetailResponse {
   userId: number;
   userNickname: string;
   bio: string;
-  userProfileImg: string;
-  userBackgroundImg: string;
+  profileImg: string;
+  backgroundImg: string;
   level: string;
   gender: string;
   tags: string[];
@@ -123,9 +121,31 @@ const getUserPageDetail = async (
 
 //유저 페이지 디테일 수정
 const patchUserPageDetail = async (
-  payload: UserPageDetailRequest
+  userProfileRequest: UserPageDetailRequest,
+  profileImg: File | null | undefined,
+  backgroundImg: File | null | undefined
 ): Promise<void> => {
-  return await patch(`/users/me/details`, payload);
+  // FormData 객체 생성
+  const formData = new FormData();
+
+  // FormData에 JSON 데이터 추가
+  formData.append(
+    "userDetailData",
+    new Blob([JSON.stringify(userProfileRequest)], { type: "application/json" })
+  );
+
+  // profileImg가 있을 경우에만 FormData에 추가
+  if (profileImg) {
+    formData.append("profileImg", profileImg);
+  }
+
+  // backgroundImg가 있을 경우에만 FormData에 추가
+  if (backgroundImg) {
+    formData.append("backgroundImg", backgroundImg);
+  }
+
+  // axios는 FormData 객체를 자동으로 처리
+  return await post(`/users/me/details`, formData);
 };
 
 //유저 인증정보 조회
