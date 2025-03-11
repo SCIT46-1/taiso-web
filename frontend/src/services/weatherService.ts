@@ -98,8 +98,7 @@ const weatherService = {
         `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst`,
         {
           params: {
-            serviceKey:
-              "AqpYxirA+lVgNDIECGsaGd1rywZ4Gwc5QEtSdhq5tBIZGdZK6mhGhYikFg9wM2Wwo/xmc878DWrqpRsOxQ0WjQ==",
+            serviceKey: import.meta.env.VITE_WEATHER_API_KEY,
             pageNo: 1,
             numOfRows: 1000,
             dataType: "JSON",

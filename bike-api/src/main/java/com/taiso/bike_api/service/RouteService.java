@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.taiso.bike_api.domain.BookmarkEntity;
 import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
 import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.RouteLikeEntity;
@@ -102,6 +103,15 @@ public class RouteService {
             liked = routeLikeRepository.existsByUser_UserIdAndRoute_RouteId(userEntity.getUserId(), routeId);
         }
 
+        UserEntity user = userRepository.findByEmail(userEmail).orElse(null);
+        
+        // 루트 북마크 여부 확인
+        boolean isBookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(
+                user.getUserId(), 
+                routeEntity.getRouteId(),
+                BookmarkType.ROUTE
+            );
+        
         // 루트 디테일 정보 반환
         return RouteDetailResponseDTO.builder()
                 .routeId(routeEntity.getRouteId())
@@ -122,6 +132,7 @@ public class RouteService {
                 .fileType(routeEntity.getFileType() != null ? routeEntity.getFileType().name() : null)
                 .routePoint(pointResponses)
                 .isLiked(liked)
+                .isBookmarked(isBookmarked)
                 .build();
     }
 
@@ -239,52 +250,54 @@ public RouteListResponseDTO getRouteList(int page, int size, String sort,
     if (tag != null && Arrays.stream(tag).anyMatch(t -> t != null && !t.isEmpty())) {
         spec = spec.and(buildTagSpecification(tag));
     }
-
+    
     // 페이징 처리 및 결과 조회
     Page<RouteEntity> routePage = routeRepository.findAll(spec, pageable);
+
+    // 현재 사용자 가져오기 (null이 아닌 경우)
+    UserEntity currentUser = null;
+    if (userEmail != null && !userEmail.isEmpty()) {
+        currentUser = userRepository.findByEmail(userEmail).orElse(null);
+    }
+    
+    // Final reference for lambda
+    final UserEntity user = currentUser;
+
+    // 북마크 조회  
+    List<BookmarkEntity> bookmarks = bookmarkRepository.findByUserAndTargetType(user, BookmarkEntity.BookmarkType.ROUTE);
+
 
     // 응답 DTO 생성
     List<RouteResponseDTO> routeResponseDTO = routePage.getContent().stream()
             .map(route -> {
-                RouteResponseDTO dto = RouteResponseDTO.builder()
-                    .routeId(route.getRouteId())
-                    .routeImgId(route.getRouteImgId())
-                    .userId(route.getUserId())
-                    .routeName(route.getRouteName())
-                    .likeCount(route.getLikeCount())
-                    .tag(route.getTags().stream()
+                // 해당 루트에 대한 좋아요 여부 확인
+                boolean isLiked = false;
+                if (user != null) {
+                    isLiked = routeLikeRepository.existsByUser_UserIdAndRoute_RouteId(
+                            user.getUserId(), route.getRouteId());
+                }
+                
+                return new RouteResponseDTO(
+                    route.getRouteId(),
+                    route.getRouteImgId(),
+                    route.getUserId(),
+                    route.getRouteName(),
+                    route.getLikeCount(),
+                    route.getTags().stream()
                             .map(RouteTagCategoryEntity::getName)
-                            .collect(Collectors.toList()))
-                    .distance(route.getDistance() != null ? route.getDistance().floatValue() : null)
-                    .altitude(route.getAltitude() != null ? route.getAltitude().floatValue() : null)
-                    .region(route.getRegion() != null ? route.getRegion().toString() : null)
-                    .distanceType(route.getDistanceType() != null ? route.getDistanceType().toString() : null)
-                    .altitudeType(route.getAltitudeType() != null ? route.getAltitudeType().toString() : null)
-                    .roadType(route.getRoadType() != null ? route.getRoadType().toString() : null)
-                    .createdAt(route.getCreatedAt() != null ? route.getCreatedAt().toString() : null)
-                    .build();
-
-                    // 북마크 정보는 별도로 채워넣기
-                    if (userEmail != null && !userEmail.isEmpty()) {
-                        try {
-                            UserEntity user = userRepository.findByEmail(userEmail).orElse(null);
-                            if (user != null) {
-                                // 별도 쿼리로 북마크 여부 확인
-                                boolean isBookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(
-                                    user.getUserId(), 
-                                    route.getRouteId(),
-                                    BookmarkType.LIGHTNING
-                                );
-                                dto.setIsBookmarked(isBookmarked);
-                            }
-                        } catch (Exception e) {
-                            // 오류 무시 - 사용자에게 표시할 데이터에 영향을 주지 않음
-                            log.error("사용자 북마크 확인 중 오류: {}", e.getMessage());
-                        }
-                    }
-                    
-                    return dto;
-                })
+                            .collect(Collectors.toList()),
+                    route.getDistance() != null ? route.getDistance().floatValue() : null,
+                    route.getAltitude() != null ? route.getAltitude().floatValue() : null,
+                    route.getRegion() != null ? route.getRegion().toString() : null,
+                    route.getDistanceType() != null ? route.getDistanceType().toString() : null,
+                    route.getAltitudeType() != null ? route.getAltitudeType().toString() : null,
+                    route.getRoadType() != null ? route.getRoadType().toString() : null,
+                    route.getCreatedAt() != null ? route.getCreatedAt().toString() : null,
+                    isLiked,
+                    bookmarks.stream()
+                            .anyMatch(bookmark -> bookmark.getTargetId().equals(route.getRouteId()))
+                );
+            })
             .collect(Collectors.toList());
 
     return RouteListResponseDTO.builder()
@@ -296,6 +309,8 @@ public RouteListResponseDTO getRouteList(int page, int size, String sort,
             .last(routePage.isLast())
             .build();
 }
+
+
     
     /** 
       @param routeId 루트 아이디

@@ -73,6 +73,8 @@ export interface MyLightningResponse {
     duration: number;
     capacity: number;
     address: string | null;
+    routeImgId: string | null;
+    currentParticipants: number;
   };
   users: {
     userId: number;
@@ -162,6 +164,11 @@ const registerUserDetail = async (
   return await post(`/users/me/details`, payload);
 };
 
+// 내 회원 디테일 프로필 이미지 조회
+const getUserDetailProfileImg = async (): Promise<string> => {
+  return await get(`/users/me/details/profileImg`);
+};
+
 export default {
   getMyReservationLightning,
   getMyCompletedLightning,
@@ -170,5 +177,6 @@ export default {
   getUserPageDetail,
   updateUserDetail,
   registerUserDetail,
-  patchUserPageDetail
+  patchUserPageDetail,
+  getUserDetailProfileImg,
 };

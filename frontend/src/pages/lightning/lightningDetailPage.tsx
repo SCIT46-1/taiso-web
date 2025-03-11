@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useAuthStore } from "../../stores/useAuthStore";
 import lightningService, {
+  CompletedLightningResponse,
   LightningDetailGetResponse,
 } from "../../services/lightningService";
 import weatherService, {
@@ -14,13 +15,7 @@ import KakaolocationMap from "../../components/KakaolocationMap";
 import UserImage from "../../components/UserImage";
 import LightningSummaryInfo from "../../components/LightningSummaryInfo";
 import bookmarkService from "../../services/bookmarkService";
-
-interface ModalProps {
-  id: string;
-  title: string;
-  children: React.ReactNode;
-  actions: React.ReactNode;
-}
+import GlobalModal from "../../components/GlobalModal";
 
 interface WeatherDisplayProps {
   weatherInfo: WeatherInfo | null;
@@ -92,21 +87,6 @@ function WeatherDisplay({
   );
 }
 
-export function Modal({ id, title, children, actions }: ModalProps) {
-  return (
-    <dialog id={id} className="modal">
-      <div className="modal-box p-8">
-        <h3 className="font-extrabold text-2xl">{title}</h3>
-        <div className="py-4">{children}</div>
-        <div className="modal-action">{actions}</div>
-      </div>
-      <form method="dialog" className="modal-backdrop">
-        <button>close</button>
-      </form>
-    </dialog>
-  );
-}
-
 function LightningDetailPage() {
   const { lightningId } = useParams();
   const [lightningDetail, setLightningDetail] =
@@ -133,6 +113,9 @@ function LightningDetailPage() {
   const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [bookmarkLoading, setBookmarkLoading] = useState<boolean>(false);
+  // (2) LightningDetailPage 컴포넌트 내부에 완료 조회 데이터를 위한 state 추가
+  const [completedLightning, setCompletedLightning] =
+    useState<CompletedLightningResponse | null>(null);
 
   // 날씨 데이터 캐시: key를 이벤트 날짜, 위치, 지속시간 조합으로 생성
   const weatherCache = useRef<{
@@ -194,10 +177,16 @@ function LightningDetailPage() {
     modal?.showModal();
   };
 
+  // (3) 가입 성공 시 완료 조회 API를 호출하도록 handleJoinLightning 수정
   const handleJoinLightning = async () => {
     setLoadingJoin(true);
     try {
       await lightningService.joinLightning(Number(lightningId));
+      // 가입 성공 후 완료 데이터를 가져옴
+      const completedData = await lightningService.getCompletedLightnings(
+        Number(lightningId)
+      );
+      setCompletedLightning(completedData);
       closeModal("join-modal");
       showModal("join-complete-modal");
     } catch (error) {
@@ -477,7 +466,6 @@ function LightningDetailPage() {
           </>
         )}
       </div>
-
       {/* 하단 좌측 영역을 두 개의 컨테이너로 분할 */}
       <div className="flex flex-col gap-4">
         {/* 좌측 상단 컨테이너: 날씨 정보 영역 - 아코디언 적용 */}
@@ -564,7 +552,6 @@ function LightningDetailPage() {
           </div>
         </div>
       </div>
-
       {/* 하단 우측 참여자 및 지도 영역 - self-start 클래스 추가 */}
       <div className="flex flex-col items-center justify-center p-4 rounded-xl shadow-xl border border-base-300 self-start relative">
         <div className="mb-4 mt-2">
@@ -725,6 +712,11 @@ function LightningDetailPage() {
           참가인원 {lightningDetail?.currentMemberCount} /{" "}
           {lightningDetail?.capacity}{" "}
         </div>
+        <progress
+          className="progress progress-primary w-[95%] mt-1 mb-4"
+          value={lightningDetail?.currentMemberCount}
+          max={lightningDetail?.capacity}
+        ></progress>
 
         <div className="w-full">
           {lightningDetail?.member
@@ -871,9 +863,8 @@ function LightningDetailPage() {
           </div>
         )}
       </div>
-
       {/* 모달 컴포넌트들 */}
-      <Modal
+      <GlobalModal
         id="join-modal"
         title="정말로 참여하시겠어요?"
         actions={
@@ -912,21 +903,9 @@ function LightningDetailPage() {
           <div className="mt-2 font-extrabold">주의사항</div>
           <p>참여하기 이후 번개를 나가면 다시 참여할 수 없어요!</p>
         </>
-      </Modal>
+      </GlobalModal>
 
-      <Modal
-        id="join-complete-modal"
-        title="참여 완료!"
-        actions={
-          <button className="btn" onClick={handleJoinLightningComplete}>
-            닫기
-          </button>
-        }
-      >
-        <p>번개에 참여하셨습니다!</p>
-      </Modal>
-
-      <Modal
+      <GlobalModal
         id="join-fail-modal"
         title="번개 참여 실패"
         actions={
@@ -939,9 +918,8 @@ function LightningDetailPage() {
           번개 참여에 실패했습니다. 이미 참여한 번개이거나, 이미 완료된
           번개입니다!
         </p>
-      </Modal>
-
-      <Modal
+      </GlobalModal>
+      <GlobalModal
         id="leave-modal"
         title="번개 나가기"
         actions={
@@ -960,9 +938,8 @@ function LightningDetailPage() {
         }
       >
         <p>정말 번개를 나가시겠습니까? 한 번 나가면 재신청이 불가합니다.</p>
-      </Modal>
-
-      <Modal
+      </GlobalModal>
+      <GlobalModal
         id="leave-fail-modal"
         title="번개 나가기 실패"
         actions={
@@ -977,9 +954,8 @@ function LightningDetailPage() {
         <p>
           나가기 실패했습니다. 참여하지 않은 번개이거나, 이미 나간 번개입니다!
         </p>
-      </Modal>
-
-      <Modal
+      </GlobalModal>
+      <GlobalModal
         id="lightning-close-modal"
         title="번개 마감"
         actions={
@@ -1004,9 +980,8 @@ function LightningDetailPage() {
           번개를 마감하시겠습니까? 한번 마감한 번개는 다시 활성화 할 수
           없습니다!
         </p>
-      </Modal>
-
-      <Modal
+      </GlobalModal>
+      <GlobalModal
         id="lightning-end-modal"
         title="번개 종료"
         actions={
@@ -1028,9 +1003,8 @@ function LightningDetailPage() {
         }
       >
         <p>번개를 종료하시겠습니까?</p>
-      </Modal>
-
-      <Modal
+      </GlobalModal>
+      <GlobalModal
         id="accept-modal"
         title="번개 신청"
         actions={
@@ -1055,22 +1029,29 @@ function LightningDetailPage() {
             있습니다.
           </p>
         </>
-      </Modal>
+      </GlobalModal>
 
-      <Modal
-        id="accept-complete-modal"
-        title="신청 완료!"
+      <GlobalModal
+        id="join-complete-modal"
+        title="참여 완료!"
         actions={
-          <button
-            className="btn"
-            onClick={() => closeModal("accept-complete-modal")}
-          >
+          <button className="btn" onClick={handleJoinLightningComplete}>
             닫기
           </button>
         }
       >
-        <p>번개에 신청하셨습니다!</p>
-      </Modal>
+        <KakaolocationMap
+          lat={lightningDetail?.latitude}
+          lng={lightningDetail?.longitude}
+        />
+        <div>번개 제목 : {completedLightning?.routeTitle}</div>
+        <div>번개 시작 시간 : {completedLightning?.eventDate}</div>
+        <div>번개 진행 시간 : {completedLightning?.duration}</div>
+        <div>정원 : {completedLightning?.capacity}</div>
+        <div>참여자 : {completedLightning?.currentParticipants}</div>
+        <div>참여 일시 : {completedLightning?.joinDate}</div>
+        <p>번개에 참여하셨습니다!</p>
+      </GlobalModal>
     </div>
   );
 }

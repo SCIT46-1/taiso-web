@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import authService from "../services/authService";
 import { useAuthStore } from "../stores/useAuthStore";
 import { Link } from "react-router";
+import userDetailService from "../services/userDetailService";
 
 function Navbar() {
   const { logout, isAuthenticated, user } = useAuthStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchProfileImg = async () => {
+      const profileImg = await userDetailService.getUserDetailProfileImg();
+      console.log(profileImg);
+    };
+    try {
+      fetchProfileImg();
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
   const handleLogout = () => {
     authService.logout();

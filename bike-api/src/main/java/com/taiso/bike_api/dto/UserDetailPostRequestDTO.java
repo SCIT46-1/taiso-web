@@ -39,5 +39,6 @@ public class UserDetailPostRequestDTO {
     private Integer FTP;
     private Integer height;
     private Integer weight;
+    @Builder.Default
     private Set<String> tags = new HashSet<>();
 }

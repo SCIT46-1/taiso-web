@@ -1,49 +1,87 @@
+import { lazy, Suspense, ComponentType, FC } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import Root from "./root";
-import MainPage from "./pages/MainPage";
-import ProtectedRoute from "./ProtectedRoute";
-import LoginPage from "./pages/auth/LoginPage";
-import RegisterPage from "./pages/auth/RegisterPage";
-import LandingPage from "./pages/auth/LandingPage";
-import OAuthCallback from "./components/OAuthCallback";
-import RoutePage from "./pages/RoutePage";
-import ClubPage from "./pages/ClubPage";
-import RouteDetailPage from "./pages/route/RouteDetailPage";
-import NotFoundErrorPage from "./pages/error/NotFoundErrorPage";
-import LightningPage from "./pages/LightningPage";
-import LightningPostPage from "./pages/lightning/LightningPostPage";
-import RoutePostPage from "./pages/route/RoutePostPage";
-import LightningDetailPage from "./pages/lightning/lightningDetailPage";
-import AuthRoute from "./AuthRoute";
-import UserOnboardingPage from "./pages/auth/UserOnboardingPage";
-import UserDetailPage from "./pages/UserDetailPage";
-import UserDetailUpdate from "./pages/user/userDetailUpdate";
-import UserLightningPage from "./pages/user/UserLightningPage";
-import UserLightningCompletePage from "./pages/user/UserLightningCompletePage";
-import ClubDetailPage from "./pages/club/ClubDetailPage";
-import ClubPostPage from "./pages/club/ClubPostPage";
-import UserAccountUpdatePage from "./pages/user/UserAccountUpdatePage";
-import UserAccountPage from "./pages/user/UserAccountPage";
-import BookMarkPage from "./pages/BookMarkPage";
+
+// 로딩 컴포넌트를 래핑하는 헬퍼 함수
+const Loadable = <P extends object>(Component: ComponentType<P>): FC<P> => {
+  return (props: P) => (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center h-screen"></div>
+      }
+    >
+      <Component {...props} />
+    </Suspense>
+  );
+};
+
+// 페이지별 lazy import 처리
+const Root = Loadable(lazy(() => import("./root")));
+const MainPage = Loadable(lazy(() => import("./pages/MainPage")));
+const ProtectedRoute = Loadable(lazy(() => import("./ProtectedRoute")));
+const LoginPage = Loadable(lazy(() => import("./pages/auth/LoginPage")));
+const RegisterPage = Loadable(lazy(() => import("./pages/auth/RegisterPage")));
+const LandingPage = Loadable(lazy(() => import("./pages/auth/LandingPage")));
+const OAuthCallback = Loadable(
+  lazy(() => import("./components/OAuthCallback"))
+);
+const RoutePage = Loadable(lazy(() => import("./pages/RoutePage")));
+const ClubPage = Loadable(lazy(() => import("./pages/ClubPage")));
+const RouteDetailPage = Loadable(
+  lazy(() => import("./pages/route/RouteDetailPage"))
+);
+const NotFoundErrorPage = Loadable(
+  lazy(() => import("./pages/error/NotFoundErrorPage"))
+);
+const LightningPage = Loadable(lazy(() => import("./pages/LightningPage")));
+const LightningPostPage = Loadable(
+  lazy(() => import("./pages/lightning/LightningPostPage"))
+);
+const RoutePostPage = Loadable(
+  lazy(() => import("./pages/route/RoutePostPage"))
+);
+const LightningDetailPage = Loadable(
+  lazy(() => import("./pages/lightning/lightningDetailPage"))
+);
+const AuthRoute = Loadable(lazy(() => import("./AuthRoute")));
+const UserOnboardingPage = Loadable(
+  lazy(() => import("./pages/auth/UserOnboardingPage"))
+);
+const UserDetailPage = Loadable(lazy(() => import("./pages/UserDetailPage")));
+const UserDetailUpdate = Loadable(
+  lazy(() => import("./pages/user/userDetailUpdate"))
+);
+const UserLightningPage = Loadable(
+  lazy(() => import("./pages/user/UserLightningPage"))
+);
+const UserLightningCompletePage = Loadable(
+  lazy(() => import("./pages/user/UserLightningCompletePage"))
+);
+const ClubDetailPage = Loadable(
+  lazy(() => import("./pages/club/ClubDetailPage"))
+);
+const ClubPostPage = Loadable(lazy(() => import("./pages/club/ClubPostPage")));
+const UserAccountUpdatePage = Loadable(
+  lazy(() => import("./pages/user/UserAccountUpdatePage"))
+);
+const UserAccountPage = Loadable(
+  lazy(() => import("./pages/user/UserAccountPage"))
+);
+const BookMarkPage = Loadable(lazy(() => import("./pages/BookMarkPage")));
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     children: [
-      // 인증 없이 접근 가능한 페이지들
+      // 인증 없이 접근 가능한 페이지
       { path: "", element: <MainPage /> },
-
-      //온보딩 테스트 페이지
       { path: "onboarding", element: <UserOnboardingPage /> },
-
       { path: "oauth/callback", element: <OAuthCallback /> },
       {
         path: "lightning",
         children: [
           { path: "", element: <LightningPage /> },
           { path: ":lightningId", element: <LightningDetailPage /> },
-          // 인증 필요한 post 라우트는 아래 ProtectedRoute에서 다룸
         ],
       },
       {
@@ -60,12 +98,11 @@ const router = createBrowserRouter([
           { path: ":clubId", element: <ClubDetailPage /> },
         ],
       },
-
       {
         path: "users",
         children: [{ path: ":userId", element: <UserDetailPage /> }],
       },
-      // 인증 후에만 접근 가능한 post 관련 페이지들
+      // 인증이 필요한 페이지들
       {
         element: <ProtectedRoute />,
         children: [
@@ -89,7 +126,6 @@ const router = createBrowserRouter([
               { path: "me/account", element: <UserAccountPage /> },
               { path: "me/account/update", element: <UserAccountUpdatePage /> },
               { path: "me/update", element: <UserDetailUpdate /> },
-
               {
                 path: "me/lightning-reservation",
                 element: <UserLightningPage />,
@@ -98,16 +134,13 @@ const router = createBrowserRouter([
                 path: "me/lightning-completed",
                 element: <UserLightningCompletePage />,
               },
-              // { path: "me/club", element: <UserClubPage /> },
-              // { path: "me/route", element: <UserRoutePage /> },
-              // { path: "me/bookmark", element: <UserBookmarkPage /> },
             ],
           },
         ],
       },
     ],
   },
-  // 로그인 등 인증로직 처리
+  // 인증 로직 처리 페이지 (로그인, 회원가입 등)
   {
     path: "auth",
     element: <AuthRoute />,

@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.taiso.bike_api.domain.RouteEntity;
 
 public interface RouteRepository extends JpaRepository<RouteEntity, Long>, JpaSpecificationExecutor<RouteEntity> {
+  RouteEntity findByRouteId(Long routeId);
+
 }

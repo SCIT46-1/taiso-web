@@ -20,8 +20,20 @@ const getBookmarkLightnings = async (): Promise<BookmarkLightningsResponse> => {
   return await get(`/users/me/bookmarks/lightnings`);
 };
 
+// 루트 북마크 생성
+const bookmarkRoute = async (routeId: number) => {
+  return await post(`/users/me/bookmarks/routes/${routeId}`);
+};
+
+// 루트 북마크 삭제
+const deleteBookmarkRoute = async (routeId: number) => {
+  return await del(`/users/me/bookmarks/routes/${routeId}`);
+};
+
 export default {
   bookmarkLightning,
   deleteBookmarkLightning,
   getBookmarkLightnings,
+  bookmarkRoute,
+  deleteBookmarkRoute,
 };
