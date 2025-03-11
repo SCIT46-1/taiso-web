@@ -4,7 +4,6 @@ import bookmarkService, {
   BookmarkRoutesResponse,
 } from "../services/bookmarkService";
 import ImageWithSkeleton from "./ImageWithSkeleton";
-import routeService from "../services/routeService";
 
 function BookmarkedRouteList() {
   const [isLoading, setIsLoading] = useState(false);
