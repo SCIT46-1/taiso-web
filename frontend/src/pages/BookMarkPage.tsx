@@ -1,5 +1,12 @@
+import BookmarkedRouteList from "../components/BookmarkedRouteList";
+
 function BookMarkPage() {
-  return <div>BookMarkPage</div>;
+  return (
+    <div>
+      북마크
+      <BookmarkedRouteList />
+    </div>
+  );
 }
 
 export default BookMarkPage;

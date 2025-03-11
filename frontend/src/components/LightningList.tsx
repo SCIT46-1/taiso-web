@@ -215,7 +215,9 @@ function LightningList({
                           {formatDate(lightning.eventDate)} (
                           {lightning.duration}분)
                         </div>
-                        <div className="text-base">{lightning.title}</div>
+                        <div className="text-base truncate md:w-[350px] w-full text-overflow-ellipsis overflow-hidden">
+                          {lightning.title}
+                        </div>
                         <div className="text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
                           <svg
                             data-slot="icon"
