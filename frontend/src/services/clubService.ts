@@ -120,6 +120,32 @@ export interface ClubBoardPostRequest {
   isNotice: boolean;
 }
 
+export interface ClubLightningListResponse {
+  content: {
+    lightningId: number;
+    creatorId: number;
+    title: string;
+    eventDate: string;
+    duration: number;
+    createdAt: string;
+    status: string;
+    capacity: number;
+    currentParticipants: number;
+    gender: string;
+    level: string;
+    bikeType: string;
+    tags: [];
+    address: string;
+    routeImgId: string;
+    bookmarked: boolean;
+  }[];
+  pageNo: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
+
 const getClubList = async (): Promise<ClubListResponse> => {
   return await get(`/clubs`);
 };
@@ -221,6 +247,15 @@ const deleteClubBoard = async (
   return await del(`/clubs/${clubId}/boards/${boardId}`);
 };
 
+//클럽 전용 번개 조회
+const getClubLightningList = async (
+  clubId: number,
+  page: number,
+  size: number
+): Promise<ClubLightningListResponse> => {
+  return await get(`/clubs/${clubId}/lightnings?page=${page}&size=${size}`);
+};
+
 //내 클럽 조회
 const getMyClub = async (): Promise<ClubListResponse> => {
   return await get(`/clubs/me`);
@@ -241,4 +276,5 @@ export default {
   updateClubBoard,
   deleteClubBoard,
   getMyClub,
+  getClubLightningList,
 };
