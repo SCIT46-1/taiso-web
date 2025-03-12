@@ -102,7 +102,7 @@ public class NewClubService {
                 .user(clubCreator)
                 .club(club)
                 .role(ClubMemberEntity.Role.클럽장)
-                .participantStatus(ClubMemberEntity.ParticipantStatus.완료)
+                .participantStatus(ClubMemberEntity.ParticipantStatus.승인)
                 .build();
 
         clubMemberRepository.save(clubMemberLeader);

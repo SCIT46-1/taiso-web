@@ -1,5 +1,6 @@
 import { lazy, Suspense, ComponentType, FC } from "react";
 import { createBrowserRouter } from "react-router-dom";
+import UserClubPage from "./pages/user/UserClubPage";
 
 // 로딩 컴포넌트를 래핑하는 헬퍼 함수
 const Loadable = <P extends object>(Component: ComponentType<P>): FC<P> => {
@@ -152,6 +153,10 @@ const router = createBrowserRouter([
               {
                 path: "me/lightning-completed",
                 element: <UserLightningCompletePage />,
+              },
+              {
+                path: "me/club",
+                element: <UserClubPage />,
               },
             ],
           },

@@ -207,7 +207,6 @@ public class LightningDetailService {
         // 번개 루트 빌드 (존재할때만)
 
             RouteEntity route = temp.getRoute();
-            log.info("번개 루트 : {}",route.getRouteId().toString());
 
                 // 번개 루트 포인트 빌드 (존재할때만)
                 List<RoutePointDTO> routePointDTOs = new ArrayList<>();

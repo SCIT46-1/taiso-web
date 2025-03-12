@@ -108,7 +108,7 @@ public class LightningEntity {
     // private Long routeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "route_id")
+    @JoinColumn(name = "route_id", nullable = true)
     private RouteEntity route;
 
     @Column(name = "address", nullable = false, length = 255)

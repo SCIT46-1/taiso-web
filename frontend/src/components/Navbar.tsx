@@ -118,10 +118,7 @@ function Navbar() {
                 <Link to="/user/me/lightning-completed">내 번개 완료 정보</Link>
               </li>
               <li>
-                <Link to="/settings">내 클럽 정보</Link>
-              </li>
-              <li>
-                <Link to="/settings">내 루트 정보</Link>
+                <Link to="/user/me/club">내 클럽 정보</Link>
               </li>
               <li>
                 <Link to="/bookmark/lightning">북마크</Link>

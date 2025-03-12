@@ -53,6 +53,7 @@ export interface ClubDetailResponse {
       userNickname: string;
       userProfileImage: string | null;
       bio: string;
+      participantStatus: string;
     }
   ];
   tags: string[];
@@ -139,7 +140,6 @@ const createClubWithImage = async (
 ): Promise<ClubDetailResponse> => {
   // FormData 객체 생성
   const formData = new FormData();
-
   // FormData에 JSON 데이터와 이미지 파일 추가
   formData.append(
     "clubData",
@@ -221,11 +221,9 @@ const deleteClubBoard = async (
   return await del(`/clubs/${clubId}/boards/${boardId}`);
 };
 
-// Get pending members for a club
-const getPendingMembers = async (
-  clubId: number
-): Promise<ClubDetailGetResponseUserDTO[]> => {
-  return await get(`/clubs/${clubId}/pending-members`);
+//내 클럽 조회
+const getMyClub = async (): Promise<ClubListResponse> => {
+  return await get(`/clubs/me`);
 };
 
 export default {
@@ -237,10 +235,10 @@ export default {
   rejectClubMember,
   acceptClubMember,
   leaveClub,
-  getPendingMembers,
   getClubBoardList,
   getClubBoardDetail,
   createClubBoard,
   updateClubBoard,
   deleteClubBoard,
+  getMyClub,
 };
