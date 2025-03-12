@@ -3,7 +3,6 @@ package com.taiso.bike_api.repository;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +13,8 @@ import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.ClubMemberEntity;
 import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 import com.taiso.bike_api.domain.UserEntity;
+
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface ClubMemberRepository extends JpaRepository<ClubMemberEntity, Long> {
@@ -31,4 +32,7 @@ public interface ClubMemberRepository extends JpaRepository<ClubMemberEntity, Lo
 	@Transactional
 	@Query("DELETE FROM ClubMemberEntity cm WHERE cm.club.id = :clubId")
 	void deleteAllByClubId(@Param("clubId") Long clubId);
+
+	// 유저 아이디로 참여 클럽 횟수 조회
+	int countByUser_UserId(Long userId);
 }

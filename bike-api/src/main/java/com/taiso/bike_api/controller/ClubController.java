@@ -66,4 +66,7 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body(clubService.updateClubDetails(clubId, requestDTO, authentication));
     }
 
+
+
+
 }

@@ -37,4 +37,5 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> 
 
     Page<BookmarkEntity> findByUserAndTargetType(UserEntity user, BookmarkType club, Pageable pageable);
 	
+	
 }

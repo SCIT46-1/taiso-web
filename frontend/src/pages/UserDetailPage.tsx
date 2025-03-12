@@ -5,23 +5,43 @@ import userDetailService, {
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
 import ReviewList from "../components/ReviewList";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
+import bookmarkService from "../services/bookmarkService";
 
 // 태그 정의
 const GENDER_OPTIONS = ["남자", "여자", "그외"];
 const LEVEL_OPTIONS = ["무경력", "초보자", "입문자", "중수", "고수"];
 const ACTIVITYTIME_OPTION = ["새벽", "오전", "오후", "저녁", "밤", "종일"];
 const ACTIVITYDAY_OPTION = ["월", "화", "수", "목", "금", "토", "일"];
-const ACTIVITYLOCATION_OPTION = ["서울", "경기", "인천", "부산", "대구", "광주",
-  "대전", "울산", "경상북도", "경상남도", "전라남도", 
-  "전라북도", "충청남도", "충청북도", "강원도", "제주도"];
+const ACTIVITYLOCATION_OPTION = [
+  "서울",
+  "경기",
+  "인천",
+  "부산",
+  "대구",
+  "광주",
+  "대전",
+  "울산",
+  "경상북도",
+  "경상남도",
+  "전라남도",
+  "전라북도",
+  "충청남도",
+  "충청북도",
+  "강원도",
+  "제주도",
+];
 
 // 태그 통합
 const categories = [
   { title: "레벨", options: LEVEL_OPTIONS, key: "level" },
   { title: "활동 시간", options: ACTIVITYTIME_OPTION, key: "activityTime" },
   { title: "활동 요일", options: ACTIVITYDAY_OPTION, key: "activityDay" },
-  { title: "활동 지역", options: ACTIVITYLOCATION_OPTION, key: "activityLocation" },
+  {
+    title: "활동 지역",
+    options: ACTIVITYLOCATION_OPTION,
+    key: "activityLocation",
+  },
 ];
 
 // 모달
@@ -55,6 +75,7 @@ function UserDetailPage() {
   );
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
+  const navigate = useNavigate();
 
   console.log(isLoading, user);
 
@@ -69,11 +90,24 @@ function UserDetailPage() {
   const [profileImgPatch, setProfileImgPatch] = useState<File | null>();
   const [backgroundImgPatch, setBackgroundImgPatch] = useState<File | null>();
 
+  // 이미지 미리보기용 상태 추가
+  const [profileImgPreview, setProfileImgPreview] = useState<string | null>(
+    null
+  );
+  const [backgroundImgPreview, setBackgroundImgPreview] = useState<
+    string | null
+  >(null);
+
+  // 북마크 상태 관리를 위한 state 추가
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
   useEffect(() => {
     const fetchUserDetail = async () => {
       setIsLoading(true);
       try {
-        const userDetailData = await userDetailService.getUserPageDetail(Number(userId));
+        const userDetailData = await userDetailService.getUserPageDetail(
+          Number(userId)
+        );
 
         if (userDetailData) {
           setUserDetail(userDetailData);
@@ -84,6 +118,10 @@ function UserDetailPage() {
           setGender(userDetailData.gender || "");
           setLevel(userDetailData.level || "");
           setTags(userDetailData.tags || []);
+
+          // 북마크 상태 설정 (API에서 이 정보를 제공한다고 가정)
+          // 만약 API에서 제공하지 않는다면, 별도의 API 호출로 북마크 상태를 확인해야 함
+          setIsBookmarked(userDetailData.bookmarked || false);
         } else {
           setUserDetail(null);
         }
@@ -100,14 +138,37 @@ function UserDetailPage() {
   // 파일 업로드 핸들러
   const handleProfileImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setProfileImgPatch(e.target.files[0]); // 새 파일로 업데이트
+      const file = e.target.files[0];
+      setProfileImgPatch(file); // 새 파일로 업데이트
+
+      // 미리보기 URL 생성
+      const previewUrl = URL.createObjectURL(file);
+      setProfileImgPreview(previewUrl);
     }
   };
 
-  const handleBackgroundImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBackgroundImgChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.files && e.target.files[0]) {
-      setBackgroundImgPatch(e.target.files[0]);
+      const file = e.target.files[0];
+      setBackgroundImgPatch(file);
+
+      // 미리보기 URL 생성
+      const previewUrl = URL.createObjectURL(file);
+      setBackgroundImgPreview(previewUrl);
     }
+  };
+
+  // 파일 업로드 취소 핸들러 추가
+  const resetProfileImg = () => {
+    setProfileImgPatch(null);
+    setProfileImgPreview(null);
+  };
+
+  const resetBackgroundImg = () => {
+    setBackgroundImgPatch(null);
+    setBackgroundImgPreview(null);
   };
 
   const handleSubmit = async () => {
@@ -130,23 +191,71 @@ function UserDetailPage() {
 
     try {
       setIsLoading(true);
-      await userDetailService.patchUserPageDetail(userProfileRequest, profileImgPatch, backgroundImgPatch);
-     
+      await userDetailService.patchUserPageDetail(
+        userProfileRequest,
+        profileImgPatch,
+        backgroundImgPatch
+      );
+
+      // 성공 후 이미지 미리보기 및 파일 상태 정리
+      setProfileImgPreview(null);
+      setBackgroundImgPreview(null);
+
+      // 최신 데이터로 페이지 갱신
+      const userDetailData = await userDetailService.getUserPageDetail(
+        Number(userId)
+      );
+
+      if (userDetailData) {
+        setUserDetail(userDetailData);
+        setProfileImg(userDetailData.profileImg || "");
+        setBackgroundImg(userDetailData.backgroundImg || "");
+      }
+
       setIsLoading(false);
       alert("프로필이 업데이트되었습니다.");
+
+      // 모달 닫기
+      closeModal("profile-edit-modal");
     } catch (error) {
       console.error("Failed to submit:", error);
       setIsLoading(false);
+      alert("프로필 업데이트에 실패했습니다. 다시 시도해 주세요.");
     }
   };
 
+  // 북마크 토글 핸들러 추가
+  const handleBookmarkToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
+    try {
+      if (!isBookmarked) {
+        await bookmarkService.bookmarkUser(Number(userId));
+      } else {
+        await bookmarkService.deleteBookmarkUser(Number(userId));
+      }
+
+      // 북마크 상태 업데이트
+      setIsBookmarked(!isBookmarked);
+    } catch (error) {
+      console.error("Bookmark operation failed:", error);
+
+      // 401 에러 체크 (인증 실패)
+      if (
+        error instanceof Error &&
+        "response" in (error as any) &&
+        (error as any).response?.status === 401
+      ) {
+        navigate("/auth/landing");
+      }
+    }
+  };
 
   // 로딩 중일 때 처리
   if (isLoading) {
     return <div className="font-semibold">Loading...</div>;
   }
- 
 
   // 모달 동작
   // 버튼에서 onClick으로 동작
@@ -165,19 +274,68 @@ function UserDetailPage() {
       {/* 배경이미지 & 프로필 이미지 */}
       <div className="flex flex-col relative">
         <img
-          src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.backgroundImg}`}
+          src={
+            userDetail?.backgroundImg !== null
+              ? `https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.backgroundImg}`
+              : "/backgroundDefault.png"
+          }
           alt="background"
-          className="w-full h-64 bg-gray-100 object-cover rounded-t-xl"
+          className="w-full h-64  object-cover rounded-t-xl"
         />
         <img
-          src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.profileImg}`}
+          src={
+            userDetail?.profileImg !== null
+              ? `https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.profileImg}`
+              : "/userDefault.png"
+          }
           alt="profile"
-          className="size-24 rounded-full bg-blue-200 absolute -bottom-12 sm:left-14 left-6"
+          className="size-24 rounded-full absolute -bottom-12 sm:left-14 left-6"
         />
+
+        {/* 북마크 아이콘 (자신의 프로필이 아닐 경우에만 표시) */}
+        {user?.userId !== Number(userId) && (
+          <div className="absolute top-4 right-4">
+            {!isBookmarked ? (
+              <svg
+                data-slot="icon"
+                fill="none"
+                strokeWidth="1.75"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                className="size-7 text-white cursor-pointer hover:text-gray-200"
+                onClick={handleBookmarkToggle}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                ></path>
+              </svg>
+            ) : (
+              <svg
+                data-slot="icon"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                className="size-7 text-white cursor-pointer hover:text-gray-200"
+                onClick={handleBookmarkToggle}
+              >
+                <path
+                  clipRule="evenodd"
+                  fillRule="evenodd"
+                  d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 0 0 1.075.676L10 15.082l5.925 2.844A.75.75 0 0 0 17 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0 0 10 2Z"
+                ></path>
+              </svg>
+            )}
+          </div>
+        )}
       </div>
       {/* 회원 정보 */}
       <div className="flex flex-col sm:ml-12 ml-6 mt-14 w-[85%] p-2">
-        <div className="flex gap-2 mb-2 flex flex-col">
+        <div className="flex gap-2 mb-2 flex-col">
           <div className="text-2xl font-bold ml-2">
             {userDetail?.userNickname}
 
@@ -235,7 +393,9 @@ function UserDetailPage() {
               </svg>
             </div>
             <div className="stat-title">참여 번개</div>
-            <div className="stat-value text-primary text-lg">26개</div>
+            <div className="stat-value text-primary text-lg">
+              {userDetail?.userLightningsCount}
+            </div>
           </div>
           <div className="stat">
             <div className="stat-figure">
@@ -254,7 +414,9 @@ function UserDetailPage() {
               </svg>
             </div>
             <div className="stat-title">가입 클럽</div>
-            <div className="stat-value text-lg">2개</div>
+            <div className="stat-value text-lg">
+              {userDetail?.userClubsCount}
+            </div>
           </div>
           <div className="stat">
             <div className="stat-figure">
@@ -273,7 +435,9 @@ function UserDetailPage() {
               </svg>
             </div>
             <div className="stat-title">등록 루트</div>
-            <div className="stat-value text-lg">9개</div>
+            <div className="stat-value text-lg">
+              {userDetail?.userRegisteredRoutesCount}
+            </div>
           </div>
         </div>
       </div>
@@ -303,10 +467,18 @@ function UserDetailPage() {
         title="Profile Edit"
         actions={
           <>
-            <button type="submit" disabled={isLoading} onClick={handleSubmit} className="btn btn-primary">
+            <button
+              type="submit"
+              disabled={isLoading}
+              onClick={handleSubmit}
+              className="btn btn-primary"
+            >
               {isLoading ? "업데이트 중..." : "프로필 변경"}
             </button>
-            <button className="btn" onClick={() => closeModal("profile-edit-modal")}>
+            <button
+              className="btn"
+              onClick={() => closeModal("profile-edit-modal")}
+            >
               취소
             </button>
           </>
@@ -314,7 +486,10 @@ function UserDetailPage() {
       >
         <form className="flex flex-col items-center justify-center max-w-sm mx-auto relative w-[20rem]">
           {/* 닉네임 */}
-          <label className="label text-sm text-gray-500 mr-auto" htmlFor="nickName">
+          <label
+            className="label text-sm text-gray-500 mr-auto"
+            htmlFor="nickName"
+          >
             닉네임
           </label>
           <input
@@ -327,7 +502,10 @@ function UserDetailPage() {
           />
 
           {/* 자기소개 */}
-          <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="bio">
+          <label
+            className="label text-sm text-gray-500 mt-4 mr-auto"
+            htmlFor="bio"
+          >
             자기소개
           </label>
           <textarea
@@ -338,28 +516,79 @@ function UserDetailPage() {
             className="textarea textarea-bordered w-full"
           ></textarea>
 
-          <div>
-            <label className="block mb-2">프로필 이미지</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleProfileImgChange}
-              className="w-full p-2 border rounded"
-            />
+          {/* 프로필 이미지 */}
+          <div className="w-full mt-4">
+            <label className="block text-sm text-gray-500 mb-2">
+              프로필 이미지
+            </label>
+            <div className="flex flex-col gap-2">
+              {/* 이미지 미리보기 */}
+              {(profileImgPreview || profileImg) && (
+                <div className="relative w-24 h-24 mx-auto">
+                  <img
+                    src={profileImgPreview || profileImg || ""}
+                    alt="프로필 미리보기"
+                    className="size-24 rounded-full object-cover"
+                  />
+                  {profileImgPreview && (
+                    <button
+                      type="button"
+                      onClick={resetProfileImg}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full size-6 flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProfileImgChange}
+                className="file-input file-input-bordered w-full"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block mb-2">배경화면 이미지</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleBackgroundImgChange}
-              className="w-full p-2 border rounded"
-            />
+          {/* 배경화면 이미지 */}
+          <div className="w-full mt-4">
+            <label className="block text-sm text-gray-500 mb-2">
+              배경화면 이미지
+            </label>
+            <div className="flex flex-col gap-2">
+              {/* 이미지 미리보기 */}
+              {(backgroundImgPreview || backgroundImg) && (
+                <div className="relative w-full h-32">
+                  <img
+                    src={backgroundImgPreview || backgroundImg || ""}
+                    alt="배경 미리보기"
+                    className="w-full h-32 rounded-lg object-cover"
+                  />
+                  {backgroundImgPreview && (
+                    <button
+                      type="button"
+                      onClick={resetBackgroundImg}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full size-6 flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleBackgroundImgChange}
+                className="file-input file-input-bordered w-full"
+              />
+            </div>
           </div>
 
           {/* 성별 선택 */}
-          <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="gender">
+          <label
+            className="label text-sm text-gray-500 mt-4 mr-auto"
+            htmlFor="gender"
+          >
             성별
           </label>
           <select
@@ -376,7 +605,10 @@ function UserDetailPage() {
           </select>
 
           {/* 레벨 선택 */}
-          <label className="label text-sm text-gray-500 mt-4 mr-auto" htmlFor="level">
+          <label
+            className="label text-sm text-gray-500 mt-4 mr-auto"
+            htmlFor="level"
+          >
             레벨
           </label>
           <select
@@ -404,10 +636,14 @@ function UserDetailPage() {
                       type="button"
                       onClick={() => {
                         setTags((prevTags) =>
-                          prevTags.includes(option) ? prevTags.filter((tag) => tag !== option) : [...prevTags, option]
+                          prevTags.includes(option)
+                            ? prevTags.filter((tag) => tag !== option)
+                            : [...prevTags, option]
                         );
                       }}
-                      className={`btn btn-sm ${tags.includes(option) ? "btn-primary" : "btn-outline"}`}
+                      className={`btn btn-sm ${
+                        tags.includes(option) ? "btn-primary" : "btn-outline"
+                      }`}
                     >
                       {option}
                     </button>

@@ -81,8 +81,13 @@ function BookmarkedRouteList() {
   return (
     <div className="flex flex-col w-[95%] mx-auto">
       {bookmarkRoutes?.length === 0 && !isLoading ? (
-        <div className="text-center my-10 text-gray-500">
-          북마크한 루트가 없습니다.
+        <div className="flex flex-col items-center justify-center h-64 p-4">
+          <div className="text-lg font-medium mb-2">
+            북마크한 루트가 없습니다
+          </div>
+          <p className="text-gray-500 text-center">
+            관심있는 루트를 북마크해보세요!
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-">

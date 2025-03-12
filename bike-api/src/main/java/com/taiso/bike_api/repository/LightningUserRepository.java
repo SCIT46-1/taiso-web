@@ -51,5 +51,9 @@ public interface LightningUserRepository extends JpaRepository<LightningUserEnti
     Optional<LightningUserEntity> findByUser_UserIdAndLightning_LightningId(Long userId, Long lightningId);
 
     List<LightningUserEntity> findByUserAndParticipantStatusInAndLightning_StatusInOrderByLightning_EventDateDesc(
-            UserEntity user, List<ParticipantStatus> pStatus, List<LightningStatus> status);
+                    UserEntity user, List<ParticipantStatus> pStatus, List<LightningStatus> status);
+
+    //유저 아이디로 참여 번개 횟수 조회
+    int countByUser_UserId(Long userId);
+
 }

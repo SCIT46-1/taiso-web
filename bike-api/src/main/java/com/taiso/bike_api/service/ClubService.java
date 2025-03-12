@@ -14,18 +14,18 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
 import com.taiso.bike_api.domain.ClubEntity;
 import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 import com.taiso.bike_api.domain.LightningTagCategoryEntity;
 import com.taiso.bike_api.domain.UserEntity;
-import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
 import com.taiso.bike_api.dto.ClubDescriptionUpdateRequestDTO;
 import com.taiso.bike_api.dto.ClubDescriptionUpdateResponseDTO;
 import com.taiso.bike_api.dto.ClubDetailGetResponseDTO;
 import com.taiso.bike_api.dto.ClubDetailsUpdateRequestDTO;
 import com.taiso.bike_api.dto.ClubDetailsUpdateResponseDTO;
-import com.taiso.bike_api.dto.ClubsGetResponseDTO;
 import com.taiso.bike_api.dto.ClubListResponseDTO;
+import com.taiso.bike_api.dto.ClubsGetResponseDTO;
 import com.taiso.bike_api.exception.ClubNotFoundException;
 import com.taiso.bike_api.exception.ClubUpdateNoPermissionException;
 import com.taiso.bike_api.exception.UserNotFoundException;
@@ -170,15 +170,16 @@ public class ClubService {
     }
 
     @Transactional
-    public ClubDetailsUpdateResponseDTO updateClubDetails(Long clubId, ClubDetailsUpdateRequestDTO requestDTO, Authentication authentication) {
+    public ClubDetailsUpdateResponseDTO updateClubDetails(Long clubId, ClubDetailsUpdateRequestDTO requestDTO,
+            Authentication authentication) {
 
         // 클럽 존재여부 확인
         ClubEntity club = clubRepository.findById(clubId)
-            .orElseThrow(() -> new ClubNotFoundException("클럽이 존재하지 않습니다."));
+                .orElseThrow(() -> new ClubNotFoundException("클럽이 존재하지 않습니다."));
 
         // 유저 존재여부 확인
         UserEntity user = userRepository.findByEmail(authentication.getName())
-            .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
 
         // 클럽 수정 권한 확인
         if (!club.getClubLeader().getUserId().equals(user.getUserId())) {
@@ -186,13 +187,13 @@ public class ClubService {
         }
 
         // 변경사항 존재여부 확인
-        if (
-            (requestDTO.getClubProfileImageId() == club.getClubProfileImageId() ||
-            requestDTO.getClubProfileImageId().equals(club.getClubProfileImageId())) &&
-            requestDTO.getClubName().equals(club.getClubName()) &&
-            requestDTO.getClubShortDescription().equals(club.getClubShortDescription()) &&
-            requestDTO.getMaxUser().equals(club.getMaxUser()) &&
-            requestDTO.getTags().equals(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))) {
+        if ((requestDTO.getClubProfileImageId() == club.getClubProfileImageId() ||
+                requestDTO.getClubProfileImageId().equals(club.getClubProfileImageId())) &&
+                requestDTO.getClubName().equals(club.getClubName()) &&
+                requestDTO.getClubShortDescription().equals(club.getClubShortDescription()) &&
+                requestDTO.getMaxUser().equals(club.getMaxUser()) &&
+                requestDTO.getTags()
+                        .equals(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))) {
             return ClubDetailsUpdateResponseDTO.toDTO("변경사항이 존재하지 않습니다.");
         }
 
@@ -212,5 +213,7 @@ public class ClubService {
 
         return ClubDetailsUpdateResponseDTO.toDTO("클럽정보가 변경되었습니다.");
     }
+    
+
 
 }

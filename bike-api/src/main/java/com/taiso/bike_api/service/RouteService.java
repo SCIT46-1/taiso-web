@@ -68,73 +68,72 @@ public class RouteService {
       루트 아이디를 통해 루트 디테일 정보 조회
     */
     public RouteDetailResponseDTO getRouteById(Long routeId, String userEmail) {
-        // 루트 아이디 오류 처리
-        if (routeId == null || routeId <= 0) {
-            throw new IllegalArgumentException(routeId + " 값은 올바르지 않음");
-        }
+    // 루트 아이디 오류 처리
+    if (routeId == null || routeId <= 0) {
+        throw new IllegalArgumentException(routeId + " 값은 올바르지 않음");
+    }
 
-        // 루트 아이디를 통해 루트 디테일 정보 조회
-        RouteEntity routeEntity = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RouteNotFoundException(routeId + "번 루트를 찾을 수 없음"));
+    // 루트 아이디를 통해 루트 디테일 정보 조회
+    RouteEntity routeEntity = routeRepository.findById(routeId)
+            .orElseThrow(() -> new RouteNotFoundException(routeId + "번 루트를 찾을 수 없음"));
 
-        // 루트 포인트 조회
-        List<RoutePointEntity> routePoints = routePointRepository.findByRouteOrderBySequenceAsc(routeEntity);
-        // 루트 포인트 리스트를 루트 포인트 DTO 리스트로 변환
-        List<RoutePointDTO> pointResponses = routePoints.stream()
-                .map(rp -> RoutePointDTO.builder()
-                        .route_point_id(rp.getRoutePointId().toString())
-                        .sequence(rp.getSequence())
-                        .latitude(rp.getLatitude().floatValue())
-                        .longitude(rp.getLongitude().floatValue())
-                        .elevation(rp.getElevation() != null ? rp.getElevation().floatValue() : null)
-                        .build())
-                .collect(Collectors.toList());
+    // 루트 포인트 조회
+    List<RoutePointEntity> routePoints = routePointRepository.findByRouteOrderBySequenceAsc(routeEntity);
+    List<RoutePointDTO> pointResponses = routePoints.stream()
+            .map(rp -> RoutePointDTO.builder()
+                    .route_point_id(rp.getRoutePointId().toString())
+                    .sequence(rp.getSequence())
+                    .latitude(rp.getLatitude().floatValue())
+                    .longitude(rp.getLongitude().floatValue())
+                    .elevation(rp.getElevation() != null ? rp.getElevation().floatValue() : null)
+                    .build())
+            .collect(Collectors.toList());
 
-        // 루트 태그 조회
-        List<String> tags = routeEntity.getTags().stream()
-                .map(RouteTagCategoryEntity::getName)
-                .collect(Collectors.toList());
+    // 루트 태그 조회
+    List<String> tags = routeEntity.getTags().stream()
+            .map(RouteTagCategoryEntity::getName)
+            .collect(Collectors.toList());
 
-        // 사용자가 좋아요를 눌렀는지 여부 확인
-        boolean liked = false;
-        if (userEmail != null) {
-            UserEntity userEntity = userRepository.findByEmail(userEmail)
-                    .orElseThrow(() -> new UserNotFoundException(userEmail + "번 유저를 찾을 수 없음"));
-            liked = routeLikeRepository.existsByUser_UserIdAndRoute_RouteId(userEntity.getUserId(), routeId);
-        }
+    // 사용자 정보 조회 및 좋아요, 북마크 여부 확인
+    boolean liked = false;
+    boolean isBookmarked = false;
+    UserEntity user = null;
+    if (userEmail != null) {
+        // 사용자 정보 조회 (한 번만 호출)
+        user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException(userEmail + "번 유저를 찾을 수 없음"));
 
-        UserEntity user = userRepository.findByEmail(userEmail).orElse(null);
-        
-        // 루트 북마크 여부 확인
-        boolean isBookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(
+        liked = routeLikeRepository.existsByUser_UserIdAndRoute_RouteId(user.getUserId(), routeId);
+        isBookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(
                 user.getUserId(), 
                 routeEntity.getRouteId(),
                 BookmarkType.ROUTE
-            );
-        
-        // 루트 디테일 정보 반환
-        return RouteDetailResponseDTO.builder()
-                .routeId(routeEntity.getRouteId())
-                .routeImgId(routeEntity.getRouteImgId())
-                .userId(routeEntity.getUserId())
-                .routeName(routeEntity.getRouteName())
-                .description(routeEntity.getDescription())
-                .likeCount(routeEntity.getLikeCount())
-                .originalFilePath(routeEntity.getOriginalFilePath())
-                .tag(tags)
-                .distance(routeEntity.getDistance().floatValue())
-                .altitude(routeEntity.getAltitude().floatValue())
-                .distanceType(routeEntity.getDistanceType().name())
-                .altitudeType(routeEntity.getAltitudeType().name())
-                .roadType(routeEntity.getRoadType().name())
-                .createdAt(routeEntity.getCreatedAt().toString())
-                .fileName(routeEntity.getFileName())
-                .fileType(routeEntity.getFileType() != null ? routeEntity.getFileType().name() : null)
-                .routePoint(pointResponses)
-                .isLiked(liked)
-                .isBookmarked(isBookmarked)
-                .build();
+        );
     }
+
+    // 루트 디테일 정보 반환
+    return RouteDetailResponseDTO.builder()
+            .routeId(routeEntity.getRouteId())
+            .routeImgId(routeEntity.getRouteImgId())
+            .userId(routeEntity.getUserId())
+            .routeName(routeEntity.getRouteName())
+            .description(routeEntity.getDescription())
+            .likeCount(routeEntity.getLikeCount())
+            .originalFilePath(routeEntity.getOriginalFilePath())
+            .tag(tags)
+            .distance(routeEntity.getDistance().floatValue())
+            .altitude(routeEntity.getAltitude().floatValue())
+            .distanceType(routeEntity.getDistanceType().name())
+            .altitudeType(routeEntity.getAltitudeType().name())
+            .roadType(routeEntity.getRoadType().name())
+            .createdAt(routeEntity.getCreatedAt().toString())
+            .fileName(routeEntity.getFileName())
+            .fileType(routeEntity.getFileType() != null ? routeEntity.getFileType().name() : null)
+            .routePoint(pointResponses)
+            .isLiked(liked)
+            .isBookmarked(isBookmarked)
+            .build();
+}
 
 
     /** 

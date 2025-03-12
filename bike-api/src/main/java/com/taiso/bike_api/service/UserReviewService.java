@@ -13,7 +13,6 @@ import com.taiso.bike_api.domain.UserReviewEntity;
 import com.taiso.bike_api.dto.UserLightningReviewResponseDTO;
 import com.taiso.bike_api.dto.UserReviewResponseDTO;
 import com.taiso.bike_api.exception.UserNotFoundException;
-import com.taiso.bike_api.exception.UserReviewNotFoundException;
 import com.taiso.bike_api.repository.UserRepository;
 import com.taiso.bike_api.repository.UserReviewRepository;
 
@@ -79,9 +78,7 @@ public class UserReviewService {
 
         List<UserReviewEntity> allReview = userReviewRepository.findByReviewed_UserId(userId);
 
-        if (allReview.isEmpty()) {
-            throw new UserReviewNotFoundException("받은 리뷰가 존재하지 않습니다.");
-        }
+
 
         log.info("유저 아이디로 찾아온 리뷰들 : {}", allReview.stream().toList());
 

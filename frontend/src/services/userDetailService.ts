@@ -106,6 +106,14 @@ export interface UserPageDetailResponse {
   level: string;
   gender: string;
   tags: string[];
+
+  userLightningsCount: number;
+
+  userClubsCount: number;
+
+  userRegisteredRoutesCount: number;
+
+  bookmarked: boolean;
 }
 
 export interface UserAuthInfoResponse {
@@ -144,8 +152,8 @@ const patchUserPageDetail = async (
     formData.append("backgroundImg", backgroundImg);
   }
 
-  // axios는 FormData 객체를 자동으로 처리
-  return await post(`/users/me/details`, formData);
+  // post 대신 patch 메서드 사용
+  return await patch(`/users/me/details`, formData);
 };
 
 //유저 인증정보 조회
