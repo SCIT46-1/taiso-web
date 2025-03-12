@@ -107,14 +107,16 @@ function LightningDetailPage() {
   >({});
 
   const [weatherInfo, setWeatherInfo] = useState<WeatherInfo | null>(null);
-  const [hourlyForecasts, setHourlyForecasts] = useState<HourlyWeatherInfo[]>([]);
+  const [hourlyForecasts, setHourlyForecasts] = useState<HourlyWeatherInfo[]>(
+    []
+  );
   const [forecastDate, setForecastDate] = useState<string>("");
   const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [bookmarkLoading, setBookmarkLoading] = useState<boolean>(false);
   const [completedLightning, setCompletedLightning] =
     useState<CompletedLightningResponse | null>(null);
-  
+
   // 날씨 데이터 캐시
   const weatherCache = useRef<{
     [key: string]: {
@@ -127,7 +129,9 @@ function LightningDetailPage() {
   const fetchLightningDetail = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await lightningService.getLightningDetail(Number(lightningId));
+      const data = await lightningService.getLightningDetail(
+        Number(lightningId)
+      );
       setLightningDetail(data);
 
       if (data && "bookmarked" in data) {
@@ -176,7 +180,9 @@ function LightningDetailPage() {
     setLoadingJoin(true);
     try {
       await lightningService.joinLightning(Number(lightningId));
-      const completedData = await lightningService.getCompletedLightnings(Number(lightningId));
+      const completedData = await lightningService.getCompletedLightnings(
+        Number(lightningId)
+      );
       setCompletedLightning(completedData);
       closeModal("join-modal");
       showModal("join-complete-modal");
@@ -215,7 +221,10 @@ function LightningDetailPage() {
       [lightningUserId]: { ...prev[lightningUserId], accept: true },
     }));
     try {
-      await lightningService.acceptLightning(Number(lightningId), lightningUserId);
+      await lightningService.acceptLightning(
+        Number(lightningId),
+        lightningUserId
+      );
       fetchLightningDetail();
     } catch (error) {
       console.error("수락 실패:", error);
@@ -233,7 +242,10 @@ function LightningDetailPage() {
       [lightningUserId]: { ...prev[lightningUserId], reject: true },
     }));
     try {
-      await lightningService.rejectLightning(Number(lightningId), lightningUserId);
+      await lightningService.rejectLightning(
+        Number(lightningId),
+        lightningUserId
+      );
       fetchLightningDetail();
     } catch (error) {
       console.error("거절 실패:", error);
@@ -286,7 +298,12 @@ function LightningDetailPage() {
   };
 
   const fetchWeatherData = async (detail: LightningDetailGetResponse) => {
-    if (!detail.eventDate || !detail.latitude || !detail.longitude || !detail.duration) {
+    if (
+      !detail.eventDate ||
+      !detail.latitude ||
+      !detail.longitude ||
+      !detail.duration
+    ) {
       return;
     }
 
@@ -295,16 +312,24 @@ function LightningDetailPage() {
 
     try {
       const eventDateTime = new Date(detail.eventDate);
-      const eventEndDateTime = new Date(eventDateTime.getTime() + detail.duration * 60 * 1000);
+      const eventEndDateTime = new Date(
+        eventDateTime.getTime() + detail.duration * 60 * 1000
+      );
 
       const formattedDate = eventDateTime.toISOString().split("T")[0];
       const startHours = eventDateTime.getHours().toString().padStart(2, "0");
-      const startMinutes = eventDateTime.getMinutes().toString().padStart(2, "0");
+      const startMinutes = eventDateTime
+        .getMinutes()
+        .toString()
+        .padStart(2, "0");
       const formattedStartTime = `${startHours}:${startMinutes}`;
 
       const startHour = eventDateTime.getHours();
       const endHour = eventEndDateTime.getHours();
-      const adjustedEndHour = eventEndDateTime.getMinutes() === 0 ? Math.max(0, endHour - 1) : endHour;
+      const adjustedEndHour =
+        eventEndDateTime.getMinutes() === 0
+          ? Math.max(0, endHour - 1)
+          : endHour;
 
       if (weatherCache.current[cacheKey]) {
         const cachedData = weatherCache.current[cacheKey];
@@ -331,7 +356,8 @@ function LightningDetailPage() {
         const closestToStart = hourlyForecasts.reduce((closest, current) => {
           const currentHour = parseInt(current.time.split(":")[0]);
           const closestHour = parseInt(closest.time.split(":")[0]);
-          return Math.abs(currentHour - startHour) < Math.abs(closestHour - startHour)
+          return Math.abs(currentHour - startHour) <
+            Math.abs(closestHour - startHour)
             ? current
             : closest;
         }, hourlyForecasts[0]);
@@ -339,14 +365,21 @@ function LightningDetailPage() {
         const closestToEnd = hourlyForecasts.reduce((closest, current) => {
           const currentHour = parseInt(current.time.split(":")[0]);
           const closestHour = parseInt(closest.time.split(":")[0]);
-          return Math.abs(currentHour - endHour) < Math.abs(closestHour - endHour)
+          return Math.abs(currentHour - endHour) <
+            Math.abs(closestHour - endHour)
             ? current
             : closest;
         }, hourlyForecasts[0]);
 
-        forecasts = closestToStart.time !== closestToEnd.time ? [closestToStart, closestToEnd] : [closestToStart];
+        forecasts =
+          closestToStart.time !== closestToEnd.time
+            ? [closestToStart, closestToEnd]
+            : [closestToStart];
       } else {
-        filteredForecasts.sort((a, b) => parseInt(a.time.split(":")[0]) - parseInt(b.time.split(":")[0]));
+        filteredForecasts.sort(
+          (a, b) =>
+            parseInt(a.time.split(":")[0]) - parseInt(b.time.split(":")[0])
+        );
         forecasts = filteredForecasts;
       }
 
@@ -375,7 +408,9 @@ function LightningDetailPage() {
 
   const handleBookmarkToggle = async () => {
     if (!user) {
-      navigate("/auth/landing", { state: { from: `/lightning/${lightningId}` } });
+      navigate("/auth/landing", {
+        state: { from: `/lightning/${lightningId}` },
+      });
       return;
     }
 
@@ -394,7 +429,9 @@ function LightningDetailPage() {
         "response" in (error as any) &&
         (error as any).response?.status === 401
       ) {
-        navigate("/auth/landing", { state: { from: `/lightning/${lightningId}` } });
+        navigate("/auth/landing", {
+          state: { from: `/lightning/${lightningId}` },
+        });
       }
     } finally {
       setBookmarkLoading(false);
@@ -416,7 +453,7 @@ function LightningDetailPage() {
 
       {/* 하단 좌측 영역 */}
       <div className="flex flex-col gap-4">
-        <div className="rounded-xl shadow-md border border-base-300">
+        <div className="rounded-lg shadow-md border border-base-300">
           <div className="collapse collapse-arrow">
             <input type="checkbox" defaultChecked />
             <div className="collapse-title text-xl font-medium flex items-center">
@@ -436,7 +473,7 @@ function LightningDetailPage() {
         </div>
 
         {/* 날씨 정보 아코디언 */}
-        <div className="rounded-xl shadow-md border border-base-300">
+        <div className="rounded-lg shadow-md border border-base-300">
           {lightningDetail?.status !== "종료" &&
             lightningDetail?.status !== "취소" && (
               <div className="collapse collapse-arrow">
@@ -446,7 +483,9 @@ function LightningDetailPage() {
                   {weatherLoading ? (
                     <span className="loading loading-dots loading-sm ml-2"></span>
                   ) : (
-                    hourlyForecasts.length > 0 && <span className="text-sm font-normal"></span>
+                    hourlyForecasts.length > 0 && (
+                      <span className="text-sm font-normal"></span>
+                    )
                   )}
                 </div>
                 <div className="collapse-content">
@@ -462,13 +501,18 @@ function LightningDetailPage() {
         </div>
 
         {/* 상세 정보 영역 */}
-        <div className="rounded-xl shadow-md border border-base-300 p-6">
+        <div className="rounded-lg shadow-md border border-base-300 p-6">
           <div className="flex flex-col">
-            <h2 className="text-2xl font-bold mb-2">{lightningDetail?.title}</h2>
+            <h2 className="text-2xl font-bold mb-2">
+              {lightningDetail?.title}
+            </h2>
             <div className="flex flex-wrap gap-1">
               {lightningDetail?.lightningTag &&
                 lightningDetail.lightningTag.map((tag, index) => (
-                  <span key={index} className="badge badge-primary badge-outline">
+                  <span
+                    key={index}
+                    className="badge badge-primary badge-outline"
+                  >
                     {tag}
                   </span>
                 ))}
@@ -489,7 +533,7 @@ function LightningDetailPage() {
 
       {/* 하단 우측 영역: 참여자 및 지도 */}
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col items-center justify-center p-4 rounded-xl shadow-xl border border-base-300 p-1 self-start relative">
+        <div className="flex flex-col items-center justify-center p-4 rounded-lg shadow-xl border border-base-300 p-1 self-start relative">
           <div className="mb-4 mt-1">
             {user && (
               <button
@@ -593,7 +637,9 @@ function LightningDetailPage() {
             <div
               className="btn w-full no-animation btn-primary"
               onClick={() =>
-                navigate("/auth/landing", { state: { from: `/lightning/${lightningId}` } })
+                navigate("/auth/landing", {
+                  state: { from: `/lightning/${lightningId}` },
+                })
               }
             >
               로그인 하고 번개 참여하기!
@@ -610,7 +656,7 @@ function LightningDetailPage() {
               >
                 참여하기
               </button>
-          )}
+            )}
           {lightningDetail?.recruitType === "수락형" &&
             user &&
             !isCreator &&
@@ -622,7 +668,7 @@ function LightningDetailPage() {
               >
                 신청하기
               </button>
-          )}
+            )}
           {user &&
             !isCreator &&
             currentMemberStatus?.participantStatus === "완료" &&
@@ -633,7 +679,7 @@ function LightningDetailPage() {
               >
                 번개 나가기
               </button>
-          )}
+            )}
           {user &&
             !isCreator &&
             (lightningDetail?.status === "마감" ||
@@ -642,21 +688,21 @@ function LightningDetailPage() {
               <button className="btn w-full no-animation btn-disabled">
                 이미 마감되었습니다!
               </button>
-          )}
+            )}
           {user &&
             !isCreator &&
             currentMemberStatus?.participantStatus === "탈퇴" && (
               <button className="btn w-full no-animation btn-disabled">
                 탈퇴한 번개에 참여할 수 없습니다!
               </button>
-          )}
+            )}
           {user &&
             !isCreator &&
             currentMemberStatus?.participantStatus === "신청대기" && (
               <button className="btn w-full no-animation btn-disabled">
                 신청 대기 중입니다!
               </button>
-          )}
+            )}
           <div className="divider mt-0"></div>
           <div className="mr-auto ml-3 font-bold">
             참가 인원 마감까지{" "}
@@ -666,7 +712,8 @@ function LightningDetailPage() {
             명 남았습니다!
           </div>
           <div className="mr-auto ml-3 mt-1 text-sm text-gray-500 mb-2">
-            참가인원 {lightningDetail?.currentMemberCount} / {lightningDetail?.capacity}
+            참가인원 {lightningDetail?.currentMemberCount} /{" "}
+            {lightningDetail?.capacity}
           </div>
           <progress
             className="progress progress-primary w-[95%] mt-1 mb-4"
@@ -688,7 +735,7 @@ function LightningDetailPage() {
                   userProfileName={member.memberNickname || ""}
                   userRole={member.role === "번개생성자" ? "creator" : "member"}
                 />
-            ))}
+              ))}
           </div>
           {isCreator && lightningDetail?.recruitType === "수락형" && (
             <div className="w-full mt-4">
@@ -706,25 +753,37 @@ function LightningDetailPage() {
                     <div className="flex gap-2 ml-auto items-center">
                       <button
                         className="btn btn-sm"
-                        disabled={loadingParticipantActions[member.lightningUserId]?.accept}
-                        onClick={() => handleAcceptParticipant(member.lightningUserId)}
+                        disabled={
+                          loadingParticipantActions[member.lightningUserId]
+                            ?.accept
+                        }
+                        onClick={() =>
+                          handleAcceptParticipant(member.lightningUserId)
+                        }
                       >
-                        {loadingParticipantActions[member.lightningUserId]?.accept
+                        {loadingParticipantActions[member.lightningUserId]
+                          ?.accept
                           ? "수락 중..."
                           : "수락하기"}
                       </button>
                       <button
                         className="btn btn-sm"
-                        disabled={loadingParticipantActions[member.lightningUserId]?.reject}
-                        onClick={() => handleRejectParticipant(member.lightningUserId)}
+                        disabled={
+                          loadingParticipantActions[member.lightningUserId]
+                            ?.reject
+                        }
+                        onClick={() =>
+                          handleRejectParticipant(member.lightningUserId)
+                        }
                       >
-                        {loadingParticipantActions[member.lightningUserId]?.reject
+                        {loadingParticipantActions[member.lightningUserId]
+                          ?.reject
                           ? "거절 중..."
                           : "거절하기"}
                       </button>
                     </div>
                   </div>
-              ))}
+                ))}
               {lightningDetail?.status === "모집" && (
                 <button
                   className="btn mt-4 w-full"
@@ -789,7 +848,7 @@ function LightningDetailPage() {
                       </div>
                     </div>
                   </div>
-              ))}
+                ))}
               {lightningDetail?.member.filter(
                 (member) => member.participantStatus === "신청대기"
               ).length === 0 && (
@@ -949,7 +1008,10 @@ function LightningDetailPage() {
         imgType="error"
         title="번개 나가기 실패"
         actions={
-          <button className="btn" onClick={() => closeModal("leave-fail-modal")}>
+          <button
+            className="btn"
+            onClick={() => closeModal("leave-fail-modal")}
+          >
             닫기
           </button>
         }
@@ -973,7 +1035,10 @@ function LightningDetailPage() {
             >
               {loadingLightningClose ? "마감 중..." : "마감하기"}
             </button>
-            <button className="btn" onClick={() => closeModal("lightning-close-modal")}>
+            <button
+              className="btn"
+              onClick={() => closeModal("lightning-close-modal")}
+            >
               취소
             </button>
           </>
@@ -998,7 +1063,10 @@ function LightningDetailPage() {
             >
               {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
             </button>
-            <button className="btn" onClick={() => closeModal("lightning-end-modal")}>
+            <button
+              className="btn"
+              onClick={() => closeModal("lightning-end-modal")}
+            >
               취소
             </button>
           </>

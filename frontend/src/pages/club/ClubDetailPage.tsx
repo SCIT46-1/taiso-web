@@ -541,7 +541,7 @@ function ClubDetailPage() {
     }
     if (!boardList) return null;
     return (
-      <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
+      <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
         <div className="card-body">
           <div className="flex justify-between items-center mb-4">
             <h2 className="card-title">게시판</h2>
@@ -656,7 +656,7 @@ function ClubDetailPage() {
   const renderMemberList = () => {
     if (!clubDetail) return null;
     return (
-      <div className="card bg-base-100 shadow-md rounded-xl border border-base-300 w-full">
+      <div className="card bg-base-100 shadow-md rounded-lg border border-base-300 w-full">
         <div className="card-body">
           <h2 className="card-title mb-2">멤버십 현황 및 멤버 목록</h2>
           <div className="mb-4">
@@ -754,7 +754,7 @@ function ClubDetailPage() {
   const renderPostDetail = () => {
     if (!selectedPost) return null;
     return (
-      <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
+      <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
         <div className="card-body">
           <div className="flex justify-between items-center mb-2">
             <button
@@ -868,7 +868,7 @@ function ClubDetailPage() {
       clubLightningList.content.length === 0
     ) {
       return (
-        <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
+        <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
           <div className="card-body">
             <div className="flex justify-between items-center mb-4">
               <h2 className="card-title">클럽 전용 번개</h2>
@@ -890,7 +890,7 @@ function ClubDetailPage() {
     }
 
     return (
-      <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
+      <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
         <div className="card-body">
           <div className="flex justify-between items-center mb-4">
             <h2 className="card-title">클럽 전용 번개</h2>
@@ -1250,7 +1250,7 @@ function ClubDetailPage() {
       {/* 나머지 UI 컴포넌트들 */}
       <div className="w-screen mx-auto mb-10 max-w-screen-lg no-animation relative">
         {/* 클럽 헤더 */}
-        <div className="card bg-base-100 shadow-md rounded-xl border border-base-300 mb-4">
+        <div className="card bg-base-100 shadow-md rounded-lg border border-base-300 mb-4">
           <div className="card-body">
             <div className="flex flex-col md:flex-row gap-6">
               <div className="w-full md:w-64 flex-shrink-0">
@@ -1311,7 +1311,7 @@ function ClubDetailPage() {
         {/* 메인 그리드 */}
         <div className="grid md:grid-cols-[2fr,1fr] grid-cols-1 gap-4">
           <div className="flex flex-col gap-4">
-            <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
+            <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
               <div className="card-body">
                 <div className="tabs tabs-boxed w-fit mb-2">
                   <a
@@ -1359,7 +1359,7 @@ function ClubDetailPage() {
             ) : activeTab === "lightning" ? (
               renderClubLightningList()
             ) : (
-              <div className="card bg-base-100 shadow-md rounded-xl border border-base-300">
+              <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
                 <div className="card-body">
                   <h2 className="card-title mb-4">클럽 상세 소개</h2>
                   <div className="w-full">
@@ -1389,7 +1389,7 @@ function ClubDetailPage() {
 
           {/* 사이드바 */}
           <div className="flex flex-col items-start justify-start gap-4 self-start">
-            <div className="card bg-base-100 shadow-md rounded-xl border border-base-300 w-full">
+            <div className="card bg-base-100 shadow-md rounded-lg border border-base-300 w-full">
               <div className="card-body">
                 <h2 className="card-title mb-4">클럽 참여</h2>
                 <div className="my-2">{renderMembershipActions()}</div>
