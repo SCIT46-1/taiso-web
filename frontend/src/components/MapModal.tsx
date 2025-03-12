@@ -155,28 +155,29 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
     <>
       {/* 모달 열기 버튼 - Show selected address if available */}
       <button
-        className="btn w-full"
+        className={`btn w-full ${selectedAddress ? "bg-gray-200" : "bg-blue-500 text-white hover:bg-blue-600"
+          }`}
         onClick={() => modalRef.current?.showModal()}
         type="button"
       >
-        {selectedAddress ? selectedAddress : "모임 장소 선택"}
+        {selectedAddress ? "모임 장소 재등록" : "모임 장소 등록" }
       </button>
 
       {/* 모달 */}
       <dialog ref={modalRef} className="modal">
-        <div className="modal-box w-full max-w-3xl">
-          <h2 className="text-2xl font-bold mb-1">모임 시작 장소 등록</h2>
-          <div className="text-sm text-gray-500 mb-2">
-            지도를 클릭해서 모임 시작 장소를 선택해보세요!
+        <div className="modal-box w-full max-w-3xl p-12">
+          <h2 className="text-2xl font-bold mb-3">모임 시작 장소 등록</h2>
+          <div className="text-sm text-gray-500 mt-3">
+            주소를 입력하거나 지도에서 모임 시작 장소를 선택해보세요!
           </div>
-          <div className="flex flex-col mb-4">
-            <div className="flex items-center">
+          <div className="flex flex-col mb-5">
+            <div className="flex items-center mt-5">
               <input
                 type="text"
                 placeholder="주소를 입력하세요"
                 value={inputAddress}
                 onChange={(e) => setInputAddress(e.target.value)}
-                className="input input-bordered w-[full] mr-2"
+                className="input input-bordered w-full mr-4"
               />
               <button onClick={handleAddressSearch} className="btn">
                 주소 검색
@@ -190,7 +191,7 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
           {/* 지도 표시 영역 */}
           <div ref={mapRef} className="w-full h-[400px] mx-auto mb-4"></div>
           <div className="flex flex-col gap-2">
-            <label className="label flex items-center gap-2 -mb-2 -mt-2">
+            <label className="label flex items-center gap-2 -mb-2">
               <svg
                 data-slot="icon"
                 fill="grey"
@@ -201,11 +202,11 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
               >
                 <path d="M3.5 2.75a.75.75 0 0 0-1.5 0v14.5a.75.75 0 0 0 1.5 0v-4.392l1.657-.348a6.449 6.449 0 0 1 4.271.572 7.948 7.948 0 0 0 5.965.524l2.078-.64A.75.75 0 0 0 18 12.25v-8.5a.75.75 0 0 0-.904-.734l-2.38.501a7.25 7.25 0 0 1-4.186-.363l-.502-.2a8.75 8.75 0 0 0-5.053-.439l-1.475.31V2.75Z" />
               </svg>
-              <span className="label-text mr-auto">모임 시작 장소 이름</span>
+              <span className="label-text mr-auto text-bold">모임 시작 장소 이름</span>
             </label>
             <div
-              className="tooltip "
-              data-tip="이름을 지어보세요! 주소, 원하는 이름을 지어도 됩니다!"
+              className="tooltip w-full"
+              data-tip="주소가 아닌 간단하게 위치를 표기해도 됩니다! (ex: 잠실역 8번 출구)"
             >
               <input
                 type="text"

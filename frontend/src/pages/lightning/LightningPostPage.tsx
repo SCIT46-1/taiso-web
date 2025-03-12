@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RouteModal from "../../components/RouteModal";
+import KakaolocationMap from "../../components/KakaolocationMap";
 import MeetingLocationSelector from "../../components/MapModal";
+import ImageWithSkeleton from "../../components/ImageWithSkeleton";
 import lightningService, {
   LightningPostRequest,
 } from "../../services/lightningService";
@@ -214,7 +216,7 @@ function LightningPostPage() {
       {/* 루트 등록 모달 */}
       <input type="checkbox" id="route_modal" className="modal-toggle" />
       <div className="modal" role="dialog">
-        <div className="modal-box">
+        <div className="modal-box w-11/12 max-w-5xl">
           <RouteModal
             onSelectRoute={handleRouteSelect}
             selectedRouteId={
@@ -267,7 +269,7 @@ function LightningPostPage() {
                   setFormData({ ...formData, title: e.target.value });
                   setFormErrors((prev) => ({ ...prev, title: "" }));
                 }}
-                className="input input-bordered placeholder:text-sm"
+                className="input input-bordered placeholder:text-sm focus:input-primary"
               />
               {formErrors.title && (
                 <span className="text-red-500 mt-2 block">
@@ -306,7 +308,7 @@ function LightningPostPage() {
                   setFormData({ ...formData, description: e.target.value });
                   setFormErrors((prev) => ({ ...prev, description: "" }));
                 }}
-                className="textarea textarea-bordered"
+                className="textarea textarea-bordered focus:input-primary min-h-40 h-auto"
               ></textarea>
               {formErrors.description && (
                 <span className="text-red-500 mt-2 block">
@@ -346,7 +348,7 @@ function LightningPostPage() {
                   setFormData({ ...formData, eventDate: e.target.value });
                   setFormErrors((prev) => ({ ...prev, eventDate: "" }));
                 }}
-                className="input input-bordered"
+                className="input input-bordered focus:input-primary"
               />
               {formErrors.eventDate && (
                 <span className="text-red-500 mt-2 block">
@@ -387,7 +389,7 @@ function LightningPostPage() {
                     setFormData({ ...formData, duration: e.target.value });
                     setFormErrors((prev) => ({ ...prev, duration: "" }));
                   }}
-                  className="input input-bordered placeholder:text-sm"
+                  className="input input-bordered placeholder:text-sm focus:input-primary"
                 />
                 {formErrors.duration && (
                   <span className="text-red-500 mt-2 block">
@@ -415,7 +417,7 @@ function LightningPostPage() {
                 <div className="join w-full">
                   <button
                     type="button"
-                    className="btn join-item"
+                    className="btn join-item bg-gray-200"
                     onClick={() => {
                       const currentValue = parseInt(formData.capacity) || 0;
                       if (currentValue > 1) {
@@ -437,11 +439,11 @@ function LightningPostPage() {
                       setFormData({ ...formData, capacity: e.target.value });
                       setFormErrors((prev) => ({ ...prev, capacity: "" }));
                     }}
-                    className="input mr-3 w-full join-item px-0 text-center focus:outline-none focus:border-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none "
+                    className="input mr-3 w-full join-item px-0 text-center focus:outline-none focus:border-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     type="button"
-                    className="btn join-item"
+                    className="btn join-item bg-gray-200"
                     onClick={() => {
                       const currentValue = parseInt(formData.capacity) || 0;
                       setFormData({
@@ -462,7 +464,7 @@ function LightningPostPage() {
             </div>
 
             {/* 최대 인원, 위치 선택 */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 gap-4 mb-4">
               <div>
                 <label
                   htmlFor="map_modal"
@@ -493,7 +495,31 @@ function LightningPostPage() {
                     {formErrors.address}
                   </span>
                 )}
+                <input
+                  id="address"
+                  type="text"
+                  placeholder="모임 장소를 등록 해주세요."
+                  value={formData.address}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, address: e.target.value }))}
+                  className="input input-bordered w-full placeholder:text-sm focus:input-primary my-2"
+                />
+                {formData.address && (
+                  <span className="text-sm text-red-500">
+                    *주소가 아닌 간단 위치를 직접 입력 할 수 있습니다! (ex: 잠실역 8번 출구)
+                  </span>
+                )}
+                <div className="mt-3">
+                  {formData.address && (
+                  <KakaolocationMap
+                    lat={Number(formData.latitude)}
+                    lng={Number(formData.longitude)}
+                    width="full"
+                    height="300px"
+                    />
+                  )}
+                </div>
               </div>
+
               <div className="-mt-2">
                 <label className="label flex items-center gap-2 justify-start">
                   <svg
@@ -512,17 +538,80 @@ function LightningPostPage() {
                   </svg>
                   <div className="label-text">번개 경로 선택하기</div>
                 </label>
-                <label htmlFor="route_modal" className="btn w-full">
+                <label
+                  htmlFor="route_modal"
+                  className={`btn w-full ${selectedRoute.id ? "bg-gray-200" : "bg-blue-500 text-white hover:bg-blue-600"
+                    }`}
+                >
                   {selectedRoute.id
-                    ? `${selectedRoute.name} (${selectedRoute.distance}km)`
+                    ? "경로 재등록"
                     : "경로 등록"}
                 </label>
+
                 {formSubmitted && formErrors.routeId && (
                   <span className="text-red-500 mt-2 block">
                     {formErrors.routeId}
                   </span>
                 )}
               </div>
+
+            </div>
+            {/* 경로이름, 거리 */}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+
+              <div className="form-control">
+                <label htmlFor="route" className="label">
+                  <span className="label-text">코스</span>
+                </label>
+                <input
+                  id="route"
+                  type="string"
+                  placeholder="예: 옷걸이 코스"
+                  value={selectedRoute.name}
+                  onChange={(e) => {
+                    setFormData({ ...formData, distance: e.target.value });
+                    setFormErrors((prev) => ({ ...prev, distance: "" }));
+                  }}
+                  className="input input-bordered placeholder:text-sm"
+                />
+                {formErrors.distance && (
+                  <span className="text-red-500 mt-2 block">
+                    {formErrors.distance}
+                  </span>
+                )}
+              </div>
+
+              <div className="form-control">
+                <label htmlFor="distance" className="label">
+                  <span className="label-text">거리 (km)</span>
+                </label>
+                <input
+                  id="distance"
+                  type="number"
+                  placeholder="예: 25"
+                  value={formData.distance}
+                  onChange={(e) => {
+                    setFormData({ ...formData, distance: e.target.value });
+                    setFormErrors((prev) => ({ ...prev, distance: "" }));
+                  }}
+                  className="input input-bordered placeholder:text-sm"
+                />
+                {formErrors.distance && (
+                  <span className="text-red-500 mt-2 block">
+                    {formErrors.distance}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 mb-4">
+            {/* 경로 이미지 */}
+            {selectedRoute.id && (
+                <ImageWithSkeleton
+                  src="https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp"
+                  alt={selectedRoute.name}
+                  className="w-full h-300"
+                />
+              )}
             </div>
 
             {/* 모집 유형 */}
@@ -565,8 +654,10 @@ function LightningPostPage() {
                       </h3>
                       <p className="text-sm text-center mt-2">
                         {option === "참가형"
-                          ? "자유롭게 참가 할 수 있어요!"
-                          : "신청을 받고 승낙을 해야 해요!"}
+                          ? <>
+                            선착순으로 누구나 자유롭게<br />참가 할 수 있어요!
+                          </>
+                          : <>신청을 받고 수락을 통해 <br />참가 할 수 있어요!</>}
                       </p>
                       {formData.recruitType === option && (
                         <div className="absolute top-2 right-2">
@@ -598,7 +689,7 @@ function LightningPostPage() {
             </div>
 
             {/* 통합 선택 옵션 섹션 */}
-            <div className="form-control mb-6 rounded-lg">
+            <div className="form-control mb-6 rounded-lg gap-2">
               <div className="flex items-center gap-2 ">
                 <svg
                   data-slot="icon"
@@ -614,14 +705,21 @@ function LightningPostPage() {
                     d="M4.5 2A2.5 2.5 0 0 0 2 4.5v3.879a2.5 2.5 0 0 0 .732 1.767l7.5 7.5a2.5 2.5 0 0 0 3.536 0l3.878-3.878a2.5 2.5 0 0 0 0-3.536l-7.5-7.5A2.5 2.5 0 0 0 8.38 2H4.5ZM5 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
                   />
                 </svg>
-                <h3 className="text-base font-medium">태그 선택</h3>
+                <span className="label-text font-medium mr-auto">
+                  태그 선택
+                </span>
               </div>
               {/* 지역 */}
               <div className="">
-                <label className="label">
-                  <span className="label-text font-medium">지역</span>
+                <label className="label flex items-center gap-1 justify-start text-blue-500">
+                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                    className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  </svg>
+                  <span className="label-text font-semibold text-blue-500">
+                    지역</span>
                 </label>
-                <div className="flex gap-3 flex-wrap">
+                <div className="flex gap-2 flex-wrap">
                   {REGION_OPTIONS.map((option) => (
                     <button
                       type="button"
@@ -630,14 +728,12 @@ function LightningPostPage() {
                         setFormData({ ...formData, region: option });
                         setFormErrors((prev) => ({ ...prev, region: "" }));
                       }}
-                      className={`btn btn-sm ${
-                        formData.region === option
-                          ? "btn-primary"
-                          : "btn-outline"
-                      }`}
+                      className={`btn px-5 rounded-full flex items-center justify-center ${formData.region === option ? "btn-primary" : "btn-outline"
+                        }`}
                     >
-                      {option}
+                     {option}
                     </button>
+
                   ))}
                 </div>
                 {formErrors.region && (
@@ -649,10 +745,15 @@ function LightningPostPage() {
 
               {/* 성별 */}
               <div className="">
-                <label className="label">
-                  <span className="label-text font-medium">성별</span>
+                <label className="label flex items-center gap-1 justify-start text-blue-500">
+                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                    className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  </svg>
+                  <span className="label-text font-semibold text-blue-500">
+                    성별</span>
                 </label>
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                   {GENDER_OPTIONS.map((option) => (
                     <button
                       key={option}
@@ -661,7 +762,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, gender: option });
                         setFormErrors((prev) => ({ ...prev, gender: "" }));
                       }}
-                      className={`btn btn-sm ${
+                      className={`btn px-5 rounded-full flex items-center justify-center ${
                         formData.gender === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -680,10 +781,15 @@ function LightningPostPage() {
 
               {/* 레벨 */}
               <div className="">
-                <label className="label">
-                  <span className="label-text font-medium">레벨</span>
+                <label className="label flex items-center gap-1 justify-start text-blue-500">
+                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                    className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  </svg>
+                  <span className="label-text font-semibold text-blue-500">
+                    레벨</span>
                 </label>
-                <div className="flex gap-3 flex-wrap">
+                <div className="flex gap-2 flex-wrap">
                   {LEVEL_OPTIONS.map((option) => (
                     <button
                       key={option}
@@ -692,7 +798,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, level: option });
                         setFormErrors((prev) => ({ ...prev, level: "" }));
                       }}
-                      className={`btn btn-sm ${
+                      className={`btn px-5 rounded-full flex items-center justify-center ${
                         formData.level === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -711,10 +817,15 @@ function LightningPostPage() {
 
               {/* 자전거 종류 */}
               <div className="">
-                <label className="label">
-                  <span className="label-text font-medium">자전거 종류</span>
+                <label className="label flex items-center gap-1 justify-start text-blue-500">
+                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                    className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  </svg>
+                  <span className="label-text font-semibold text-blue-500">
+                    자전거 종류</span>
                 </label>
-                <div className="flex gap-3 flex-wrap">
+                <div className="flex gap-2 flex-wrap">
                   {BIKE_TYPE_OPTIONS.map((option) => (
                     <button
                       key={option}
@@ -723,7 +834,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, bikeType: option });
                         setFormErrors((prev) => ({ ...prev, bikeType: "" }));
                       }}
-                      className={`btn btn-sm ${
+                      className={`btn px-5 rounded-full flex items-center justify-center ${
                         formData.bikeType === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -742,16 +853,21 @@ function LightningPostPage() {
 
               {/* 태그 */}
               <div>
-                <label className="label">
-                  <span className="label-text font-medium">태그</span>
+                <label className="label flex items-center gap-1 justify-start text-blue-500">
+                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                    className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  </svg>
+                  <span className="label-text font-semibold text-blue-500">
+                    태그</span>
                 </label>
-                <div className="flex gap-3 flex-wrap">
+                <div className="flex gap-2 flex-wrap">
                   {TAG_OPTIONS.map((option) => (
                     <button
                       key={option}
                       type="button"
                       onClick={() => handleTagToggle(option)}
-                      className={`btn btn-sm ${
+                      className={`btn px-5 rounded-full flex items-center justify-center ${
                         formData.tags.includes(option)
                           ? "btn-primary"
                           : "btn-outline "
@@ -764,30 +880,6 @@ function LightningPostPage() {
                 {formErrors.tags && (
                   <span className="text-red-500 mt-2 block">
                     {formErrors.tags}
-                  </span>
-                )}
-              </div>
-            </div>
-            {/* 거리, 경로 ID */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="form-control">
-                <label htmlFor="distance" className="label">
-                  <span className="label-text">거리 (km)</span>
-                </label>
-                <input
-                  id="distance"
-                  type="number"
-                  placeholder="예: 25"
-                  value={formData.distance}
-                  onChange={(e) => {
-                    setFormData({ ...formData, distance: e.target.value });
-                    setFormErrors((prev) => ({ ...prev, distance: "" }));
-                  }}
-                  className="input input-bordered placeholder:text-sm"
-                />
-                {formErrors.distance && (
-                  <span className="text-red-500 mt-2 block">
-                    {formErrors.distance}
                   </span>
                 )}
               </div>

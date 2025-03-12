@@ -3,9 +3,11 @@ import React, { useEffect, useRef } from "react";
 interface KakaoMapProps {
   lat: number | undefined;
   lng: number | undefined;
+  width?: string;  // 선택적 props
+  height?: string; // 선택적 props
 }
 
-const KakaolocationMap: React.FC<KakaoMapProps> = ({ lat, lng }) => {
+const KakaolocationMap: React.FC<KakaoMapProps> = ({ lat, lng, width, height }) => {
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,7 +37,15 @@ const KakaolocationMap: React.FC<KakaoMapProps> = ({ lat, lng }) => {
     marker.setMap(map);
   }, [lat, lng]);
 
-  return <div ref={mapRef} style={{ width: "300px", height: "250px" }} />;
+  return (
+    <div
+      ref={mapRef}
+      style={{
+        width: width || "300px",  // width가 전달되지 않으면 기본값 적용
+        height: height || "250px", // height가 전달되지 않으면 기본값 적용
+      }}
+    />
+  );
 };
 
 export default KakaolocationMap;
