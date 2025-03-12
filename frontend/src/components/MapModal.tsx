@@ -155,12 +155,15 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
     <>
       {/* 모달 열기 버튼 - Show selected address if available */}
       <button
-        className={`btn w-full ${selectedAddress ? "bg-gray-200" : "bg-blue-500 text-white hover:bg-blue-600"
-          }`}
+        className={`btn w-full ${
+          selectedAddress
+            ? "bg-gray-200"
+            : "bg-blue-500 text-white hover:bg-blue-600"
+        }`}
         onClick={() => modalRef.current?.showModal()}
         type="button"
       >
-        {selectedAddress ? "모임 장소 재등록" : "모임 장소 등록" }
+        {selectedAddress ? "모임 장소 재등록" : "모임 장소 등록"}
       </button>
 
       {/* 모달 */}
@@ -179,9 +182,9 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
                 onChange={(e) => setInputAddress(e.target.value)}
                 className="input input-bordered w-full mr-4"
               />
-              <button onClick={handleAddressSearch} className="btn">
+              <div onClick={handleAddressSearch} className="btn">
                 주소 검색
-              </button>
+              </div>
             </div>
             {/* 에러 메시지 표시 */}
             {addressError && (
@@ -202,7 +205,9 @@ const MeetingLocationSelector: React.FC<MeetingLocationSelectorProps> = ({
               >
                 <path d="M3.5 2.75a.75.75 0 0 0-1.5 0v14.5a.75.75 0 0 0 1.5 0v-4.392l1.657-.348a6.449 6.449 0 0 1 4.271.572 7.948 7.948 0 0 0 5.965.524l2.078-.64A.75.75 0 0 0 18 12.25v-8.5a.75.75 0 0 0-.904-.734l-2.38.501a7.25 7.25 0 0 1-4.186-.363l-.502-.2a8.75 8.75 0 0 0-5.053-.439l-1.475.31V2.75Z" />
               </svg>
-              <span className="label-text mr-auto text-bold">모임 시작 장소 이름</span>
+              <span className="label-text mr-auto text-bold">
+                모임 시작 장소 이름
+              </span>
             </label>
             <div
               className="tooltip w-full"

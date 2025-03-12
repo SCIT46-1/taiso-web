@@ -34,7 +34,7 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
   // Pagination for all routes
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const pageSize = 5;
+  const pageSize = 3;
 
   // Fetch all routes with pagination
   useEffect(() => {
@@ -141,11 +141,11 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
   // Function to get route image URL
 
   return (
-    <div className="route-modal w-full p-12">
+    <div className="route-modal w-full p-12 h-full">
       <h2 className="text-2xl font-bold mb-4">경로 선택</h2>
 
       {/* Search bar */}
-      <div className="form-control my-4 w-2/3">
+      <div className="form-control my-4 w-2/3 ">
         <div className="input-group flex items-center gap-2">
           <input
             type="text"
@@ -190,8 +190,8 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center p-8">
-          <span className="loading loading-spinner loading-md"></span>
+        <div className="flex justify-center items-center p-8 h-full">
+          <span className="loading loading-spinner loading-md "></span>
         </div>
       ) : error ? (
         <div className="alert alert-error">
@@ -258,14 +258,18 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
                     )}
                   </div>
                   <div className="flex justify-between text-sm">
-                    <div className="badge badge-outline badge-primary mb-1">{route.region}</div>
+                    <div className="badge badge-outline badge-primary mb-1">
+                      {route.region}
+                    </div>
                     <span className="font-semibold">{route.distance} km</span>
                   </div>
                 </div>
 
                 {selectedRouteId === route.id && (
                   <div className="absolute top-2 right-2">
-                    <div className="badge badge-primary badge-sm p-2.5">선택</div>
+                    <div className="badge badge-primary badge-sm p-2.5">
+                      선택
+                    </div>
                   </div>
                 )}
               </div>
@@ -319,7 +323,7 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
             </button>
           </div>
         </div>
-        )}
+      )}
     </div>
   );
 }

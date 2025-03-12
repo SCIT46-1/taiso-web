@@ -253,7 +253,7 @@ const getClubLightningList = async (
   page: number,
   size: number
 ): Promise<ClubLightningListResponse> => {
-  return await get(`/clubs/${clubId}/lightnings?page=${page}&size=${size}`);
+  return await get(`/lightnings/clubs/${clubId}?page=${page}&size=${size}`);
 };
 
 //내 클럽 조회

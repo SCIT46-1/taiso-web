@@ -7,11 +7,11 @@ import userDetailService from "../services/userDetailService";
 function Navbar() {
   const { logout, isAuthenticated, user } = useAuthStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  const [profileImg, setProfileImg] = useState("");
   useEffect(() => {
     const fetchProfileImg = async () => {
       const profileImg = await userDetailService.getUserDetailProfileImg();
-      console.log(profileImg);
+      setProfileImg(profileImg);
     };
     try {
       fetchProfileImg();
@@ -35,7 +35,10 @@ function Navbar() {
 
   return (
     <>
+      <div className="navbar -mb-1 -mt-2">
+
       <div className="navbar -my-2">
+
         <div className="flex-1">
           <Link to="/" className="btn btn-ghost text-xl no-animation font-mono">
             <img src="/logo.png" alt="Logo" style={{ width: "65px", height: "auto" }} />
@@ -61,13 +64,10 @@ function Navbar() {
           {isAuthenticated && (
             <div
               onClick={() => setIsSidebarOpen(true)}
-              className="btn btn-ghost btn-circle avatar cursor-pointer"
+              className="btn btn-ghost btn-circle avatar cursor-pointer no-animation"
             >
-              <div className="w-10 rounded-full">
-                <img
-                  alt="Avatar"
-                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                />
+              <div className="w-10 rounded-full ">
+                <img alt="Avatar" src={profileImg || "userDefault.png"} />
               </div>
             </div>
           )}
@@ -93,10 +93,7 @@ function Navbar() {
           <div className="flex items-center gap-2">
             <div className="btn btn-ghost btn-circle avatar cursor-pointer no-animation ">
               <div className="w-10 rounded-full">
-                <img
-                  alt="Avatar"
-                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                />
+                <img alt="Avatar" src={profileImg || "userDefault.png"} />
               </div>
             </div>
             <div className="text-sm font-bold">{user?.userNickname}</div>
