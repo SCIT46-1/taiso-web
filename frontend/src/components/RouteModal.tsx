@@ -141,12 +141,12 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
   // Function to get route image URL
 
   return (
-    <div className="route-modal">
-      <h2 className="text-lg font-semibold mb-4">경로 선택</h2>
+    <div className="route-modal w-full p-12">
+      <h2 className="text-2xl font-bold mb-4">경로 선택</h2>
 
       {/* Search bar */}
-      <div className="form-control mb-4">
-        <div className="input-group">
+      <div className="form-control my-4 w-2/3">
+        <div className="input-group flex items-center gap-2">
           <input
             type="text"
             placeholder="경로 검색..."
@@ -174,7 +174,7 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
       </div>
 
       {/* Tabs */}
-      <div className="tabs tabs-boxed mb-4">
+      <div className="tabs tabs-boxed mb-4 w-2/5">
         <a
           className={`tab ${activeTab === "all" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("all")}
@@ -217,20 +217,20 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
             : "북마크한 루트가 없습니다."}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 max-h-[300px] overflow-y-auto">
+        <div className="grid grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
           {filteredRoutes.map((route) => (
             <div
               key={route.id}
-              className={`card card-compact cursor-pointer bg-base-100 border hover:border-primary ${
+              className={`card card-compact cursor-pointer w-30 bg-base-100 border hover:border-primary ${
                 selectedRouteId === route.id
-                  ? "border-primary ring-1 ring-primary"
+                  ? "border-primary"
                   : "border-gray-200"
               }`}
               onClick={() =>
                 onSelectRoute(route.id, route.name, route.distance)
               }
             >
-              <div className="card-body p-0">
+              <div className="card-body">
                 {/* Route Image */}
                 <div className="h-32 overflow-hidden">
                   <img
@@ -244,8 +244,8 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
                   />
                 </div>
 
-                <div className="p-3">
-                  <div className="flex justify-between items-center">
+                <div className="flex flex-col justify-between p-1">
+                  <div className="flex gap-1 items-center">
                     <h3 className="card-title text-base">{route.name}</h3>
                     {route.bookmarked && (
                       <svg
@@ -257,15 +257,15 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
                       </svg>
                     )}
                   </div>
-                  <div className="flex justify-between text-sm mt-1">
-                    <span>{route.region}</span>
-                    <span>{route.distance} km</span>
+                  <div className="flex justify-between text-sm">
+                    <div className="badge badge-outline badge-primary mb-1">{route.region}</div>
+                    <span className="font-semibold">{route.distance} km</span>
                   </div>
                 </div>
 
                 {selectedRouteId === route.id && (
                   <div className="absolute top-2 right-2">
-                    <div className="badge badge-primary badge-sm">선택됨</div>
+                    <div className="badge badge-primary badge-sm p-2.5">선택</div>
                   </div>
                 )}
               </div>
@@ -276,7 +276,7 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
 
       {/* Add a selection confirmation at the bottom if route is selected */}
       {selectedRoute && (
-        <div className="alert alert-success mt-4">
+        <div role="alert" className="alert alert-outline my-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="stroke-current shrink-0 h-6 w-6"
@@ -319,7 +319,7 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
             </button>
           </div>
         </div>
-      )}
+        )}
     </div>
   );
 }
