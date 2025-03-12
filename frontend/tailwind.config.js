@@ -11,7 +11,6 @@ export default {
   plugins: [require("daisyui")],
   daisyui: {
     themes: [
-      "light",
       {
         mytheme: {
           primary: "#6666ff",
