@@ -1,5 +1,5 @@
 import { useParams, useSearchParams } from "react-router";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import clubService, {
   ClubDetailResponse,
   ClubBoardListResponse,
@@ -12,11 +12,9 @@ import { Link, useNavigate } from "react-router-dom";
 
 function ClubDetailPage() {
   const { clubId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _setSearchParams] = useSearchParams();
   const { user } = useAuthStore();
-  const modalRef = useRef<HTMLDialogElement>(null);
-  const deleteModalRef = useRef<HTMLDialogElement>(null);
-  const membershipModalRef = useRef<HTMLDialogElement>(null);
+
   const navigate = useNavigate();
 
   // 모달 상태 통합 관리
@@ -35,7 +33,7 @@ function ClubDetailPage() {
   });
 
   // 상태: 피드백용 알림 (모달로 표시)
-  const [notification, setNotification] = useState<{
+  const [_notification, setNotification] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
@@ -132,10 +130,23 @@ function ClubDetailPage() {
         "success"
       );
 
+      // 남은 회원이 있으면 멤버십 모달 다시 열기
+      if (updatedPendingMembers.length > 0) {
+        setTimeout(() => {
+          openModal("membership");
+        }, 300);
+      }
+
       return updatedPendingMembers; // 업데이트된 배열 반환
     } catch (error) {
       console.error("회원 거절에 실패했습니다.", error);
       showNotification("회원 거절에 실패했습니다.", "error");
+
+      // 오류 발생 시에도 멤버십 모달 다시 열기
+      setTimeout(() => {
+        openModal("membership");
+      }, 300);
+
       return pendingMembers; // 오류 시 기존 배열 반환
     } finally {
       setIsMembershipLoading(false);
@@ -381,7 +392,7 @@ function ClubDetailPage() {
     }
   };
 
-  // 클럽 가입 신청 거절 핸들러를 완전히 수정
+  // 클럽 가입 신청 거절 핸들러 수정
   const handleRejectMember = (userId: number) => {
     // 멤버십 모달을 먼저 완전히 닫고 확인 모달 열기
     closeModal("membership");
@@ -389,45 +400,7 @@ function ClubDetailPage() {
     // 약간의 지연 후 확인 모달 표시
     setTimeout(() => {
       showConfirm("정말로 이 가입 신청을 거절하시겠습니까?", async () => {
-        try {
-          setIsMembershipLoading(true);
-          await clubService.rejectClubMember(Number(clubId), userId);
-
-          const memberName =
-            pendingMembers.find((m) => m.userId === userId)?.userNickname ||
-            "회원";
-
-          // 업데이트된 pendingMembers 생성
-          const updatedPendingMembers = pendingMembers.filter(
-            (member) => member.userId !== userId
-          );
-
-          // 상태 업데이트
-          setPendingMembers(updatedPendingMembers);
-
-          // 작업 완료 알림
-          showNotification(
-            `${memberName} 님의 가입 신청을 거절했습니다.`,
-            "success"
-          );
-
-          // 남은 회원이 있으면 멤버십 모달 다시 열기
-          if (updatedPendingMembers.length > 0) {
-            setTimeout(() => {
-              openModal("membership");
-            }, 300);
-          }
-        } catch (error) {
-          console.error("회원 거절에 실패했습니다.", error);
-          showNotification("회원 거절에 실패했습니다.", "error");
-
-          // 오류 발생 시에도 멤버십 모달 다시 열기
-          setTimeout(() => {
-            openModal("membership");
-          }, 300);
-        } finally {
-          setIsMembershipLoading(false);
-        }
+        await doRejectMember(userId);
       });
     }, 100); // 약간의 지연으로 모달 전환이 더 자연스럽게
   };
@@ -877,38 +850,6 @@ function ClubDetailPage() {
   // 클럽 전용 번개 생성 페이지로 이동
   const handleCreateLightningClick = () => {
     navigate(`/lightning/post?clubId=${clubId}&isClubOnly=true`);
-  };
-
-  // 번개 상태에 따른 버튼 렌더링
-  const renderStatusButton = (status: string) => {
-    switch (status) {
-      case "모집":
-        return (
-          <button className="btn btn-outline btn-primary md:w-[150px] w-full no-animation">
-            참가
-          </button>
-        );
-      case "마감":
-      case "강제마감":
-        return (
-          <button
-            className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
-            disabled
-          >
-            마감
-          </button>
-        );
-      case "종료":
-      default:
-        return (
-          <button
-            className="btn btn-outline btn-error md:w-[150px] w-full no-animation"
-            disabled
-          >
-            종료
-          </button>
-        );
-    }
   };
 
   // 클럽 전용 번개 목록 렌더링
