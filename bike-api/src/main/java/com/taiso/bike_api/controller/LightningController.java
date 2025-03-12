@@ -72,7 +72,13 @@ public class LightningController {
         return ResponseEntity.status(HttpStatus.OK).body(lightningListResponseDTO);
     }
 
-
+    @GetMapping("/clubs/{clubId}")
+    @Operation(summary = "클럽 전용 번개 조회", description = "클럽 전용 번개 조회 API")
+    public ResponseEntity<LightningListResponseDTO> getClubLightningList(
+        @PathVariable(name = "clubId") Long clubId
+        , @AuthenticationPrincipal String userEmail) {
+        return ResponseEntity.status(HttpStatus.OK).body(lightningService.getClubLightningList(clubId, userEmail));
+    }
 
 
     @GetMapping("/{lightningId}/participation")

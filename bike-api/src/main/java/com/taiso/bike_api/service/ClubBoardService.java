@@ -1,11 +1,12 @@
 package com.taiso.bike_api.service;
 
-import com.taiso.bike_api.domain.*;
-import com.taiso.bike_api.dto.*;
-import com.taiso.bike_api.exception.*;
-import com.taiso.bike_api.repository.*;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,8 +16,30 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.taiso.bike_api.domain.ClubBoardEntity;
+import com.taiso.bike_api.domain.ClubEntity;
+import com.taiso.bike_api.domain.ClubMemberEntity;
+import com.taiso.bike_api.domain.UserDetailEntity;
+import com.taiso.bike_api.domain.UserEntity;
+import com.taiso.bike_api.dto.ClubBoardGetResponseDTO;
+import com.taiso.bike_api.dto.ClubBoardListResponseDTO;
+import com.taiso.bike_api.dto.ClubBoardPatchRequestDTO;
+import com.taiso.bike_api.dto.ClubBoardPostRequestDTO;
+import com.taiso.bike_api.dto.ResponseClubBoardListDTO;
+import com.taiso.bike_api.exception.ClubBoardNotFoundException;
+import com.taiso.bike_api.exception.ClubBoardNotPermissionException;
+import com.taiso.bike_api.exception.ClubBoardNoticeNotPermissionException;
+import com.taiso.bike_api.exception.ClubMemberMismatchException;
+import com.taiso.bike_api.exception.ClubNotFoundException;
+import com.taiso.bike_api.exception.UserNotFoundException;
+import com.taiso.bike_api.repository.ClubBoardRepository;
+import com.taiso.bike_api.repository.ClubMemberRepository;
+import com.taiso.bike_api.repository.ClubRepository;
+import com.taiso.bike_api.repository.UserDetailRepository;
+import com.taiso.bike_api.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -235,8 +258,10 @@ public class ClubBoardService {
         }
         // 페이지 요청 생성
         Pageable pageable = PageRequest.of(page, size, sortObj);
-        // 필터링 조건 생성
-        Specification<ClubBoardEntity> spec = Specification.where(null);
+        
+        // 필터링 조건 생성 - 클럽 ID로 필터링
+        Specification<ClubBoardEntity> spec = (root, query, criteriaBuilder) -> 
+            criteriaBuilder.equal(root.get("club").get("clubId"), clubId);
 
         // 필터링된 데이터로 페이징 조회
         Page<ClubBoardEntity> clubBoardPage = clubBoardRepository.findAll(spec, pageable);

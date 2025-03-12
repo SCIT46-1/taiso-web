@@ -66,7 +66,11 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body(clubService.updateClubDetails(clubId, requestDTO, authentication));
     }
 
-
+    @GetMapping("/me")
+    @Operation(summary = "내 가입 클럽 조회", description = "내 가입 클럽 조회 API")
+    public ResponseEntity<ClubListResponseDTO> getMyClub(Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK).body(clubService.getMyClub(authentication));
+    }
 
 
 }

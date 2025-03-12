@@ -42,5 +42,8 @@ public interface LightningRepository extends JpaRepository<LightningEntity, Long
 
 	// 클럽 번개 리스트 조회 repository
 	List<LightningEntity> findByClubId(Long clubId);
-	
+
+	// 루트 아이디를 통해 번개 조회
+	List<LightningEntity> findByRoute_RouteId(Long routeId);
+
 }

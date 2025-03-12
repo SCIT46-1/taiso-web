@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.taiso.bike_api.domain.BookmarkEntity;
 import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
+import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.RouteEntity;
 import com.taiso.bike_api.domain.RouteLikeEntity;
 import com.taiso.bike_api.domain.RoutePointEntity;
@@ -30,6 +31,7 @@ import com.taiso.bike_api.exception.RouteLikeNotFoundException;
 import com.taiso.bike_api.exception.RouteNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
 import com.taiso.bike_api.repository.BookmarkRepository;
+import com.taiso.bike_api.repository.LightningRepository;
 import com.taiso.bike_api.repository.RouteLikeRepository;
 import com.taiso.bike_api.repository.RoutePointRepository;
 import com.taiso.bike_api.repository.RouteRepository;
@@ -59,6 +61,9 @@ public class RouteService {
 
     @Autowired
     private BookmarkRepository bookmarkRepository;
+
+    @Autowired
+    private LightningRepository lightningRepository;
 
 
     /** 
@@ -330,6 +335,16 @@ public RouteListResponseDTO getRouteList(int page, int size, String sort,
         if (!userEmail.equals(userEntity.getEmail())) {
             throw new RouteDeleteAccessDeniedException("삭제 권한이 없습니다.");
         }
+
+
+            // 먼저 Lightning 엔티티들 중 routeId가 일치하는 것들의 route를 null로 업데이트
+    List<LightningEntity> lightnings = lightningRepository.findByRoute_RouteId(routeId);
+    for (LightningEntity lightning : lightnings) {
+        lightning.setRoute(null);
+        lightningRepository.save(lightning);
+    }
+    
+        
         // 루트 삭제
         routeRepository.delete(routeEntity);
     }

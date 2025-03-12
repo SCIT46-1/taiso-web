@@ -12,4 +12,5 @@ import com.taiso.bike_api.domain.ClubBoardEntity;
 public interface ClubBoardRepository extends JpaRepository<ClubBoardEntity, Long> {
     Page<ClubBoardEntity> findAll(Specification<ClubBoardEntity> spec, Pageable pageable);
 
+
 }

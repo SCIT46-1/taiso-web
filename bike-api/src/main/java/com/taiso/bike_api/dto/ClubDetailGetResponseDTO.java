@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.taiso.bike_api.domain.ClubEntity;
+import com.taiso.bike_api.domain.ClubMemberEntity.ParticipantStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,9 +47,15 @@ public class ClubDetailGetResponseDTO {
                                        .clubDescription(entity.getClubDescription())
                                        .createdAt(entity.getCreatedAt())
                                        .maxUser(entity.getMaxUser())
-                                       .currentScale(entity.getUsers().size())
-                                       .users(entity.getUsers().stream().map(user -> ClubDetailGetResponseUserDTO.toDTO(user.getUser())).collect(Collectors.toList()))
-                                       .tags(entity.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
+                                       .currentScale(entity.getUsers().stream().filter(member -> member.getParticipantStatus() == ParticipantStatus.완료 || member.getParticipantStatus() == ParticipantStatus.승인).collect(Collectors.toList()).size())
+                                       .users(entity.getUsers().stream()
+                                              .map(member -> ClubDetailGetResponseUserDTO.toDTO(
+                                                  member.getUser(), 
+                                                  member.getParticipantStatus().toString()))
+                                              .collect(Collectors.toList()))
+                                       .tags(entity.getTags().stream()
+                                             .map(tag -> tag.getName())
+                                             .collect(Collectors.toSet()))
                                        .build();
     }
 }

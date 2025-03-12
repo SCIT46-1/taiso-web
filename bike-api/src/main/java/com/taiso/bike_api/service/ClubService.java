@@ -55,14 +55,12 @@ public class ClubService {
     private BookmarkRepository bookmarkRepository;
     
     public ClubDetailGetResponseDTO getClubDetail(Long clubId) {
-
         // 클럽 존재여부 확인
         ClubEntity club = clubRepository.findById(clubId)
             .orElseThrow(() -> new ClubNotFoundException("클럽이 존재하지 않습니다."));
-
+        
         // responseDTO 빌드
         return ClubDetailGetResponseDTO.toDTO(club);
-        
     }
 
     public ClubListResponseDTO getClubs(int page, int size, String tags, String sort, String userEmail) {
@@ -214,6 +212,36 @@ public class ClubService {
         return ClubDetailsUpdateResponseDTO.toDTO("클럽정보가 변경되었습니다.");
     }
     
+
+    // 내가 가입한 클럽 조회
+    public ClubListResponseDTO getMyClub(Authentication authentication) {
+        UserEntity user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
+
+
+        List<ClubEntity> clubs = clubRepository.findAllByUsers_User_UserIdAndUsers_ParticipantStatus(user.getUserId(), ParticipantStatus.승인);
+
+        return ClubListResponseDTO.builder()
+                .content(clubs.stream().map(club -> ClubsGetResponseDTO.builder()
+                        .clubId(club.getClubId())
+                        .clubProfileImageId(club.getClubProfileImageId())
+                        .clubName(club.getClubName())
+                        .clubLeaderId(club.getClubLeader().getUserId())
+                        .clubLeaderName(club.getClubLeader().getUserDetail().getUserNickname())
+                        .clubLeaderProfileImageId(club.getClubLeader().getUserDetail().getUserProfileImg())
+                        .clubShortDescription(club.getClubShortDescription())
+                        .maxScale(club.getMaxUser())
+                        .currentScale(club.getUsers().stream().filter(member -> member.getParticipantStatus() == ParticipantStatus.완료 || member.getParticipantStatus() == ParticipantStatus.승인).collect(Collectors.toList()).size())
+                        .tags(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
+                        .build())
+                        .collect(Collectors.toList()))
+                .pageNo(1)
+                .pageSize(clubs.size())
+                .totalElements(clubs.size())
+                .totalPages(1)
+                .last(true)
+                .build();
+    }
 
 
 }
