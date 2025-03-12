@@ -36,9 +36,12 @@ function Navbar() {
   return (
     <>
       <div className="navbar -mb-1 -mt-2">
+
+      <div className="navbar -my-2">
+
         <div className="flex-1">
           <Link to="/" className="btn btn-ghost text-xl no-animation font-mono">
-            taiso
+            <img src="/logo.png" alt="Logo" style={{ width: "65px", height: "auto" }} />
           </Link>
         </div>
         <div className="flex-none gap-2">

@@ -124,34 +124,47 @@ function LightningPage() {
 
       <div className="flex-1 w-full mx-auto px-4 sm:px-6">
         {/* 필터 드롭다운 섹션 - md 브레이크포인트 사용으로 모바일(md보다 작은 화면)에서만 변경 */}
-        <div className="flex flex-wrap md:gap-2 gap-1 md:ml-14 md:justify-start justify-center mt-4">
+        <div className="flex flex-wrap md:gap-2 gap-2 md:ml-14 md:justify-start justify-center mt-4">
           {/* 태그 선택 버튼 (모달 오픈) */}
-          <button
-            className="btn md:btn-sm btn-xs m-1"
-            onClick={() => setIsTagModalOpen(true)}
-          >
-            태그
-            {selectedAvailableTags.length > 0 && (
-              <span className="badge md:badge-sm badge-xs badge-primary ml-1">
-                {selectedAvailableTags.length}
-              </span>
+            {selectedAvailableTags.length === 0 ? (
+              <button
+                className="btn md:btn-sm btn-xs my-1 btn-outline btn-primary rounded-full border-1"
+                onClick={() => setIsTagModalOpen(true)}
+              >
+                태그 
+              </button>
+            ) : (
+                <>
+                  <button
+                  className="btn md:btn-sm btn-xs my-1 btn-outline btn-primary rounded-full border-1 hover:bg-primary hover:border-primary"
+                    onClick={() => setIsTagModalOpen(true)}
+                  >
+                    태그 {selectedAvailableTags.length}
+                  </button>
+              </>
             )}
-          </button>
 
           {/* 성별 드롭다운 (단일 선택) */}
           <div className="dropdown dropdown-bottom">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn md:btn-sm btn-xs m-1"
-            >
-              성별
-              {selectedGender && (
-                <span className="badge md:badge-sm badge-xs badge-primary ml-1">
-                  {selectedGender}
-                </span>
-              )}
-            </div>
+              <div>
+                {!selectedGender ? (
+                  <div
+                    tabIndex={0}
+                    role="button"
+                  className="btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary"
+                  >
+                    성별
+                  </div>
+                ) : (
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn md:btn-sm btn-xs my-1 btn-outline btn-primary rounded-full border-1"
+                  >
+                    {selectedGender}
+                  </div>
+                )}
+              </div>
             <ul
               tabIndex={0}
               className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
@@ -174,16 +187,23 @@ function LightningPage() {
 
           {/* 자전거 타입 드롭다운 - 비슷한 방식으로 수정 */}
           <div className="dropdown dropdown-bottom">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn md:btn-sm btn-xs m-1"
-            >
-              자전거 타입
-              {selectedBikeType && (
-                <span className="badge md:badge-sm badge-xs badge-primary ml-1">
+            <div>
+              {!selectedBikeType ? (
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary"
+                >
+                  자전거 타입
+                </div>
+              ) : (
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn md:btn-sm btn-xs my-1 btn-outline btn-primary rounded-full border-1"
+                >
                   {selectedBikeType}
-                </span>
+                </div>
               )}
             </div>
             <ul
@@ -208,16 +228,23 @@ function LightningPage() {
 
           {/* 난이도 드롭다운 (단일 선택) */}
           <div className="dropdown dropdown-bottom">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn md:btn-sm btn-xs m-1"
-            >
-              난이도
-              {selectedLevel && (
-                <span className="badge md:badge-sm badge-xs badge-primary ml-1">
-                  {selectedLevel}
-                </span>
+            <div>
+              {!selectedLevel ? (
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary"
+                >
+                  난이도
+                </div>
+              ) : (
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn md:btn-sm btn-xs my-1 btn-outline btn-primary rounded-full border-1"
+                >
+                    {selectedLevel}
+                </div>
               )}
             </div>
             <ul
@@ -242,16 +269,23 @@ function LightningPage() {
 
           {/* 지역 드롭다운 (단일 선택) */}
           <div className="dropdown dropdown-bottom">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn md:btn-sm btn-xs m-1"
-            >
-              지역
-              {selectedLocation && (
-                <span className="badge md:badge-sm badge-xs badge-primary ml-1">
-                  {selectedLocation}
-                </span>
+            <div>
+              {!selectedLocation ? (
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary"
+                >
+                  지역
+                </div>
+              ) : (
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn md:btn-sm btn-xs my-1 btn-outline btn-primary rounded-full border-1"
+                >
+                    {selectedLocation}
+                </div>
               )}
             </div>
             <ul
@@ -272,6 +306,29 @@ function LightningPage() {
                 </li>
               ))}
             </ul>
+          </div>
+          <div className="flex items-center justify-center">
+            {(selectedAvailableTags.length > 0 ||
+              selectedGender ||
+              selectedBikeType ||
+              selectedLevel ||
+              selectedLocation) && (
+              <>
+                <button
+                className="btn btn-outline border-red-500 btn-xs btn-circle hover:bg-red-200 hover:border-red-500"
+                  onClick={() => {
+                  setSelectedAvailableTags([]);
+                  setSelectedGender(null);
+                  setSelectedBikeType(null);
+                  setSelectedLevel(null);
+                  setSelectedLocation(null);
+                  }}>
+                <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="red" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="h-4 w-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+                </button>
+              </>
+          )}
           </div>
         </div>
 
@@ -321,20 +378,6 @@ function LightningPage() {
                 </button>
               </span>
             )}
-
-            {/* 전체 초기화 버튼 */}
-            <button
-              className="badge badge-outline md:text-sm text-xs"
-              onClick={() => {
-                setSelectedAvailableTags([]);
-                setSelectedGender(null);
-                setSelectedBikeType(null);
-                setSelectedLevel(null);
-                setSelectedLocation(null);
-              }}
-            >
-              전체 초기화
-            </button>
           </div>
         )}
 
