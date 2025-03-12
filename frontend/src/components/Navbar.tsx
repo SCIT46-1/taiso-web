@@ -124,7 +124,7 @@ function Navbar() {
                 <Link to="/settings">내 루트 정보</Link>
               </li>
               <li>
-                <Link to="/bookmark">북마크</Link>
+                <Link to="/bookmark/lightning">북마크</Link>
               </li>
               <li>
                 <div onClick={handleLogout}>로그아웃</div>

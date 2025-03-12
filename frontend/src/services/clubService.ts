@@ -1,6 +1,28 @@
 import { del, get, patch, post } from "../api/request";
 
 export interface ClubListResponse {
+  content: {
+    clubId: number;
+    clubLeaderId: number;
+    clubLeaderName: string;
+    clubLeaderProfileImageId: string;
+    clubName: string;
+    clubProfileImageId: string;
+    clubShortDescription: string;
+    currentScale: number;
+    maxScale: number;
+    tags: string[];
+    bookmarked: boolean;
+  }[];
+  pageNo: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
+
+export interface ClubList {
+  bookmarked: boolean;
   clubId: number;
   clubLeaderId: number;
   clubLeaderName: string;
@@ -97,7 +119,7 @@ export interface ClubBoardPostRequest {
   isNotice: boolean;
 }
 
-const getClubList = async (): Promise<ClubListResponse[]> => {
+const getClubList = async (): Promise<ClubListResponse> => {
   return await get(`/clubs`);
 };
 

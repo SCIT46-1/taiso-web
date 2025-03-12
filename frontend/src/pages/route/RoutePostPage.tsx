@@ -159,7 +159,7 @@ function RoutePostPage() {
   };
 
   return (
-    <div className="flex justify-center items-center relative sm:w-full w-[90%]">
+    <div className="flex justify-center items-center relative sm:w-full w-[90%] no-animation">
       <div className="w-full max-w-lg bg-base-100 p-6">
         <h1 className="text-2xl font-bold text-center mb-4">루트 등록하기</h1>
         <form onSubmit={handleSubmit} noValidate>

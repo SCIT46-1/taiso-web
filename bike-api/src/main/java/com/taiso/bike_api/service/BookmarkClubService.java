@@ -60,6 +60,10 @@ public class BookmarkClubService {
         // 북마크한 클럽상세리스트 조회
         Page<ClubEntity> clubPage = clubRepository.findAllByClubIdIn(bookmarkPage.stream().map(bookmark -> bookmark.getTargetId()).collect(Collectors.toList()), pageable);
 
+
+        boolean bookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(user.getUserId(),
+                user.getUserId(), BookmarkType.CLUB);
+        
         // 응답 DTO생성 - 빌더 패턴 사용
         List<BookmarkClubResponseDTO> clubDTO = clubPage.getContent().stream()
                 .map(club -> {
@@ -75,6 +79,7 @@ public class BookmarkClubService {
                             .maxScale(club.getMaxUser())
                             .currentScale(club.getUsers().stream().filter(member -> member.getParticipantStatus() == ParticipantStatus.완료 || member.getParticipantStatus() == ParticipantStatus.승인).collect(Collectors.toList()).size())
                             .tags(club.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
+                            .bookmarked(bookmarked)
                             .build();
 
                     return dto;

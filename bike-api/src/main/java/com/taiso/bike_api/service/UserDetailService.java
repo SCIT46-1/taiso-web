@@ -8,11 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
 import com.taiso.bike_api.domain.UserDetailEntity;
+import com.taiso.bike_api.domain.UserEntity;
 import com.taiso.bike_api.dto.UserDetailRequestDTO;
 import com.taiso.bike_api.dto.UserDetailResponseDTO;
 import com.taiso.bike_api.exception.InvalidFileExtensionException;
+import com.taiso.bike_api.repository.BookmarkRepository;
+import com.taiso.bike_api.repository.ClubMemberRepository;
+import com.taiso.bike_api.repository.LightningUserRepository;
+import com.taiso.bike_api.repository.RouteRepository;
 import com.taiso.bike_api.repository.UserDetailRepository;
+import com.taiso.bike_api.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +33,21 @@ public class UserDetailService {
 
     @Autowired
     private UserDetailRepository userDetailRepository;
+
+    @Autowired
+    private LightningUserRepository lightningUserRepository;
+
+    @Autowired
+    private ClubMemberRepository clubMemberRepository;
+
+    @Autowired
+    private RouteRepository routeRepository; 
+
+    @Autowired
+    private BookmarkRepository bookmarkRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     //이미지를 S3에 저장하기 + 정보 업데이트
     @Transactional
@@ -95,9 +117,8 @@ public class UserDetailService {
     }
 
 
-    //S3에서 이미지를 불러오기 + 정보 불러오기
     @Transactional
-    public UserDetailResponseDTO getUserDetailById (Long userId) {
+    public UserDetailResponseDTO getUserDetailById (Long userId, String userEmail) {
 
         if (userId == null || userId <= 0) {
             throw new IllegalArgumentException(userId + " 값은 올바르지 않음");
@@ -111,6 +132,23 @@ public class UserDetailService {
         }
         UserDetailEntity userDetail = temp.get();
 
+        //이메일로 유저 찾기
+        Optional<UserEntity> tempUser = userRepository.findByEmail(userEmail);
+        if(!tempUser.isPresent()) {
+            throw new NoSuchElementException("존재하지 않는 데이터");
+        }
+        UserEntity user = tempUser.get();
+
+
+        Integer userLightningsCount = lightningUserRepository.countByUser_UserId(userId);
+
+        Integer userClubsCount = clubMemberRepository.countByUser_UserId(userId);
+
+        Integer userRegisteredRoutesCount = routeRepository.countByUserId(userId);
+
+        boolean bookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(user.getUserId(), userId, BookmarkType.USER);
+
+
         UserDetailResponseDTO userDetailResponseDTO = null;
             //Entity -> DTO 로 builder
             userDetailResponseDTO = UserDetailResponseDTO.builder()
@@ -119,9 +157,13 @@ public class UserDetailService {
                     .bio(userDetail.getBio())
                     .profileImg(userDetail.getUserProfileImg())
                     .backgroundImg(userDetail.getUserBackgroundImg())
-                    .level(userDetail.getLevel().name())
-                    .gender(userDetail.getGender().name())
+                    .level(userDetail.getLevel() != null ? userDetail.getLevel().name() : null)
+                    .gender(userDetail.getGender() != null ? userDetail.getGender().name() : null)
                     .tags(userDetail.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()))
+                    .userLightningsCount(userLightningsCount)
+                    .userClubsCount(userClubsCount)
+                    .userRegisteredRoutesCount(userRegisteredRoutesCount)
+                    .bookmarked(bookmarked)
                     .build();
 
         return userDetailResponseDTO;

@@ -18,6 +18,8 @@ import com.taiso.bike_api.dto.BookmarkClubDeleteResponseDTO;
 import com.taiso.bike_api.dto.BookmarkClubsGetResponseDTO;
 import com.taiso.bike_api.service.BookmarkClubService;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 
 @RestController
 @RequestMapping("/api/users/me/bookmarks/clubs")
@@ -27,6 +29,7 @@ public class BookmarkClubController {
     private BookmarkClubService bookmarkClubService;
 
     @GetMapping("")
+    @Operation(summary = "북마크한 클럽 목록 조회", description = "북마크한 클럽 목록을 조회합니다.")
     public ResponseEntity<BookmarkClubsGetResponseDTO> getBookmarkClubs(
         @RequestParam(name = "page", defaultValue = "0") int page
         , @RequestParam(name = "size", defaultValue = "8") int size
@@ -36,6 +39,7 @@ public class BookmarkClubController {
     }
 
     @PostMapping("/{clubId}")
+    @Operation(summary = "북마크 생성", description = "북마크를 생성합니다.")
     public ResponseEntity<BookmarkClubCreateResponseDTO> createBookmarkClub(
         @PathVariable(name = "clubId") Long clubId
         , Authentication authentication) {
@@ -43,6 +47,7 @@ public class BookmarkClubController {
     }
 
     @DeleteMapping("/{clubId}")
+    @Operation(summary = "북마크 삭제", description = "북마크를 삭제합니다.")
     public ResponseEntity<BookmarkClubDeleteResponseDTO> deleteBookmarkClub(
         @PathVariable(name = "clubId") Long clubId
         , Authentication authentication) {

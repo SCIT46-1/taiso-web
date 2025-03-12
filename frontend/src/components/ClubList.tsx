@@ -4,7 +4,7 @@ import ClubCard from "./ClubCard";
 
 function ClubList() {
   const [isLoading, setIsLoading] = useState(true);
-  const [clubList, setClubList] = useState<ClubListResponse[]>([]);
+  const [clubList, setClubList] = useState<ClubListResponse>();
 
   useEffect(() => {
     const fetchClubList = async () => {
@@ -27,7 +27,7 @@ function ClubList() {
 
   return (
     <div className="w-full mx-auto">
-      {clubList.map((club) => (
+      {clubList?.content.map((club) => (
         <ClubCard key={club.clubId} club={club} />
       ))}
     </div>

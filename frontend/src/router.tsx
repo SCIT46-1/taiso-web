@@ -66,7 +66,18 @@ const UserAccountUpdatePage = Loadable(
 const UserAccountPage = Loadable(
   lazy(() => import("./pages/user/UserAccountPage"))
 );
-const BookMarkPage = Loadable(lazy(() => import("./pages/BookMarkPage")));
+const BookMarkedRoutePage = Loadable(
+  lazy(() => import("./pages/bookmark/BookMarkedRoutePage"))
+);
+const BookMarkedLightningPage = Loadable(
+  lazy(() => import("./pages/bookmark/BookMarkedLightningPage"))
+);
+const BookMarkedUserPage = Loadable(
+  lazy(() => import("./pages/bookmark/BookMarkedUserPage"))
+);
+const BookMarkedClubPage = Loadable(
+  lazy(() => import("./pages/bookmark/BookMarkedClubPage"))
+);
 
 const router = createBrowserRouter([
   {
@@ -107,7 +118,15 @@ const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: "user-onboarding", element: <UserOnboardingPage /> },
-          { path: "bookmark", element: <BookMarkPage /> },
+          {
+            path: "bookmark",
+            children: [
+              { path: "route", element: <BookMarkedRoutePage /> },
+              { path: "lightning", element: <BookMarkedLightningPage /> },
+              { path: "user", element: <BookMarkedUserPage /> },
+              { path: "club", element: <BookMarkedClubPage /> },
+            ],
+          },
           {
             path: "lightning",
             children: [{ path: "post", element: <LightningPostPage /> }],

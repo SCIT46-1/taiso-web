@@ -55,8 +55,7 @@ public class UserController {
                                                                   HttpServletResponse httpServletResponse){
 
         log.info("로직 시작 : {}", userDetailRequestDTO.toString());
-        log.info("profileImg : {}",profileImg.getOriginalFilename());
-        log.info("backgroundImg : {}",backgroundImg.getOriginalFilename());
+
 
         // 파일Id를 포함한 DTO를 DB로 보내 저장
         userDetailService.updateUserDetail(userDetailRequestDTO, profileImg, backgroundImg);
@@ -66,12 +65,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @Operation(summary = "내 페이지 정보 조회", description = "회원 프로필 페이지 정보 조회")
-    public ResponseEntity<UserDetailResponseDTO> getUserDetail(@PathVariable(name = "userId") Long userId) {
+    @Operation(summary = "유저 페이지 정보 조회", description = "회원 프로필 페이지 정보 조회")
+    public ResponseEntity<UserDetailResponseDTO> getUserDetail(@PathVariable(name = "userId") Long userId, @AuthenticationPrincipal String userEmail) {
 
         log.info(userId.toString());
         // 찾아온 데이터를 담기
-        UserDetailResponseDTO userDetailResponseDTO = userDetailService.getUserDetailById(userId);
+        UserDetailResponseDTO userDetailResponseDTO = userDetailService.getUserDetailById(userId, userEmail);
         log.info(userDetailResponseDTO.toString());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userDetailResponseDTO);

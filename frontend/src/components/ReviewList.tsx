@@ -55,7 +55,11 @@ function ReviewList({ userId }: ReviewListProps) {
           <div className="chat-image avatar">
             <div className="w-10 rounded-full">
               <img
-                src={review.reviewerProfileImg}
+                src={
+                  review.reviewerProfileImg
+                    ? `https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${review.reviewerProfileImg}`
+                    : "/userDefault.png"
+                }
                 alt={review.reviewerNickname}
                 className="size-24 bg-blue-200 -bottom-12 sm:left-14 left-6"
               />

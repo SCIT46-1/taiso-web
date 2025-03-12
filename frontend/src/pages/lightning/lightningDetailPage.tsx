@@ -12,10 +12,10 @@ import weatherService, {
 import { getWeatherIcon } from "../../utils/weatherIcons";
 import KakaoMapRoute from "../../components/KakaoMap";
 import KakaolocationMap from "../../components/KakaolocationMap";
-import UserImage from "../../components/UserImage";
 import LightningSummaryInfo from "../../components/LightningSummaryInfo";
 import bookmarkService from "../../services/bookmarkService";
 import GlobalModal from "../../components/GlobalModal";
+import UserProfileCard from "../../components/UserProfileCard";
 
 interface WeatherDisplayProps {
   weatherInfo: WeatherInfo | null;
@@ -536,17 +536,14 @@ function LightningDetailPage() {
                   </span>
                 ))}
             </div>
-            <div className="divider mt-2"></div>
-            <div className="flex items-center gap-2">
-              <UserImage
-                profileImage={
-                  lightningDetail?.creator.creatorProfileImg as string
-                }
-              />
-
-              <span>{lightningDetail?.creator.creatorNickname}</span>
-            </div>
-            <p className="mt-4">{lightningDetail?.description}</p>
+            <div className="divider -mt-1 -mb-[0.5px]"></div>
+            <UserProfileCard
+              userProfileId={lightningDetail?.creator.userId}
+              userProfileImg={lightningDetail?.creator.creatorProfileImg || ""}
+              userProfileName={lightningDetail?.creator.creatorNickname || ""}
+              userRole="creator"
+            />
+            <p className="mt-2">{lightningDetail?.description}</p>
             <div className="mt-2 font-bold">주의사항</div>
             <p>주의사항 내용을 여기에 작성합니다.</p>
           </div>
@@ -726,30 +723,13 @@ function LightningDetailPage() {
                 member.participantStatus === "승인"
             )
             .map((member, index) => (
-              <div
+              <UserProfileCard
                 key={index}
-                className="flex flex-row items-center gap-2 p-2 "
-              >
-                <UserImage profileImage={member.memberProfileImg as string} />
-                <div className="font-medium ">{member.memberNickname}</div>
-                {member.role === "번개생성자" && (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="rgba(255,215,0,1)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-crown"
-                  >
-                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
-                    <path d="M5 21h14" />
-                  </svg>
-                )}
-              </div>
+                userProfileId={member.lightningUserId}
+                userProfileImg={member.memberProfileImg || ""}
+                userProfileName={member.memberNickname || ""}
+                userRole={member.role === "번개생성자" ? "creator" : "member"}
+              />
             ))}
         </div>
         {isCreator && lightningDetail?.recruitType === "수락형" && (
@@ -759,8 +739,15 @@ function LightningDetailPage() {
               .filter((member) => member.participantStatus === "신청대기")
               .map((member, index) => (
                 <div key={index} className="flex items-center gap-2 p-2">
-                  <UserImage profileImage={member.memberProfileImg as string} />
-                  <div>{member.memberNickname}</div>
+                  <UserProfileCard
+                    userProfileId={member.lightningUserId}
+                    userProfileImg={member.memberProfileImg || ""}
+                    userProfileName={member.memberNickname || ""}
+                    userRole={
+                      member.role === "번개생성자" ? "creator" : "member"
+                    }
+                    showRoleIcon={false}
+                  />
                   <div className="flex gap-2 ml-auto items-center">
                     <button
                       className="btn btn-sm"
@@ -843,15 +830,14 @@ function LightningDetailPage() {
             {lightningDetail?.member
               .filter((member) => member.participantStatus === "신청대기")
               .map((member, index) => (
-                <div key={index} className="flex items-center gap-2 p-2 ">
-                  <UserImage profileImage={member.memberProfileImg as string} />
-                  <div className="flex flex-col">
-                    <div className="font-medium">{member.memberNickname}</div>
-                    <div className="text-sm text-gray-500">
-                      상태: {member.participantStatus}
-                    </div>
-                  </div>
-                </div>
+                <UserProfileCard
+                  key={index}
+                  userProfileId={member.lightningUserId}
+                  userProfileImg={member.memberProfileImg || ""}
+                  userProfileName={member.memberNickname || ""}
+                  userRole={member.role === "번개생성자" ? "creator" : "member"}
+                  extraInfo={`상태: ${member.participantStatus}`}
+                />
               ))}
             {lightningDetail?.member.filter(
               (member) => member.participantStatus === "신청대기"
