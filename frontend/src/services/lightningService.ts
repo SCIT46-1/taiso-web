@@ -146,6 +146,18 @@ export interface UserReviewData {
   };
 }
 
+export interface CompletedLightningResponse {
+  lightningId: number;
+  eventDate: string;
+  duration: number;
+  latitude: number;
+  longitude: number;
+  capacity: number;
+  currentParticipants: number;
+  routeTitle: string;
+  joinDate: string;
+}
+
 const createLightning = async (
   payload: LightningPostRequest
 ): Promise<LightningPostResponse> => {
@@ -161,24 +173,17 @@ const getLightningList = async (
   level: string,
   region: string,
   tags: string[],
-  selectedDate: string
+  selectedDate: string,
+  clubId?: number
 ): Promise<LightningListResponse> => {
-  return await get(
-    `/lightnings?page=${page}&size=${size}&sort=${sort}&gender=${gender}&bikeType=${bikeType}&level=${level}&region=${region}&tags=${tags}&date=${selectedDate}`
-  );
-};
+  let url = `/lightnings?page=${page}&size=${size}&sort=${sort}&gender=${gender}&bikeType=${bikeType}&level=${level}&region=${region}&tags=${tags}&date=${selectedDate}`;
 
-export interface CompletedLightningResponse {
-  lightningId: number;
-  eventDate: string;
-  duration: number;
-  latitude: number;
-  longitude: number;
-  capacity: number;
-  currentParticipants: number;
-  routeTitle: string;
-  joinDate: string;
-}
+  if (clubId) {
+    url += `&clubId=${clubId}`;
+  }
+
+  return await get(url);
+};
 
 const getLightningDetail = async (
   lightningId: number

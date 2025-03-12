@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import RouteModal from "../../components/RouteModal";
 import KakaolocationMap from "../../components/KakaolocationMap";
 import MeetingLocationSelector from "../../components/MapModal";
@@ -55,6 +55,10 @@ interface FormErrors {
 }
 
 function LightningPostPage() {
+  const [searchParams] = useSearchParams();
+  const clubId = searchParams.get("clubId");
+  const isClubOnly = searchParams.get("isClubOnly") === "true";
+
   // 모든 폼 상태를 하나의 객체로 관리
   const [formData, setFormData] = useState({
     title: "",
@@ -72,8 +76,8 @@ function LightningPostPage() {
     distance: "",
     routeId: "",
     address: "",
-    isClubOnly: false,
-    clubId: "",
+    isClubOnly: isClubOnly || false,
+    clubId: clubId || "",
     tags: [] as string[],
   });
 
@@ -96,6 +100,17 @@ function LightningPostPage() {
   console.log(formData);
   console.log(formErrors);
 
+  // Add effect to handle club-only parameters
+  useEffect(() => {
+    if (isClubOnly && clubId) {
+      setFormData((prev) => ({
+        ...prev,
+        isClubOnly: true,
+        clubId: clubId,
+      }));
+    }
+  }, [isClubOnly, clubId]);
+
   // 태그 토글 함수
   const handleTagToggle = (option: string) => {
     const updatedTags = formData.tags.includes(option)
@@ -111,8 +126,8 @@ function LightningPostPage() {
 
     if (!formData.title.trim()) errors.title = "제목은 필수입니다.";
     if (!formData.description.trim()) errors.description = "설명은 필수입니다.";
-    if (!formData.eventDate) errors.eventDate = "이벤트 날짜는 필수입니다.";
-    if (!formData.duration) errors.duration = "지속 시간은 필수입니다.";
+    if (!formData.eventDate) errors.eventDate = "모임 날짜는 필수입니다.";
+    if (!formData.duration) errors.duration = "예상 소요시간은 필수입니다.";
     if (!formData.capacity) errors.capacity = "최대 인원 수를 입력해주세요.";
     if (!formData.latitude) errors.latitude = "위도를 입력해주세요.";
     if (!formData.longitude) errors.longitude = "경도를 입력해주세요.";
@@ -233,7 +248,9 @@ function LightningPostPage() {
       {/* 번개 등록 폼 */}
       <div className="flex justify-center items-center relative sm:w-full">
         <div className="w-full max-w-lg bg-base-100 p-4">
-          <h1 className="text-2xl font-bold text-center mb-4">번개 등록하기</h1>
+          <h1 className="text-2xl font-bold text-center mb-4">
+            {isClubOnly ? "클럽 전용 번개 등록하기" : "번개 등록하기"}
+          </h1>
           {serverError && (
             <p className="text-red-500 mb-4 text-center">{serverError}</p>
           )}
@@ -500,21 +517,27 @@ function LightningPostPage() {
                   type="text"
                   placeholder="모임 장소를 등록 해주세요."
                   value={formData.address}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, address: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      address: e.target.value,
+                    }))
+                  }
                   className="input input-bordered w-full placeholder:text-sm focus:input-primary my-2"
                 />
                 {formData.address && (
                   <span className="text-sm text-red-500">
-                    *주소가 아닌 간단 위치를 직접 입력 할 수 있습니다! (ex: 잠실역 8번 출구)
+                    *주소가 아닌 간단 위치를 직접 입력 할 수 있습니다! (ex:
+                    잠실역 8번 출구)
                   </span>
                 )}
                 <div className="mt-3">
                   {formData.address && (
-                  <KakaolocationMap
-                    lat={Number(formData.latitude)}
-                    lng={Number(formData.longitude)}
-                    width="full"
-                    height="300px"
+                    <KakaolocationMap
+                      lat={Number(formData.latitude)}
+                      lng={Number(formData.longitude)}
+                      width="full"
+                      height="300px"
                     />
                   )}
                 </div>
@@ -540,12 +563,13 @@ function LightningPostPage() {
                 </label>
                 <label
                   htmlFor="route_modal"
-                  className={`btn w-full ${selectedRoute.id ? "bg-gray-200" : "bg-blue-500 text-white hover:bg-blue-600"
-                    }`}
+                  className={`btn w-full ${
+                    selectedRoute.id
+                      ? "bg-gray-200"
+                      : "bg-blue-500 text-white hover:bg-blue-600"
+                  }`}
                 >
-                  {selectedRoute.id
-                    ? "경로 재등록"
-                    : "경로 등록"}
+                  {selectedRoute.id ? "경로 재등록" : "경로 등록"}
                 </label>
 
                 {formSubmitted && formErrors.routeId && (
@@ -554,11 +578,9 @@ function LightningPostPage() {
                   </span>
                 )}
               </div>
-
             </div>
             {/* 경로이름, 거리 */}
             <div className="grid grid-cols-2 gap-4 mb-4">
-
               <div className="form-control">
                 <label htmlFor="route" className="label">
                   <span className="label-text">코스</span>
@@ -604,8 +626,8 @@ function LightningPostPage() {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 mb-4">
-            {/* 경로 이미지 */}
-            {selectedRoute.id && (
+              {/* 경로 이미지 */}
+              {selectedRoute.id && (
                 <ImageWithSkeleton
                   src="https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp"
                   alt={selectedRoute.name}
@@ -653,11 +675,18 @@ function LightningPostPage() {
                         {option}
                       </h3>
                       <p className="text-sm text-center mt-2">
-                        {option === "참가형"
-                          ? <>
-                            선착순으로 누구나 자유롭게<br />참가 할 수 있어요!
+                        {option === "참가형" ? (
+                          <>
+                            선착순으로 누구나 자유롭게
+                            <br />
+                            참가 할 수 있어요!
                           </>
-                          : <>신청을 받고 수락을 통해 <br />참가 할 수 있어요!</>}
+                        ) : (
+                          <>
+                            신청을 받고 수락을 통해 <br />
+                            참가 할 수 있어요!
+                          </>
+                        )}
                       </p>
                       {formData.recruitType === option && (
                         <div className="absolute top-2 right-2">
@@ -712,12 +741,25 @@ function LightningPostPage() {
               {/* 지역 */}
               <div className="">
                 <label className="label flex items-center gap-1 justify-start text-blue-500">
-                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                    className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  <svg
+                    data-Slot="icon"
+                    fill="none"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5"
+                    />
                   </svg>
                   <span className="label-text font-semibold text-blue-500">
-                    지역</span>
+                    지역
+                  </span>
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {REGION_OPTIONS.map((option) => (
@@ -728,12 +770,14 @@ function LightningPostPage() {
                         setFormData({ ...formData, region: option });
                         setFormErrors((prev) => ({ ...prev, region: "" }));
                       }}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${formData.region === option ? "btn-primary" : "btn-outline"
-                        }`}
+                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                        formData.region === option
+                          ? "btn-primary"
+                          : "btn-outline"
+                      }`}
                     >
-                     {option}
+                      {option}
                     </button>
-
                   ))}
                 </div>
                 {formErrors.region && (
@@ -746,12 +790,25 @@ function LightningPostPage() {
               {/* 성별 */}
               <div className="">
                 <label className="label flex items-center gap-1 justify-start text-blue-500">
-                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                    className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  <svg
+                    data-Slot="icon"
+                    fill="none"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5"
+                    />
                   </svg>
                   <span className="label-text font-semibold text-blue-500">
-                    성별</span>
+                    성별
+                  </span>
                 </label>
                 <div className="flex gap-2">
                   {GENDER_OPTIONS.map((option) => (
@@ -782,12 +839,25 @@ function LightningPostPage() {
               {/* 레벨 */}
               <div className="">
                 <label className="label flex items-center gap-1 justify-start text-blue-500">
-                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                    className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  <svg
+                    data-Slot="icon"
+                    fill="none"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5"
+                    />
                   </svg>
                   <span className="label-text font-semibold text-blue-500">
-                    레벨</span>
+                    레벨
+                  </span>
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {LEVEL_OPTIONS.map((option) => (
@@ -818,12 +888,25 @@ function LightningPostPage() {
               {/* 자전거 종류 */}
               <div className="">
                 <label className="label flex items-center gap-1 justify-start text-blue-500">
-                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                    className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  <svg
+                    data-Slot="icon"
+                    fill="none"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5"
+                    />
                   </svg>
                   <span className="label-text font-semibold text-blue-500">
-                    자전거 종류</span>
+                    자전거 종류
+                  </span>
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {BIKE_TYPE_OPTIONS.map((option) => (
@@ -854,12 +937,25 @@ function LightningPostPage() {
               {/* 태그 */}
               <div>
                 <label className="label flex items-center gap-1 justify-start text-blue-500">
-                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                    className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+                  <svg
+                    data-Slot="icon"
+                    fill="none"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5"
+                    />
                   </svg>
                   <span className="label-text font-semibold text-blue-500">
-                    태그</span>
+                    태그
+                  </span>
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {TAG_OPTIONS.map((option) => (
@@ -885,28 +981,25 @@ function LightningPostPage() {
               </div>
             </div>
 
-            {/* 주소
-            <div className="form-control mb-4">
-              <label htmlFor="address" className="label">
-                <span className="label-text">주소</span>
-              </label>
-              <input
-                id="address"
-                type="text"
-                placeholder="예: 서울특별시 강남구"
-                value={formData.address}
-                onChange={(e) => {
-                  setFormData({ ...formData, address: e.target.value });
-                  setFormErrors((prev) => ({ ...prev, address: "" }));
-                }}
-                className="input input-bordered placeholder:text-sm"
-              />
-              {formErrors.address && (
-                <span className="text-red-500 mt-2 block">
-                  {formErrors.address}
-                </span>
-              )}
-            </div> */}
+            {/* Add club-only indicator when creating a club-only lightning */}
+            {isClubOnly && clubId && (
+              <div className="alert alert-info mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="stroke-current shrink-0 w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <span>클럽 전용 번개로 등록됩니다.</span>
+              </div>
+            )}
 
             {/* 제출 버튼 */}
             <div className="form-control mt-6 mb-16">

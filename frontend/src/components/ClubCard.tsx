@@ -33,10 +33,10 @@ function ClubCard({ club }: { club: ClubList }) {
   };
 
   return (
-    <div className="mx-auto">
+    <div className="mx-auto w-[90%] rounded-lg hover:bg-base-200">
       <div className="flex mb-1">
         <Link to={`/club/${club.clubId}`} className="flex-1">
-          <div className="w-full flex items-center ml-8 p-4 relative">
+          <div className="w-full flex items-center p-4 relative">
             {!isBookmarked ? (
               <svg
                 data-slot="icon"
@@ -115,14 +115,6 @@ function ClubCard({ club }: { club: ClubList }) {
             </div>
           </div>
         </Link>
-
-        <div className="p-4 mt-auto flex items-center justify-center mr-8">
-          <Link to={`/club/${club.clubId}`} className="group">
-            <button className="btn btn-outline btn-primary sm:w-[150px] no-animation">
-              상세보기
-            </button>
-          </Link>
-        </div>
       </div>
     </div>
   );
