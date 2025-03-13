@@ -431,7 +431,7 @@ function ClubDetailPage() {
   const renderMembershipActions = () => {
     if (!user) {
       return (
-        <button className="btn btn-outline" disabled>
+        <button className="btn btn-outline w-full" disabled>
           로그인 후 이용 가능합니다
         </button>
       );
@@ -440,7 +440,7 @@ function ClubDetailPage() {
       return (
         <div className="flex gap-2">
           <button
-            className="btn btn-primary"
+            className="btn btn-primary w-full"
             onClick={() => {
               fetchPendingMembers();
               openModal("membership");
@@ -460,7 +460,7 @@ function ClubDetailPage() {
       case null:
         return (
           <button
-            className="btn btn-primary"
+            className="btn btn-primary w-full"
             onClick={doApplyClub}
             disabled={
               isMembershipLoading ||
@@ -476,14 +476,14 @@ function ClubDetailPage() {
         );
       case "신청대기":
         return (
-          <button className="btn btn-outline" disabled>
+          <button className="btn btn-outline w-full" disabled>
             가입 신청 처리 중
           </button>
         );
       case "승인":
         return (
           <button
-            className="btn btn-outline btn-error"
+            className="btn btn-outline btn-error w-full"
             onClick={() =>
               showConfirm("정말 클럽을 탈퇴하시겠습니까?", doLeaveClub)
             }
@@ -499,7 +499,7 @@ function ClubDetailPage() {
       case "탈퇴":
         return (
           <button
-            className="btn btn-primary"
+            className="btn btn-primary w-full"
             onClick={doApplyClub}
             disabled={isMembershipLoading}
           >
@@ -541,13 +541,11 @@ function ClubDetailPage() {
     }
     if (!boardList) return null;
     return (
-      <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
-        <div className="card-body">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="card-title">게시판</h2>
+        <div className="px-3">
+          <div className="flex justify-end items-center">
             {canCreatePost() ? (
               <button
-                className="btn btn-primary btn-sm"
+                className="btn btn-primary btn-sm mr-2"
                 onClick={handleNewPostClick}
               >
                 글쓰기
@@ -567,7 +565,7 @@ function ClubDetailPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="table w-full">
-                <thead>
+                <thead className="text-sm">
                   <tr>
                     <th className="w-16 text-center">번호</th>
                     <th>제목</th>
@@ -635,7 +633,6 @@ function ClubDetailPage() {
             </div>
           )}
         </div>
-      </div>
     );
   };
 
@@ -657,10 +654,17 @@ function ClubDetailPage() {
     if (!clubDetail) return null;
     return (
       <div className="card bg-base-100 shadow-md rounded-lg border border-base-300 w-full">
-        <div className="card-body">
-          <h2 className="card-title mb-2">멤버십 현황 및 멤버 목록</h2>
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
+        <div className="card-body p-6 gap-1">
+          <div className="flex justify-start items-center gap-1.5 mb-2">
+            <svg data-Slot="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+              strokeWidth="2"
+              className="size-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+            </svg>
+            <h2 className="card-title">클럽 멤버</h2>
+          </div>
+          <div className="">
+            <div className="flex justify-between items-center">
               <div className="font-medium">인원 현황</div>
               <div className="text-sm font-medium">
                 {clubDetail?.currentScale} / {clubDetail?.maxUser} 명
@@ -682,6 +686,7 @@ function ClubDetailPage() {
               max="100"
             ></progress>
           </div>
+          
           <div className="divider my-2"></div>
           {clubDetail?.users
             .filter(
@@ -874,7 +879,7 @@ function ClubDetailPage() {
               <h2 className="card-title">클럽 전용 번개</h2>
               {canCreatePost() && (
                 <button
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-primary btn-sm mr-2"
                   onClick={handleCreateLightningClick}
                 >
                   번개 만들기
@@ -890,10 +895,8 @@ function ClubDetailPage() {
     }
 
     return (
-      <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
-        <div className="card-body">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="card-title">클럽 전용 번개</h2>
+        <div className="px-3">
+        <div className="flex justify-end items-center">
             {canCreatePost() && (
               <button
                 className="btn btn-primary btn-sm"
@@ -979,7 +982,6 @@ function ClubDetailPage() {
             </div>
           )}
         </div>
-      </div>
     );
   };
 
@@ -1251,9 +1253,9 @@ function ClubDetailPage() {
       <div className="w-screen mx-auto mb-10 max-w-screen-lg no-animation relative">
         {/* 클럽 헤더 */}
         <div className="card bg-base-100 shadow-md rounded-lg border border-base-300 mb-4">
-          <div className="card-body">
+          <div className="card-body p-4">
             <div className="flex flex-col md:flex-row gap-6">
-              <div className="w-full md:w-64 flex-shrink-0">
+              <div className="w-48 md:w-48 flex-shrink-0">
                 {clubDetail.clubProfileImageId ? (
                   <ImageWithSkeleton
                     src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${clubDetail.clubProfileImageId}`}
@@ -1261,15 +1263,15 @@ function ClubDetailPage() {
                     className="rounded-lg"
                   />
                 ) : (
-                  <div className="bg-base-300 rounded-lg w-full h-64 flex items-center justify-center">
+                  <div className="bg-base-300 rounded-lg w-48 h-48 flex items-center justify-center">
                     <span className="text-3xl font-bold opacity-30">
                       {clubDetail.clubName.substring(0, 2).toUpperCase()}
                     </span>
                   </div>
                 )}
               </div>
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold mb-2">
+              <div className="flex-1 p-2">
+                <h1 className="text-2xl font-bold mb-2">
                   {clubDetail.clubName}
                 </h1>
                 <div className="flex items-center mb-2">
@@ -1309,91 +1311,98 @@ function ClubDetailPage() {
         </div>
 
         {/* 메인 그리드 */}
-        <div className="grid md:grid-cols-[2fr,1fr] grid-cols-1 gap-4">
-          <div className="flex flex-col gap-4">
-            <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
-              <div className="card-body">
-                <div className="tabs tabs-boxed w-fit mb-2">
+        <div className="grid md:grid-cols-[5fr,2fr] grid-cols-1 gap-4">
+          <div className="flex flex-col gap-1">
+            <div className="">
+              <div>
+                <div role="tablist" className="tabs tabs-lifted tabs-lg">
                   <a
-                    className={`tab ${
-                      activeTab === "info" ? "tab-active" : ""
-                    }`}
+                    role="tab"
+                    className={`tab font-semibold text-base ${activeTab === "info" ? "tab-active" : ""
+                      }`}
                     onClick={() => setActiveTab("info")}
                   >
                     클럽 정보
                   </a>
-                  <a
-                    className={`tab ${
-                      activeTab === "board" ? "tab-active" : ""
-                    }`}
-                    onClick={() => {
-                      setActiveTab("board");
-                      if (!boardList) fetchBoardList();
-                    }}
-                  >
-                    게시판
-                  </a>
-                  <a
-                    className={`tab ${
-                      activeTab === "lightning" ? "tab-active" : ""
-                    }`}
-                    onClick={() => {
-                      setActiveTab("lightning");
-                      if (!clubLightningList) fetchClubLightningList();
-                    }}
-                  >
-                    번개
-                  </a>
+                    <a
+                      role="tab"
+                    className={`tab font-semibold text-base ${activeTab === "board" ? "tab-active" : ""
+                        }`}
+                      onClick={() => {
+                        setActiveTab("board");
+                        if (!boardList) fetchBoardList();
+                      }}
+                    >
+                      게시판
+                    </a>
+                    <a
+                      role="tab"
+                    className={`tab font-semibold text-base ${activeTab === "lightning" ? "tab-active" : ""
+                        }`}
+                      onClick={() => {
+                        setActiveTab("lightning");
+                        if (!clubLightningList) fetchClubLightningList();
+                      }}
+                    >
+                      번개
+                    </a>
                 </div>
-                <p className="text-sm text-gray-500">
-                  {activeTab === "info"
-                    ? "클럽의 상세 정보와 멤버 목록을 확인하세요."
-                    : activeTab === "board"
-                    ? "클럽 게시판에서 멤버들과 소통하세요."
-                    : "클럽 전용 번개를 확인하고 함께 라이딩하세요."}
-                </p>
+
+                <div>
+                  <p className="text-sm text-gray-500 mt-3 mb-2">
+                    {activeTab === "info"
+                      ? "클럽의 상세 정보와 멤버 목록을 확인하세요."
+                      : activeTab === "board"
+                        ? "클럽 게시판에서 멤버들과 소통하세요."
+                        : "클럽 전용 번개를 확인하고 함께 라이딩하세요."}
+                  </p>
+                </div>
               </div>
+
             </div>
             {activeTab === "board" ? (
               renderBoardContent()
             ) : activeTab === "lightning" ? (
               renderClubLightningList()
-            ) : (
-              <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
-                <div className="card-body">
-                  <h2 className="card-title mb-4">클럽 상세 소개</h2>
-                  <div className="w-full">
-                    <p
-                      className="whitespace-pre-line break-all"
-                      style={{
-                        wordBreak: "break-all",
-                        overflowWrap: "break-word",
-                        maxWidth: "100%",
-                      }}
-                    >
-                      {clubDetail.clubDescription || "상세 설명이 없습니다."}
-                    </p>
+              ) : (
+                <>
+                  <div className="bg-gray-100">
+                    <div className="card-body">
+                      <h2 className="font-semibold">클럽 상세 소개</h2>
+                      <div className="w-full">
+                        <p
+                            className="whitespace-pre-line break-all text-base"
+                        style={{
+                          wordBreak: "break-all",
+                          overflowWrap: "break-word",
+                          maxWidth: "100%",
+                        }}
+                      >
+                          {clubDetail.clubDescription || "상세 설명이 없습니다."}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-lg mt-6 mb-2">클럽 태그</h3>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {clubDetail.tags.map((tag, index) => (
+                    <div className="bg-gray-100">
+                      <div className="card-body">
+                        <h3 className="font-semibold">클럽 태그</h3>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {clubDetail.tags.map((tag, index) => (
                       <div key={index} className="badge badge-lg">
                         #{tag}
                       </div>
-                    ))}
+                      ))}
+                    </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
             )}
           </div>
 
           {/* 사이드바 */}
-          <div className="flex flex-col items-start justify-start gap-4 self-start">
-            <div className="card bg-base-100 shadow-md rounded-lg border border-base-300 w-full">
-              <div className="card-body">
-                <h2 className="card-title mb-4">클럽 참여</h2>
+          <div className="flex flex-col items-start justify-start gap-2 self-start w-full">
+            <div className="w-full h-auto">
                 <div className="my-2">{renderMembershipActions()}</div>
-              </div>
             </div>
             {renderMemberList()}
           </div>
