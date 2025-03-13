@@ -46,11 +46,15 @@ VALUES ('무정차', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 4. user_tage 테이블에 태그 추가가
 INSERT INTO user_tag_category (category, name)
+VALUES ('활동시간', '아침');
+INSERT INTO user_tag_category (category, name)
 VALUES ('활동시간', '오전');
 INSERT INTO user_tag_category (category, name)
 VALUES ('활동시간', '오후');
 INSERT INTO user_tag_category (category, name)
 VALUES ('활동시간', '저녁');
+INSERT INTO user_tag_category (category, name)
+VALUES ('활동시간', '밤');
 INSERT INTO user_tag_category (category, name)
 VALUES ('활동요일', '월');
 INSERT INTO user_tag_category (category, name)
@@ -100,11 +104,23 @@ VALUES ('활동지역', '제주도');
 INSERT INTO user_tag_category (category, name)
 VALUES ('자전거유형', '로드');
 INSERT INTO user_tag_category (category, name)
-VALUES ('자전거유형', '따릉이');
+VALUES ('자전거유형', '그래블');
 INSERT INTO user_tag_category (category, name)
 VALUES ('자전거유형', '하이브리드');
 INSERT INTO user_tag_category (category, name)
+VALUES ('자전거유형', 'MTB');
+INSERT INTO user_tag_category (category, name)
+VALUES ('자전거유형', '픽시');
+INSERT INTO user_tag_category (category, name)
+VALUES ('자전거유형', '트라이애슬론');
+INSERT INTO user_tag_category (category, name)
+VALUES ('자전거유형', '투어링');
+INSERT INTO user_tag_category (category, name)
+VALUES ('자전거유형', '따릉이');
+INSERT INTO user_tag_category (category, name)
 VALUES ('자전거유형', '자유');
+
+
 
 
 INSERT INTO ROUTE (

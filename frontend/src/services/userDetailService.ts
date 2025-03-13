@@ -86,6 +86,7 @@ export interface MyLightningResponse {
     tags: string[];
   };
   status: string;
+  isStravaConnected: boolean;
 }
 
 export interface UserPageDetailRequest {

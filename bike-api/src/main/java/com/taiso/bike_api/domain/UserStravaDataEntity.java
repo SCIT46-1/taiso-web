@@ -57,7 +57,7 @@ public class UserStravaDataEntity {
      * 스트라바에서 제공하는 액티비티 Id (외부 고유값)
      */
     @Column(name = "activity_id", nullable = false, unique = true)
-    private Integer activityId;
+    private Long activityId;
 
     /**
      * 스트라바 API에서 제공한 액티비티 이름

@@ -5,6 +5,8 @@ import userDetailService, {
   MyLightningResponse,
 } from "../services/userDetailService";
 import ReviewModal from "./ReviewModal";
+import stravaService, { StravaActivity } from "../services/stravaService";
+import StravaModal from "./StravaModal";
 
 function UserCompletedLightningList() {
   const [completedLightning, setCompletedLightning] = useState<
@@ -12,6 +14,16 @@ function UserCompletedLightningList() {
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [isStravaConnected, setIsStravaConnected] = useState<boolean>(false);
+  const [checkingStravaConnection, setCheckingStravaConnection] =
+    useState<boolean>(true);
+  const [lightningStravaStatus, setLightningStravaStatus] = useState<{
+    [key: number]: boolean;
+  }>({});
+  const [lightningStravaData, setLightningStravaData] = useState<{
+    [key: number]: StravaActivity;
+  }>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,9 +40,57 @@ function UserCompletedLightningList() {
       }
     };
     fetchData();
-  }, []);
+  }, [refreshKey]);
 
-  // 시간 포맷팅
+  useEffect(() => {
+    const checkStravaConnection = async () => {
+      try {
+        const data = await stravaService.getStravaActivities(1, 1);
+        setIsStravaConnected(true);
+      } catch (error) {
+        console.error("Strava not connected:", error);
+        setIsStravaConnected(false);
+      } finally {
+        setCheckingStravaConnection(false);
+      }
+    };
+
+    checkStravaConnection();
+  }, [refreshKey]);
+
+  useEffect(() => {
+    const checkLightningStravaConnection = async () => {
+      if (!isStravaConnected || completedLightning.length === 0) return;
+
+      const statusMap: { [key: number]: boolean } = {};
+      const dataMap: { [key: number]: StravaActivity } = {};
+
+      for (const lightning of completedLightning) {
+        try {
+          const lightningId = lightning.lightning.lightningId;
+          const activityData = await stravaService.getUserLightningActivity(
+            lightningId
+          );
+
+          if (activityData && Object.keys(activityData).length > 0) {
+            statusMap[lightningId] = true;
+            dataMap[lightningId] = activityData;
+          } else {
+            statusMap[lightningId] = false;
+          }
+        } catch (error) {
+          console.error("Failed to check lightning Strava status:", error);
+          statusMap[lightning.lightning.lightningId] = false;
+        }
+      }
+
+      setLightningStravaStatus(statusMap);
+      setLightningStravaData(dataMap);
+    };
+
+    checkLightningStravaConnection();
+  }, [completedLightning, isStravaConnected, refreshKey]);
+
   const formatTime = (date: string | number | Date) => {
     const dateObj = new Date(date);
     const hours = dateObj.getHours();
@@ -39,7 +99,6 @@ function UserCompletedLightningList() {
     return `${hours}:${minutes}`;
   };
 
-  // 날짜 포맷팅 (YYYY년 MM월 DD일 형식)
   const formatDate = (date: string | number | Date) => {
     const dateObj = new Date(date);
     const month = dateObj.getMonth() + 1;
@@ -48,7 +107,6 @@ function UserCompletedLightningList() {
     return `${month}월 ${day}일`;
   };
 
-  // 날짜별로 그룹화하는 함수
   const groupByDate = (items: MyLightningResponse[]) => {
     const groups: { [key: string]: MyLightningResponse[] } = {};
 
@@ -65,7 +123,6 @@ function UserCompletedLightningList() {
       groups[dateKey].push(item);
     });
 
-    // 날짜순으로 정렬된 배열로 변환
     return Object.entries(groups)
       .sort(
         ([dateA], [dateB]) =>
@@ -78,8 +135,179 @@ function UserCompletedLightningList() {
       }));
   };
 
-  // 날짜별로 그룹화된 데이터
   const groupedLightnings = groupByDate(completedLightning);
+
+  const handleStravaLinkSuccess = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
+
+  const handleStravaConnect = async () => {
+    try {
+      const url = await stravaService.getStravaLink();
+      window.location.href = url;
+    } catch (error) {
+      console.error("Error getting Strava link:", error);
+    }
+  };
+
+  const StravaInfoModal = ({
+    lightningId,
+    modalId,
+  }: {
+    lightningId: number;
+    modalId: string;
+  }) => {
+    const stravaData = lightningStravaData[lightningId];
+
+    return (
+      <dialog id={modalId} className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg mb-4">스트라바 활동 정보</h3>
+
+          {stravaData ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between">
+                <span className="font-semibold">활동명:</span>
+                <span>{stravaData.name || "정보 없음"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">거리:</span>
+                <span>
+                  {stravaData.distance !== undefined
+                    ? `${(stravaData.distance / 1000).toFixed(2)} km`
+                    : "정보 없음"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">시간:</span>
+                <span>
+                  {stravaData.moving_time
+                    ? `${Math.floor(stravaData.moving_time / 60)}분 ${
+                        stravaData.moving_time % 60
+                      }초`
+                    : "정보 없음"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">평균 속도:</span>
+                <span>
+                  {stravaData.average_speed
+                    ? `${(stravaData.average_speed * 3.6).toFixed(1)} km/h`
+                    : "정보 없음"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">고도 상승:</span>
+                <span>
+                  {stravaData.total_elevation_gain
+                    ? `${stravaData.total_elevation_gain}m`
+                    : "정보 없음"}
+                </span>
+              </div>
+              {stravaData.start_date && (
+                <div className="flex justify-between">
+                  <span className="font-semibold">날짜:</span>
+                  <span>
+                    {new Date(stravaData.start_date).toLocaleString()}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              스트라바 활동 정보를 불러올 수 없습니다.
+            </div>
+          )}
+
+          <div className="modal-action">
+            <form method="dialog">
+              <button className="btn">닫기</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+    );
+  };
+
+  const renderStravaButton = (lightningId: number) => {
+    if (checkingStravaConnection) {
+      return (
+        <button
+          className="btn btn-outline btn-primary md:w-[150px] w-full no-animation"
+          disabled
+        >
+          <span className="loading loading-spinner loading-xs"></span>
+        </button>
+      );
+    }
+
+    if (!isStravaConnected) {
+      return (
+        <button
+          className="btn btn-outline btn-primary md:w-[150px] w-full no-animation"
+          onClick={handleStravaConnect}
+        >
+          스트라바 연결하기
+        </button>
+      );
+    }
+
+    const hasActivity = lightningStravaStatus[lightningId];
+    if (hasActivity) {
+      return (
+        <button
+          className="btn btn-outline btn-success md:w-[150px] w-full no-animation"
+          onClick={() =>
+            (
+              document.getElementById(
+                `strava-info-modal-${lightningId}`
+              ) as HTMLDialogElement
+            )?.showModal()
+          }
+        >
+          등록 정보보기
+        </button>
+      );
+    } else {
+      return (
+        <button
+          className="btn btn-outline btn-primary md:w-[150px] w-full no-animation"
+          onClick={() =>
+            (
+              document.getElementById(
+                `strava-modal-${lightningId}`
+              ) as HTMLDialogElement
+            )?.showModal()
+          }
+        >
+          스트라바 등록
+        </button>
+      );
+    }
+  };
+
+  const renderStravaModals = (lightningId: number) => {
+    if (!isStravaConnected) return null;
+
+    const hasActivity = lightningStravaStatus[lightningId];
+
+    if (hasActivity) {
+      return (
+        <StravaInfoModal
+          lightningId={lightningId}
+          modalId={`strava-info-modal-${lightningId}`}
+        />
+      );
+    } else {
+      return (
+        <StravaModal
+          modalId={`strava-modal-${lightningId}`}
+          lightningId={lightningId}
+          onSuccess={handleStravaLinkSuccess}
+        />
+      );
+    }
+  };
 
   return (
     <div className="flex flex-col">
@@ -209,17 +437,17 @@ function UserCompletedLightningList() {
                           >
                             리뷰 등록
                           </button>
-                          <button className="btn btn-outline btn-primary md:w-[150px] w-full no-animation">
-                            스트라바 등록
-                          </button>
+
+                          {renderStravaButton(lightning.lightning.lightningId)}
                         </div>
                       </div>
 
-                      {/* 리뷰 모달 */}
                       <ReviewModal
                         lightning={lightning}
                         modalId={`review-modal-${lightning.lightning.lightningId}`}
                       />
+
+                      {renderStravaModals(lightning.lightning.lightningId)}
 
                       {index < group.lightnings.length - 1 && (
                         <div className="divider w-full -my-2"></div>

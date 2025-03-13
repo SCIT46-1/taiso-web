@@ -22,4 +22,5 @@ public class UserLightningsGetResponseDTO {
     private Set<UserLightningsGetResponseUserDTO> users;
     private UserLightningsGetResponseTagsDTO tags;
     private ParticipantStatus status;
+    private boolean isStravaConnected;
 }
