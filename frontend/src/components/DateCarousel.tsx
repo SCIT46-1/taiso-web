@@ -130,7 +130,7 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
 
             // 선택된 날짜면 파란색 배경, 흰색 글자, 굵은 글씨 적용
             if (selectedDate.toDateString() === d.toDateString()) {
-              circleClasses += " bg-blue-400 text-white font-bold no-animation";
+              circleClasses += " bg-primary text-white font-bold no-animation";
             }
 
             return (
@@ -141,10 +141,7 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
               >
                 <div className={`${circleClasses} ${textClasses} flex flex-col items-center justify-center`}>
                   <span className="text-sm sm:text-base">{dayNumber}</span>
-
-                  <div className={`${textClasses} text-xs sm:text-sm`}>
-                    {dayName}
-                  </div>
+                  <span className="text-sm sm:text-base">{dayName}</span>
                 </div>
 
               </div>
