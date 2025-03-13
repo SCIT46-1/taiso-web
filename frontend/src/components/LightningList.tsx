@@ -203,19 +203,20 @@ function LightningList({
                   className="flex-1 group"
                 >
                   <div className="bg-base-100 w-full md:flex block items-center">
-                    <figure className="size-40 flex items-center justify-center md:ml-4 mx-auto md:mx-0 relative overflow-hidden my-2 md:my-0">
+                    <div className="text-base flex flex-col items-center px-3">
+                      <span className="text-xl">{formatDate(lightning.eventDate)}</span>
+                      <span className="text-sm">({lightning.duration}분)</span>
+                    </div>
+                    <figure className="size-40 flex items-center justify-center md:ml-4 mx-auto md:mx-0 relative overflow-hidden md:my-0">
                       <ImageWithSkeleton
                         src={lightning.routeImgId}
                         alt={lightning.title}
                       />
                     </figure>
+                    
                     <div className="flex flex-col p-2 md:ml-6 md:text-left text-center">
                       <div className="flex flex-col">
-                        <div className="text-base font-bold">
-                          {formatDate(lightning.eventDate)} (
-                          {lightning.duration}분)
-                        </div>
-                        <div className="text-base truncate md:w-[350px] w-full text-overflow-ellipsis overflow-hidden">
+                        <div className="text-base font-semibold truncate md:w-[350px] w-full text-overflow-ellipsis overflow-hidden mb-1">
                           {lightning.title}
                         </div>
                         <div className="text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">

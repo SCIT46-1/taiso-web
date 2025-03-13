@@ -124,11 +124,11 @@ function LightningPage() {
 
       <div className="flex-1 w-full mx-auto px-4 sm:px-6">
         {/* 필터 드롭다운 섹션 - md 브레이크포인트 사용으로 모바일(md보다 작은 화면)에서만 변경 */}
-        <div className="flex flex-wrap md:gap-2 gap-2 md:ml-14 md:justify-start justify-center mt-4">
+        <div className="flex flex-wrap md:gap-2 gap-2 md:ml-14 md:justify-start justify-center mt-2">
           {/* 태그 선택 버튼 (모달 오픈) */}
             {selectedAvailableTags.length === 0 ? (
               <button
-                className="btn md:btn-sm btn-xs my-1 btn-outline btn-primary rounded-full border-1"
+                className="btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary"
                 onClick={() => setIsTagModalOpen(true)}
               >
                 태그 
@@ -307,6 +307,7 @@ function LightningPage() {
               ))}
             </ul>
           </div>
+          {/* 태그 일괄 삭제 버튼 */}
           <div className="flex items-center justify-center">
             {(selectedAvailableTags.length > 0 ||
               selectedGender ||
@@ -333,51 +334,17 @@ function LightningPage() {
         </div>
 
         {/* 선택된 필터 태그 표시 영역 */}
-        {(selectedAvailableTags.length > 0 ||
-          selectedGender ||
-          selectedBikeType ||
-          selectedLevel ||
-          selectedLocation) && (
+        {(selectedAvailableTags.length > 0 ) && (
           <div className="flex flex-wrap md:gap-2 gap-1 mt-4 md:ml-14 md:justify-start justify-center">
             {selectedAvailableTags.map((tag) => (
               <span
                 key={tag}
-                className="badge badge-primary gap-1 md:text-sm text-xs"
+                className="badge badge-primary gap-1 md:text-sm text-xs h-6"
               >
                 {tag}
                 <button onClick={() => toggleAvailableTag(tag)}>×</button>
               </span>
             ))}
-            {selectedGender && (
-              <span className="badge badge-primary gap-1 md:text-sm text-xs">
-                성별: {selectedGender}
-                <button onClick={() => toggleGenderTag(selectedGender)}>
-                  ×
-                </button>
-              </span>
-            )}
-            {selectedBikeType && (
-              <span className="badge badge-primary gap-1 md:text-sm text-xs">
-                자전거: {selectedBikeType}
-                <button onClick={() => toggleBikeTypeTag(selectedBikeType)}>
-                  ×
-                </button>
-              </span>
-            )}
-            {selectedLevel && (
-              <span className="badge badge-primary gap-1 md:text-sm text-xs">
-                난이도: {selectedLevel}
-                <button onClick={() => toggleLevelTag(selectedLevel)}>×</button>
-              </span>
-            )}
-            {selectedLocation && (
-              <span className="badge badge-primary gap-1 md:text-sm text-xs">
-                지역: {selectedLocation}
-                <button onClick={() => toggleLocationTag(selectedLocation)}>
-                  ×
-                </button>
-              </span>
-            )}
           </div>
         )}
 
@@ -413,14 +380,41 @@ function LightningPage() {
       {isTagModalOpen && (
         <div className="modal modal-open">
           <div className="modal-box md:w-auto w-11/12 max-w-md">
-            <h3 className="font-bold text-lg">태그 선택</h3>
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-lg">태그 선택</h3>
+              <div className="modal-action">
+                {/* 모달 닫기 */}
+                <button
+                  className="btn btn-xs btn-circle bg-transparent border-none"
+                  onClick={() => setIsTagModalOpen(false)}
+                >
+                  <svg
+                    data-Slot="icon"
+                    fill="none"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18 18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
             <div className="py-4">
               <div className="flex flex-wrap gap-2">
                 {availableTags.map((tag) => (
                   <button
                     key={tag}
                     onClick={() => toggleAvailableTag(tag)}
-                    className={`btn md:btn-sm btn-xs ${
+                    className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
                       selectedAvailableTags.includes(tag)
                         ? "btn-primary"
                         : "btn-outline"
@@ -432,11 +426,7 @@ function LightningPage() {
                 ))}
               </div>
             </div>
-            <div className="modal-action">
-              <button className="btn" onClick={() => setIsTagModalOpen(false)}>
-                닫기
-              </button>
-            </div>
+           
           </div>
           <div
             className="modal-backdrop"

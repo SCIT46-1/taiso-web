@@ -88,8 +88,8 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
   }, [selectedDate, dateList]);
 
   return (
-    <div className="relative w-screen left-[50%] right-[50%] py-3 -mx-[50vw] bg-base-200 ">
-      <div className="flex items-center justify-center space-x-2 sm:space-x-4 my-1 px-2 sm:px-0 max-w-screen-xl mx-auto ">
+    <div className="relative w-screen left-[50%] right-[50%] py-3 -mx-[50vw]">
+      <div className="flex items-center justify-center space-x-2 sm:space-x-4 my-1 px-2 sm:px-0 max-w-screen-xl mx-auto h-20">
         {/* 왼쪽 화살표 버튼 (과거 이동) */}
         <button
           className="btn btn-circle btn-sm sm:btn-md no-animation bg-gray-300 hover:bg-gray-400"
@@ -124,7 +124,7 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
 
             // 기본 원형 스타일
             let circleClasses =
-              "w-16 sm:w-24 h-8 sm:h-10 flex items-center justify-center rounded-full transition-colors no-animation mx-1 p-2";
+              "w-16 sm:w-24 h-14 sm:h-16 flex items-center justify-center rounded-full transition-colors no-animation mx-1 p-2";
             // 토/일이면 텍스트 빨간색, 아니면 검정색
             const textClasses = isWeekend(d) ? "text-red-500" : "text-black";
 
@@ -136,7 +136,7 @@ function DateCarousel({ range = 7, onDateChange }: DateCarouselProps) {
             return (
               <div
                 key={index}
-                className="flex flex-col items-center flex-shrink-0 cursor-pointer"
+                className="flex flex-col items-center flex-shrink-0 cursor-pointer h-20 justify-center"
                 onClick={() => handleDateClick(d)}
               >
                 <div className={`${circleClasses} ${textClasses} flex flex-col items-center justify-center`}>

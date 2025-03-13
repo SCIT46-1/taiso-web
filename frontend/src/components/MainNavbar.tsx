@@ -4,7 +4,7 @@ import { useAuthStore } from "../stores/useAuthStore";
 function MainNavbar() {
   const { isAuthenticated } = useAuthStore();
   return (
-    <div className="flex flex-col items-center justify-center mt-1 mb-3">
+    <div className="flex flex-col items-center justify-center mt-1 mb-1">
       {!isAuthenticated && (
         <div className="text-center text-sm text-gray-500 bg-base-200 p-4 px-8 rounded-xl mt-2 mb-8">
           <Link to="/auth/landing" className=" font-bold">
@@ -20,7 +20,7 @@ function MainNavbar() {
           className={({ isActive }) =>
             ` ${
               isActive && "bg-base-200 font-bold"
-            } flex items-center justify-center flex-col px-4 py-2 rounded-xl`
+            } flex items-center justify-center flex-col px-5 py-3 rounded-xl`
           }
         >
           <svg
@@ -49,7 +49,7 @@ function MainNavbar() {
           className={({ isActive }) =>
             ` ${
               isActive && "bg-base-200 font-bold"
-            } flex items-center justify-center flex-col px-4 py-2 rounded-xl`
+            } flex items-center justify-center flex-col px-5 py-3 rounded-xl`
           }
         >
           <svg
@@ -81,7 +81,7 @@ function MainNavbar() {
           className={({ isActive }) =>
             ` ${
               isActive && "bg-base-200 font-bold"
-            } flex items-center justify-center flex-col px-4 py-2 rounded-xl`
+            } flex items-center justify-center flex-col px-5 py-3 rounded-xl`
           }
         >
           <svg
