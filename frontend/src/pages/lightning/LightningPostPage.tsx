@@ -770,7 +770,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, region: option });
                         setFormErrors((prev) => ({ ...prev, region: "" }));
                       }}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.region === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -819,7 +819,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, gender: option });
                         setFormErrors((prev) => ({ ...prev, gender: "" }));
                       }}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.gender === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -868,7 +868,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, level: option });
                         setFormErrors((prev) => ({ ...prev, level: "" }));
                       }}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.level === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -917,7 +917,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, bikeType: option });
                         setFormErrors((prev) => ({ ...prev, bikeType: "" }));
                       }}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.bikeType === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -963,7 +963,7 @@ function LightningPostPage() {
                       key={option}
                       type="button"
                       onClick={() => handleTagToggle(option)}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.tags.includes(option)
                           ? "btn-primary"
                           : "btn-outline "
