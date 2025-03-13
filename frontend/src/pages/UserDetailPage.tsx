@@ -372,7 +372,6 @@ function UserDetailPage() {
           <div className="collapse-content text-sm m-4">{userDetail?.bio}</div>
         </div>
       </div>
-
       {/* 통계 */}
       <div className="border bg-gray-100 flex flex-col items-center justify-center">
         <div className="stats shadow flex justify-center first:before:w-fit m-2 gap-2 w-[85%]">
@@ -441,26 +440,37 @@ function UserDetailPage() {
           </div>
         </div>
       </div>
-
       {/* 스트라바 통계 */}
-      <div className="border bg-blue-300 flex flex-col items-center justify-center mt-8 mb-8 pt-2 pb-4">
-        <div className="text-2xl font-bold m-3 text-white">STRAVA</div>
-        <div className="flex justify-center first:before:w-fit mx-auto gap-2 ">
-          <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
-            <div>주행거리</div>
-            <div>DUMMY</div>
-          </div>
-          <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
-            <div>획득고도</div>
-            <div>DUMMY</div>
+      {!userDetail?.stravaConnected && (
+        <div className="border bg-blue-300 flex flex-col items-center justify-center mt-8 mb-8 pt-2 pb-4">
+          <div>스트라바를 연동하지 않은 유저</div>
+        </div>
+      )}
+      {userDetail?.stravaConnected && (
+        <div className="border bg-blue-300 flex flex-col items-center justify-center mt-8 mb-8 pt-2 pb-4">
+          <div className="text-2xl font-bold m-3 text-white">STRAVA</div>
+          <div className="flex justify-center first:before:w-fit mx-auto gap-2 ">
+            <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
+              <div>횟수</div>
+              <div>{userDetail?.userStravaDataCount}</div>
+            </div>
+            <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
+              <div>주행거리</div>
+              <div>{userDetail?.userStravaKm}</div>
+            </div>
+            <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
+              <div>획득고도</div>
+              <div>{userDetail?.userStravaElevation} M</div>
+            </div>
           </div>
         </div>
-      </div>
-
+      )}
       {/* 리뷰 */}
-      <ReviewList userId={Number(userId)} />
+      <div className="mb-4">
+        <h2 className="text-xl font-bold pl-4 pt-4">리뷰</h2>
+        <ReviewList userId={Number(userId)} />
+      </div>
       <div className="h-24"></div>
-
       {/* 모달 컴포넌트들 */}
       <Modal
         id="profile-edit-modal"

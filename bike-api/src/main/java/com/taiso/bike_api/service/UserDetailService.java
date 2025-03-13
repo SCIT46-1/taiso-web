@@ -20,6 +20,7 @@ import com.taiso.bike_api.repository.LightningUserRepository;
 import com.taiso.bike_api.repository.RouteRepository;
 import com.taiso.bike_api.repository.UserDetailRepository;
 import com.taiso.bike_api.repository.UserRepository;
+import com.taiso.bike_api.repository.UserStravaDataRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,9 @@ public class UserDetailService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserStravaDataRepository userStravaDataRepository;
 
     //이미지를 S3에 저장하기 + 정보 업데이트
     @Transactional
@@ -146,7 +150,22 @@ public class UserDetailService {
 
         Integer userRegisteredRoutesCount = routeRepository.countByUserId(userId);
 
-        boolean bookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(user.getUserId(), userId, BookmarkType.USER);
+        boolean bookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(user.getUserId(), userId,
+                BookmarkType.USER);
+
+        boolean isStravaConnected = userRepository.existsByUserIdAndStravaIdIsNull(userId);
+
+        Integer userStravaDataCount = userStravaDataRepository.countByUser(user);
+
+        Integer userStravaKm = userStravaDataRepository.findByUser(user)
+                .stream()
+                .mapToInt(data -> data.getDistance() != null ? data.getDistance().intValue() : 0)
+                .sum();
+
+        Integer userStravaElevation = userStravaDataRepository.findByUser(user)
+                .stream()
+                .mapToInt(data -> data.getElevation() != null ? data.getElevation().intValue() : 0)
+                .sum();
 
 
         UserDetailResponseDTO userDetailResponseDTO = null;
@@ -164,6 +183,10 @@ public class UserDetailService {
                     .userClubsCount(userClubsCount)
                     .userRegisteredRoutesCount(userRegisteredRoutesCount)
                     .bookmarked(bookmarked)
+                    .isStravaConnected(!isStravaConnected)
+                    .userStravaDataCount(userStravaDataCount)
+                    .userStravaKm(userStravaKm)
+                    .userStravaElevation(userStravaElevation)
                     .build();
 
         return userDetailResponseDTO;

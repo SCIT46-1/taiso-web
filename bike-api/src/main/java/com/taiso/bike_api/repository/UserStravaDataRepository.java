@@ -32,4 +32,8 @@ public interface UserStravaDataRepository extends JpaRepository<UserStravaDataEn
     
     // 활동의 중복 등록 방지를 위한 존재 여부 확인
     boolean existsByUserAndLightningAndActivityId(UserEntity user, LightningEntity lightning, Long activityId);
+
+
+    //특정 사용자의 컬럼 개수 조회
+    Integer countByUser(UserEntity user);
 } 

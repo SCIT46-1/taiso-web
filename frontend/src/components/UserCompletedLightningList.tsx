@@ -46,6 +46,7 @@ function UserCompletedLightningList() {
     const checkStravaConnection = async () => {
       try {
         const data = await stravaService.getStravaActivities(1, 1);
+        console.log(data);
         setIsStravaConnected(true);
       } catch (error) {
         console.error("Strava not connected:", error);

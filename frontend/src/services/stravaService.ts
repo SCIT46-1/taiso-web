@@ -78,17 +78,6 @@ export interface StravaActivityPagedResponse {
   size: number;
 }
 
-interface StravaAthlete {
-  id: number;
-  resource_state: number;
-}
-
-interface StravaMap {
-  id: string;
-  summary_polyline: string;
-  resource_state: number;
-}
-
 // Strava auth link
 const getStravaLink = async (): Promise<string> => {
   return await get(`/strava/link`);
