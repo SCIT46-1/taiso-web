@@ -150,7 +150,7 @@ public class LightningEntity {
     }
 
     public enum BikeType {
-        로드, MTB, 하이브리드, 기타
+        로드, 그래블, 하이브리드, MTB, 픽시, 트라이애슬론, 투어링, 따릉이, 자유
     }
 
     public enum Region {

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +18,7 @@ import com.taiso.bike_api.domain.LightningUserEntity;
 import com.taiso.bike_api.domain.LightningUserEntity.ParticipantStatus;
 import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.domain.UserEntity;
+import com.taiso.bike_api.domain.UserStravaDataEntity;
 import com.taiso.bike_api.dto.RegisterRequestDTO;
 import com.taiso.bike_api.dto.RegisterResponseDTO;
 import com.taiso.bike_api.dto.UserLightningsGetResponseDTO;
@@ -30,12 +33,15 @@ import com.taiso.bike_api.repository.UserDetailRepository;
 import com.taiso.bike_api.repository.UserRepository;
 import com.taiso.bike_api.repository.UserRoleRepository;
 import com.taiso.bike_api.repository.UserStatusRepository;
+import com.taiso.bike_api.repository.UserStravaDataRepository;
 import com.taiso.bike_api.util.RandomNickNameGenerator;
 
 import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
+
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -54,6 +60,9 @@ public class UserService {
 
     @Autowired
     private LightningUserRepository lightningUserRepository;
+
+    @Autowired
+    private UserStravaDataRepository userStravaDataRepository;
 
     @Transactional
     public RegisterResponseDTO register(RegisterRequestDTO dto) {
@@ -168,6 +177,7 @@ public class UserService {
                                 .collect(Collectors.toSet()))
                             .build())
                         .status(lightningUserEntity.getParticipantStatus())
+                        .isStravaConnected(isStravaConnectedForLightning(lightningUserEntity))
                         .build();
                 })
                 .collect(Collectors.toList());
@@ -175,11 +185,50 @@ public class UserService {
         return userLightningsGetResponseDTOList;
     }
 
+    /**
+     * Checks if a user has Strava data linked to a specific lightning event
+     * @param lightningUserEntity The lightning user entity to check
+     * @return true if Strava data exists for this user and lightning, false otherwise
+     */
+    private boolean isStravaConnectedForLightning(LightningUserEntity lightningUserEntity) {
+        // If the lightning is not in 종료 status, always return false
+        // because Strava connection is only relevant for completed events
+        if (lightningUserEntity.getLightning().getStatus() != LightningStatus.종료) {
+            return false;
+        }
+        
+        try {
+            // Get user and lightning information from the entity
+            UserEntity user = lightningUserEntity.getUser();
+            Long lightningId = lightningUserEntity.getLightning().getLightningId();
+            
+            // Query the UserStravaData repository to check if there's a record
+            // for this user and lightning combination
+            Optional<UserStravaDataEntity> stravaData = 
+                userStravaDataRepository.findByUserAndLightningLightningId(user, lightningId);
+            
+            boolean hasStravaConnection = stravaData.isPresent();
+            
+            log.debug("Strava connection check for user {} and lightning {}: {}", 
+                    user.getUserId(), lightningId, hasStravaConnection ? "Connected" : "Not connected");
+            
+            return hasStravaConnection;
+        } catch (Exception e) {
+            // Log the error
+            log.error("Error checking Strava connection for lightning {}: {}", 
+                    lightningUserEntity.getLightning().getLightningId(), e.getMessage());
+            return false;
+        }
+    }
+
     // 이메일 중복 체크
     public boolean checkEmail(String email) {
         Optional<UserEntity> user = userRepository.findByEmail(email);
         return user.isPresent();
     }
+
+
+
 
     public String getUserNicknameByEmail(String email) {
         Optional<UserEntity> user = userRepository.findByEmail(email);

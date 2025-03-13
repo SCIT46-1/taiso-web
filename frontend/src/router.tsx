@@ -1,6 +1,7 @@
 import { lazy, Suspense, ComponentType, FC } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import UserClubPage from "./pages/user/UserClubPage";
+import StravaSuccessPage from "./pages/strava/StravaSuccessPage";
 
 // 로딩 컴포넌트를 래핑하는 헬퍼 함수
 const Loadable = <P extends object>(Component: ComponentType<P>): FC<P> => {
@@ -114,6 +115,7 @@ const router = createBrowserRouter([
         path: "users",
         children: [{ path: ":userId", element: <UserDetailPage /> }],
       },
+      { path: "strava-success", element: <StravaSuccessPage /> },
       // 인증이 필요한 페이지들
       {
         element: <ProtectedRoute />,

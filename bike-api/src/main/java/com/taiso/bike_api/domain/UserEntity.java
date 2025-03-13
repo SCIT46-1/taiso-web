@@ -73,4 +73,13 @@ public class UserEntity {
     @Builder.Default
     private Set<LightningUserEntity> lightningUsers = new HashSet<>();
 
+
+    @Column(name = "strava_id", nullable = true)
+    private Long stravaId;
+
+    @Column(name = "strava_access_token", nullable = true)
+    private String stravaAccessToken;
+
+    @Column(name = "strava_refresh_token", nullable = true)
+    private String stravaRefreshToken;
 }

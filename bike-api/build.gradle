@@ -65,6 +65,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
 
+	// 웹 클라이언트
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 	// 유효성 검사
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
