@@ -33,4 +33,13 @@ public class UserDetailResponseDTO {
     private Integer userRegisteredRoutesCount;
 
     private boolean bookmarked;
+
+    private boolean isStravaConnected;
+
+    private Integer userStravaDataCount;
+
+    private Integer userStravaKm;
+
+    private Integer userStravaElevation;
+
 }
