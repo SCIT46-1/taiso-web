@@ -466,8 +466,7 @@ function UserDetailPage() {
         </div>
       )}
       {/* 리뷰 */}
-      <div className="mb-4">
-        <h2 className="text-xl font-bold pl-4 pt-4">리뷰</h2>
+      <div className="mb-4 justify-center flex">
         <ReviewList userId={Number(userId)} />
       </div>
       <div className="h-24"></div>
@@ -651,9 +650,9 @@ function UserDetailPage() {
                             : [...prevTags, option]
                         );
                       }}
-                      className={`btn btn-sm ${
-                        tags.includes(option) ? "btn-primary" : "btn-outline"
-                      }`}
+                      className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary 
+                        ${tags.includes(option) ? "btn-primary" : "btn-outline"
+                        }`}
                     >
                       {option}
                     </button>

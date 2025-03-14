@@ -66,11 +66,11 @@ function RouteDetailPage() {
     <div className="flex flex-col mt-2 gap-2 md:w-full w-[90%]">
       
       <div className="flex justify-between">
-        <div className="p-2">
+        <div className="px-2 pt-2">
           {/* 루트 이름 */}
-          <div className="text-3xl font-semibold">{routeDetail?.routeName}</div>
+          <div className="px-1 text-2xl font-semibold">{routeDetail?.routeName}</div>
           {/* 태그들 */}
-          <div className="flex flex-wrap gap-1 pt-3 md:justify-start justify-center">
+          <div className="flex flex-wrap gap-1 pt-2 md:justify-start justify-center">
             {routeDetail?.tag.map((tag, index) => (
               <div key={index} className="badge badge-outline badge-primary">
                 {tag}
@@ -86,11 +86,15 @@ function RouteDetailPage() {
               {routeDetail?.roadType}
             </div>
           </div>
+          {/* 루트 한줄 소개 */}
+          <div className="flex justify-between p-2">
+            {routeDetail?.description}
+          </div>
 
 
         </div>
         {/* 좋아요, 북마크 아이콘 */}
-        <div className="pt-1 flex items-start gap-1 mt-1 pr-2">
+        <div className="pt-3 flex items-start gap-1 mt-1 pr-3">
           <svg
             data-slot="icon"
             fill="none"
@@ -99,7 +103,7 @@ function RouteDetailPage() {
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
-            className="size-7 text-gray-600 top-3 right-5 z-10"
+            className="size-5 text-gray-600 top-3 right-5 z-10"
           >
             <path
               strokeLinecap="round"
@@ -116,7 +120,7 @@ function RouteDetailPage() {
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
-              className="size-7 text-red-500 top-3 right-5 z-10"
+              className="size-6 text-red-500 top-3 right-5 z-10"
             >
               <path
                 strokeLinecap="round"
@@ -124,7 +128,7 @@ function RouteDetailPage() {
                 d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
               ></path>
             </svg>
-            <span className="font-semibold flex items-center justify-center">
+            <span className="font-semibold flex items-center justify-center h-5">
               25
             </span>
             </div>
@@ -132,7 +136,7 @@ function RouteDetailPage() {
       </div>
 
       {/* 파일 */}
-      <div className="flex justify-between p-3 bg-gray-100">
+      <div className="flex justify-between p-3 mb-1 board board-1 rounded-lg border border-gray-300">
         {/* 루트 파일 */}
         <div
           className="flex items-center gap-1 hover:bg-base-200 p-1 rounded-md w-fit"
@@ -150,9 +154,9 @@ function RouteDetailPage() {
           >
             <path d="M3 3.5A1.5 1.5 0 0 1 4.5 2h6.879a1.5 1.5 0 0 1 1.06.44l4.122 4.12A1.5 1.5 0 0 1 17 7.622V16.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16.5v-13Z" />
           </svg>
-          <div className="text-lg link ">{routeDetail?.fileName}</div>
+          <div className="link">{routeDetail?.fileName}</div>
         </div>
-        <button className="btn btn-sm btn-primary p-5 flex items-center justify-center">
+        <button className="btn btn-sm btn-primary p-3 flex items-center justify-center">
           GPX 다운로드
         </button>
       </div>
@@ -160,7 +164,6 @@ function RouteDetailPage() {
       <RouteViewer routePoints={routeDetail?.routePoint} />
 
       <div className="divider -mt-1 -mb-[0.5px]"></div>
-
       <div className="stats stats-vertical lg:stats-horizontal divide-y-4 lg:divide-y-0 lg:divide-x-2">
         <div className="stat flex flex-col justify-center items-center">
           <div className="stat-title">거리</div>
@@ -187,15 +190,9 @@ function RouteDetailPage() {
           <div className="stat-value">1,200m</div>
         </div>
       </div>
-
       <div className="divider -mt-1 -mb-[0.5px]"></div>
 
-        {/* 루트 한줄 소개 */}
-        <div className="flex justify-between p-3 bg-gray-100">
-            {routeDetail?.description}
-        </div>
-
-      <div className="flex items-center justify-center gap-1">
+      <div className="flex items-center justify-center gap-1 mt-10">
         <button
           className={`btn btn-outline w-fit no-animation transition-none ${
             routeDetail?.liked ? "" : "btn-error transition-none"

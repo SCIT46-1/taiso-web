@@ -70,7 +70,7 @@ const AltitudeChart: React.FC<AltitudeChartProps> = ({
 
   return (
     <div className="my-6">
-      <h3 className="text-xl font-semibold mb-2 flex ml-4">
+      <h3 className="text-xl font-semibold flex ml-4">
         고도표</h3>
       <ResponsiveContainer width="100%" height={200}>
         <AreaChart

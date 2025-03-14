@@ -922,8 +922,8 @@ function ClubDetailPage() {
                         />
                       </figure>
                       <div className="flex flex-col p-2 md:ml-6 md:text-left text-center flex-1">
-                        <div className="flex flex-col">
-                          <div className="text-base font-bold">
+                        <div className="flex flex-col gap-1">
+                          <div className="text-lg font-bold">
                             {new Date(lightning.eventDate).toLocaleTimeString(
                               [],
                               { hour: "2-digit", minute: "2-digit" }
@@ -1349,7 +1349,7 @@ function ClubDetailPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-500 mt-3 mb-2">
+                  <p className="text-sm text-gray-500 mt-3 mb-1">
                     {activeTab === "info"
                       ? "클럽의 상세 정보와 멤버 목록을 확인하세요."
                       : activeTab === "board"
