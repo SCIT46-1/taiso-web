@@ -207,7 +207,7 @@ function LightningList({
                       <span className="text-xl">{formatDate(lightning.eventDate)}</span>
                       <span className="text-sm">({lightning.duration}분)</span>
                     </div>
-                    <figure className="size-40 flex items-center justify-center md:ml-4 mx-auto md:mx-0 relative overflow-hidden md:my-0">
+                    <figure className="size-40 ">
                       <ImageWithSkeleton
                         src={lightning.routeImgId}
                         alt={lightning.title}
