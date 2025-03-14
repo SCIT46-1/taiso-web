@@ -16,6 +16,7 @@ import userDetailService, {
   UserDetailPatchRequest,
   UserDetailResponse,
 } from "../../services/userDetailService";
+import GlobalModal from "../../components/GlobalModal";
 
 function UserDetailUpdate() {
   const navigate = useNavigate();
@@ -92,9 +93,19 @@ function UserDetailUpdate() {
   }
 
   return (
-    <div>
-      <div className="text-2xl font-bold">UserDetailUpdate</div>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+    <div className="container mx-auto py-8">
+      <div className="text-2xl font-bold mb-8 text-center">개인정보 수정</div>
+        <form className="flex flex-col items-center justify-center max-w-sm mx-auto relative w-[20rem]" onSubmit={handleSubmit}>
+          <label
+          className="label text-sm text-gray-500 mt-4 mr-auto gap-1"
+            htmlFor="password"
+        >
+          <svg data-Slot="icon" fill="currentColor" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            className="h-4 w-4 opacity-70">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+            닉네임
+          </label>
         <input
           type="text"
           name="userNickname"
@@ -102,7 +113,17 @@ function UserDetailUpdate() {
           className="w-full input input-bordered"
           value={updateUserInfo?.userNickname || ""}
           onChange={handleUpdateUserInfo}
-        />
+          />
+          <label
+          className="label text-sm text-gray-500 mt-4 mr-auto gap-1"
+          htmlFor="password"
+        >
+          <svg data-Slot="icon" fill="currentColor" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            className="h-4 w-4 opacity-70">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+            이름
+          </label>
         <input
           type="text"
           name="fullName"
@@ -110,7 +131,17 @@ function UserDetailUpdate() {
           className="w-full input input-bordered"
           value={updateUserInfo?.fullName || ""}
           onChange={handleUpdateUserInfo}
-        />
+          />
+          <label
+          className="label text-sm text-gray-500 mt-4 mr-auto gap-1"
+            htmlFor="password"
+        >
+          <svg data-Slot="icon" fill="currentColor" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            className="h-4 w-4 opacity-70">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+            전화번호
+          </label>
         <input
           type="text"
           name="phoneNumber"
@@ -118,7 +149,17 @@ function UserDetailUpdate() {
           className="w-full input input-bordered"
           value={updateUserInfo?.phoneNumber || ""}
           onChange={handleUpdateUserInfo}
-        />
+          />
+          <label
+          className="label text-sm text-gray-500 mt-4 mr-auto gap-1"
+            htmlFor="password"
+        >
+          <svg data-Slot="icon" fill="currentColor" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            className="h-4 w-4 opacity-70">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+            생년월일
+          </label>
         <input
           type="text"
           name="birthDate"
@@ -126,7 +167,17 @@ function UserDetailUpdate() {
           className="w-full input input-bordered"
           value={updateUserInfo?.birthDate || ""}
           onChange={handleUpdateUserInfo}
-        />
+          />
+          <label
+          className="label text-sm text-gray-500 mt-4 mr-auto gap-1"
+            htmlFor="password"
+        >
+          <svg data-Slot="icon" fill="currentColor" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            className="h-4 w-4 opacity-70">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+            성별
+          </label>
         <input
           type="text"
           name="gender"
@@ -134,7 +185,17 @@ function UserDetailUpdate() {
           className="w-full input input-bordered"
           value={updateUserInfo?.gender || ""}
           onChange={handleUpdateUserInfo}
-        />
+          />
+          <label
+          className="label text-sm text-gray-500 mt-4 mr-auto gap-1"
+            htmlFor="password"
+        >
+          <svg data-Slot="icon" fill="currentColor" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            className="h-4 w-4 opacity-70">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+            키
+          </label>
         <input
           type="number"
           name="height"
@@ -142,7 +203,17 @@ function UserDetailUpdate() {
           className="w-full input input-bordered"
           value={updateUserInfo?.height || ""}
           onChange={handleUpdateUserInfo}
-        />
+          />
+          <label
+          className="label text-sm text-gray-500 mt-4 mr-auto gap-1"
+            htmlFor="password"
+        >
+          <svg data-Slot="icon" fill="currentColor" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            className="h-4 w-4 opacity-70">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+            몸무게
+          </label>
         <input
           type="number"
           name="weight"
@@ -150,7 +221,17 @@ function UserDetailUpdate() {
           className="w-full input input-bordered"
           value={updateUserInfo?.weight || ""}
           onChange={handleUpdateUserInfo}
-        />
+          />
+          <label
+          className="label text-sm text-gray-500 mt-4 mr-auto gap-1"
+            htmlFor="password"
+        >
+          <svg data-Slot="icon" fill="currentColor" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            className="h-4 w-4 opacity-70">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+            FTP
+          </label>
         <input
           type="number"
           name="ftp"
@@ -160,46 +241,54 @@ function UserDetailUpdate() {
           onChange={handleUpdateUserInfo}
         />
 
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary mt-10">
           저장
         </button>
       </form>
 
+      
+      
       {/* Success Modal */}
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-lg font-bold mb-4">업데이트 성공</h3>
-            <p className="mb-6">회원 정보가 성공적으로 업데이트되었습니다.</p>
-            <div className="flex justify-end">
-              <button
-                onClick={handleConfirmSuccess}
-                className="btn btn-primary"
-              >
-                확인
-              </button>
-            </div>
-          </div>
-        </div>
+        <GlobalModal
+        id="Success-modal"
+        imgType="success"
+        title="업데이트 성공"
+        actions={
+          <button
+            onClick={handleConfirmSuccess}
+            className="btn btn-primary"
+          >
+            확인
+          </button>
+        }
+      >
+        <>
+          <p className="mb-6">회원 정보가 성공적으로 업데이트되었습니다.</p>
+        </>
+      </GlobalModal>
       )}
 
       {/* Error Modal */}
       {showErrorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-lg font-bold mb-4 text-error">업데이트 실패</h3>
-            <p className="mb-6">회원 정보 업데이트에 실패했습니다.</p>
-            <div className="flex justify-end">
-              <button
-                onClick={handleCloseErrorModal}
-                className="btn btn-primary"
-              >
-                확인
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <GlobalModal
+        id="Error-modal"
+        imgType="error"
+        title="업데이트 실패"
+        actions={
+          <button
+            onClick={handleCloseErrorModal}
+            className="btn btn-primary"
+          >
+            확인
+          </button>
+        }
+      >
+        <>
+          <p className="mb-6">회원 정보 업데이트에 실패했습니다.</p>
+        </>
+      </GlobalModal>
+        )}
     </div>
   );
 }

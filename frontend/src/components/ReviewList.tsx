@@ -46,7 +46,7 @@ function ReviewList({ userId }: ReviewListProps) {
   }
 
   return (
-    <div className="w-[80%] flex flex-col gap-2 mt-4 sm:ml-12 ml-4">
+    <div className="w-[80%] flex flex-col gap-2 mt-4">
       <div className="text-2xl font-bold ml-2">review</div>
       <div className="border-t border-gray-300 mb-2"></div>
       {userReviews?.length === 0 ? (
