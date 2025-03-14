@@ -1,5 +1,6 @@
 package com.taiso.bike_api.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import com.taiso.bike_api.domain.LightningEntity;
 import com.taiso.bike_api.domain.LightningEntity.BikeType;
 import com.taiso.bike_api.domain.LightningEntity.Gender;
 import com.taiso.bike_api.domain.LightningEntity.Level;
+import com.taiso.bike_api.domain.LightningEntity.LightningStatus;
 import com.taiso.bike_api.domain.LightningEntity.Region;
 import com.taiso.bike_api.domain.LightningTagCategoryEntity;
 import com.taiso.bike_api.domain.LightningUserEntity;
@@ -389,25 +391,25 @@ public class LightningService {
         // 클럽 ID에 해당하는 번개만 조회하는 Specification 생성
         Specification<LightningEntity> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            
+
             // 클럽 ID 필터링
             predicates.add(criteriaBuilder.equal(root.get("clubId"), clubId));
-            
+
             // 클럽 전용 번개만 조회
             predicates.add(criteriaBuilder.equal(root.get("isClubOnly"), true));
-            
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
-        
+
         // 기본 정렬 기준 설정 (최신순)
         Sort sortObj = Sort.by("createdAt").descending();
-        
+
         // 페이지 요청 생성 (첫 페이지, 적절한 사이즈)
         Pageable pageable = PageRequest.of(0, 8, sortObj);
-        
+
         // 필터링된 데이터로 페이징 조회
         Page<LightningEntity> lightningPage = lightningRepository.findAll(spec, pageable);
-        
+
         // 응답 DTO 생성
         List<ResponseComponentDTO> lightningDTO = lightningPage.getContent().stream()
                 .map(lightning -> {
@@ -430,18 +432,107 @@ public class LightningService {
                             .address(lightning.getAddress())
                             .routeImgId(lightning.getRoute() != null ? lightning.getRoute().getRouteImgId() : null)
                             .build();
+
+                // 북마크 정보는 별도로 채워넣기
+                if (userEmail != null && !userEmail.isEmpty()) {
+                    try {
+                        UserEntity user = userRepository.findByEmail(userEmail).orElse(null);
+                        if (user != null) {
+                            // 별도 쿼리로 북마크 여부 확인
+                            boolean isBookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(
+                                    user.getUserId(),
+                                    lightning.getLightningId(),
+                                    BookmarkType.LIGHTNING);
+                            dto.setBookmarked(isBookmarked);
+                        }
+                    } catch (Exception e) {
+                        log.error("사용자 북마크 확인 중 오류: {}", e.getMessage());
+                    }
+                }
+
+                return dto;
+            })
+            .collect(Collectors.toList());
+
+        // 현재 참여자 수 계산
+        for (ResponseComponentDTO lightning : lightningDTO) {
+            int currentParticipants = lightningUserRepository
+                    .countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightning.getLightningId());
+            lightning.setCurrentParticipants(currentParticipants);
+        }
+
+        return LightningListResponseDTO.builder()
+                .content(lightningDTO)
+                .pageNo(lightningPage.getNumber() + 1)
+                .pageSize(lightningPage.getSize())
+                .totalElements(lightningPage.getTotalElements())
+                .totalPages(lightningPage.getTotalPages())
+                .last(lightningPage.isLast())
+                .build();
+    }
+    
+    //메인페이지 번개 리스트 조회
+    public LightningListResponseDTO getMainPage(String userEmail) {
+        // 현재 시각 가져오기
+        LocalDateTime now = LocalDateTime.now();
+        
+        // 현재 시각 이후에 가장 가까운 시작 시간을 가진 번개 이벤트 4개 조회
+        Specification<LightningEntity> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            
+            // 현재 시각 이후의 번개만 조회
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("eventDate"), now));
+            
+            // 모집 상태인 번개만 조회
+            predicates.add(criteriaBuilder.equal(root.get("status"), LightningStatus.모집));
+            
+            // 클럽 전용이 아닌 번개만 조회
+            predicates.add(criteriaBuilder.equal(root.get("isClubOnly"), false));
+            
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+        
+        // 이벤트 시작 시간 기준으로 정렬
+        Sort sort = Sort.by("eventDate").ascending();
+        
+        // 페이지 요청 (첫 4개만)
+        Pageable pageable = PageRequest.of(0, 4, sort);
+        
+        // 조회 실행
+        Page<LightningEntity> lightningPage = lightningRepository.findAll(spec, pageable);
+        
+        // 응답 DTO 생성
+        List<ResponseComponentDTO> lightningDTOs = lightningPage.getContent().stream()
+                .map(lightning -> {
+                    // 기본 DTO 생성
+                    ResponseComponentDTO dto = ResponseComponentDTO.builder()
+                            .lightningId(lightning.getLightningId())
+                            .creatorId(lightning.getCreatorId())
+                            .title(lightning.getTitle())
+                            .eventDate(lightning.getEventDate())
+                            .duration(lightning.getDuration())
+                            .createdAt(lightning.getCreatedAt())
+                            .status(lightning.getStatus())
+                            .capacity(lightning.getCapacity())
+                            .gender(lightning.getGender())
+                            .level(lightning.getLevel())
+                            .bikeType(lightning.getBikeType())
+                            .tags(lightning.getTags().stream()
+                                    .map(LightningTagCategoryEntity::getName)
+                                    .collect(Collectors.toList()))
+                            .address(lightning.getAddress())
+                            .routeImgId(lightning.getRoute() != null ? lightning.getRoute().getRouteImgId() : null)
+                            .build();
                     
-                    // 북마크 정보는 별도로 채워넣기
+                    // 북마크 정보 추가
                     if (userEmail != null && !userEmail.isEmpty()) {
                         try {
                             UserEntity user = userRepository.findByEmail(userEmail).orElse(null);
                             if (user != null) {
-                                // 별도 쿼리로 북마크 여부 확인
                                 boolean isBookmarked = bookmarkRepository.existsByUser_UserIdAndTargetIdAndTargetType(
-                                    user.getUserId(), 
-                                    lightning.getLightningId(),
-                                    BookmarkType.LIGHTNING
-                                );
+                                        user.getUserId(),
+                                        lightning.getLightningId(),
+                                        BookmarkType.LIGHTNING);
                                 dto.setBookmarked(isBookmarked);
                             }
                         } catch (Exception e) {
@@ -449,20 +540,20 @@ public class LightningService {
                         }
                     }
                     
+                    // 현재 참여자 수 추가
+                    int currentParticipants = lightningUserRepository
+                            .countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightning.getLightningId());
+                    dto.setCurrentParticipants(currentParticipants);
+                    
                     return dto;
                 })
                 .collect(Collectors.toList());
         
-        // 현재 참여자 수 계산
-        for (ResponseComponentDTO lightning : lightningDTO) {
-            int currentParticipants = lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightning.getLightningId());
-            lightning.setCurrentParticipants(currentParticipants);
-        }
-        
+        // 최종 응답 DTO 생성 및 반환
         return LightningListResponseDTO.builder()
-                .content(lightningDTO)
-                .pageNo(lightningPage.getNumber() + 1)
-                .pageSize(lightningPage.getSize())
+                .content(lightningDTOs)
+                .pageNo(1)
+                .pageSize(4)
                 .totalElements(lightningPage.getTotalElements())
                 .totalPages(lightningPage.getTotalPages())
                 .last(lightningPage.isLast())

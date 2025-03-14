@@ -265,6 +265,11 @@ const getCompletedLightnings = async (
   return await get(`/lightnings/${lightningId}/complete`);
 };
 
+//메인 페이지 번개 조회
+const getMainLightnings = async (): Promise<LightningListResponse> => {
+  return await get(`/lightnings/main`);
+};
+
 export default {
   createLightning,
   getLightningList,
@@ -280,4 +285,5 @@ export default {
   submitUserReview,
   deleteUserReview,
   getCompletedLightnings,
+  getMainLightnings,
 };

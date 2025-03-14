@@ -79,7 +79,7 @@ public class SecurityConfig {
                 //TODO: 권한 관련 수정 필요
                         .requestMatchers("/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/auth/kakao", "/api/lightnings/", "/api/routes/**", "/api/lightnings/{lightningId}", "/api/lightnings", "/api/clubs"
-                                , "api/clubs/{clubId}", "/api/users/{userId}")
+                                , "api/clubs/{clubId}", "/api/users/{userId}", "/api/lightnings/main")
                         .permitAll()
 
                 // 그 외 모든 요청은 인증 필요
