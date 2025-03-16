@@ -202,21 +202,20 @@ function LightningList({
                   to={`/lightning/${lightning.lightningId}`}
                   className="flex-1 group"
                 >
-                  <div className="bg-base-100 w-full md:flex block items-center">
-                    <div className="text-base flex flex-col items-center px-3 mr-2">
-                      <span className="text-lg font-bold">
-                        {formatDate(lightning.eventDate)}
-                      </span>
-                      <span className="text-sm">({lightning.duration}분)</span>
+                  <div className="bg-base-100 w-full md:flex block items-center justify-center">
+                    <div className="text-base flex flex-col items-center px-3 mr-4 text-center">
+                      <span className="text-xl">{formatDate(lightning.eventDate)}</span>
+                      <span className="text-xs">({lightning.duration}분)</span>
                     </div>
-                    <figure className="size-40 flex items-center justify-center">
-                      <ImageWithSkeleton
-                        src={lightning.routeImgId}
-                        alt={lightning.title}
-                      />
-                    </figure>
 
-                    <div className="flex flex-col p-2 md:ml-4 md:text-left text-center">
+                      <figure className="size-40 flex items-center justify-center">
+                        <ImageWithSkeleton
+                          src={lightning.routeImgId}
+                          alt={lightning.title}
+                        />
+                      </figure>
+                    
+                    <div className="flex flex-col p-2 md:ml-6 md:text-left text-center">
                       <div className="flex flex-col">
                         <div className="text-base font-semibold truncate md:w-[350px] w-full text-overflow-ellipsis overflow-hidden mb-1">
                           {lightning.title}
@@ -282,7 +281,7 @@ function LightningList({
                             viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
-                            className="size-7 text-gray-600 absolute top-3 right-5 z-10"
+                            className="size-7 text-blue-500 absolute top-3 right-5 z-10"
                             onClick={(e) => handleBookmarkToggle(e, lightning)}
                           >
                             <path
@@ -298,7 +297,7 @@ function LightningList({
                             viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
-                            className="size-7 text-gray-600 absolute top-3 right-5 z-10"
+                            className="size-7 text-blue-500 absolute top-3 right-5 z-10"
                             onClick={(e) => handleBookmarkToggle(e, lightning)}
                           >
                             <path

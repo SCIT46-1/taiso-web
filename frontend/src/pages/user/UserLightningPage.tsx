@@ -33,7 +33,7 @@ function UserLightningPage() {
     <div className="flex flex-col w-full max-w-screen-lg mx-auto">
       <UserLightningVar />
 
-      <div className="p-4">
+      <div className="px-4 pt-1">
         {error && (
           <div className="alert alert-error shadow-lg mb-4">
             <div>

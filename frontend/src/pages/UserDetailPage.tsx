@@ -441,14 +441,14 @@ function UserDetailPage() {
         </div>
       </div>
       {/* 스트라바 통계 */}
-      {!userDetail?.stravaConnected && (
         <div className="border bg-blue-300 flex flex-col items-center justify-center mt-8 mb-8 pt-2 pb-4">
-          <div>스트라바를 연동하지 않은 유저</div>
-        </div>
-      )}
-      {userDetail?.stravaConnected && (
-        <div className="border bg-blue-300 flex flex-col items-center justify-center mt-8 mb-8 pt-2 pb-4">
-          <div className="text-2xl font-bold m-3 text-white">STRAVA</div>
+        <div className="text-2xl font-bold mb-3 mt-2 text-white">STRAVA</div>
+            {!userDetail?.stravaConnected && (
+            <div className="text-white">
+                <div>아직 스트라바를 연동하지 않았습니다.</div>
+              </div>
+            )}
+          {userDetail?.stravaConnected && (
           <div className="flex justify-center first:before:w-fit mx-auto gap-2 ">
             <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
               <div>횟수</div>
@@ -462,9 +462,9 @@ function UserDetailPage() {
               <div>획득고도</div>
               <div>{userDetail?.userStravaElevation} M</div>
             </div>
-          </div>
+            </div>
+          )}
         </div>
-      )}
       {/* 리뷰 */}
       <div className="mb-4 justify-center flex">
         <ReviewList userId={Number(userId)} />

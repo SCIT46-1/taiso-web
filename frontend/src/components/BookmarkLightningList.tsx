@@ -118,7 +118,7 @@ function BookmarkLightningList() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-wrap justify-center gap-2 mt-4">
+      <div className="flex flex-wrap justify-center gap-2">
         {bookmarkLightnings.map((lightning) => (
           <div key={lightning.lightningId} className="w-[90%] relative">
             <div className="md:flex block">
@@ -200,7 +200,7 @@ function BookmarkLightningList() {
                         viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg"
                         aria-hidden="true"
-                        className="size-7 text-gray-600 absolute top-3 right-5 z-10 cursor-pointer"
+                        className="size-7 text-blue-500 absolute top-3 right-5 z-10 cursor-pointer"
                         onClick={(e) =>
                           handleRemoveBookmark(e, lightning.lightningId)
                         }

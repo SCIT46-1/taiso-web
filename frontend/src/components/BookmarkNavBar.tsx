@@ -7,7 +7,7 @@ function BookmarkNavBar() {
   // 네비게이션 링크 정보
   const navLinks = [
     { path: "/bookmark/route", label: "루트" },
-    { path: "/bookmark/lightning", label: "라이트닝" },
+    { path: "/bookmark/lightning", label: "번개" },
     { path: "/bookmark/user", label: "유저" },
     { path: "/bookmark/club", label: "클럽" },
   ];
