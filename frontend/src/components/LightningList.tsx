@@ -281,7 +281,7 @@ function LightningList({
                             viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
-                            className="size-7 text-gray-600 absolute top-3 right-5 z-10"
+                            className="size-7 text-blue-500 absolute top-3 right-5 z-10"
                             onClick={(e) => handleBookmarkToggle(e, lightning)}
                           >
                             <path
@@ -297,7 +297,7 @@ function LightningList({
                             viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
-                            className="size-7 text-gray-600 absolute top-3 right-5 z-10"
+                            className="size-7 text-blue-500 absolute top-3 right-5 z-10"
                             onClick={(e) => handleBookmarkToggle(e, lightning)}
                           >
                             <path

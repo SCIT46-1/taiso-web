@@ -102,7 +102,7 @@ function CompletedLightningItem({
           </div>
 
           {/* 액션 버튼 - 더 깔끔한 레이아웃으로 변경 */}
-          <div className="flex justify-end gap-2 p-4 bg-base-100 border-t">
+          <div className="flex p-4 bg-base-100 border-t">
             <button
               className="btn btn-sm btn-outline no-animation"
               onClick={() =>
@@ -195,7 +195,7 @@ function CompletedLightningItem({
           </Link>
 
           {/* 액션 버튼 - 더 깔끔한 레이아웃으로 변경 */}
-          <div className="flex justify-end gap-2 p-4 bg-base-100 border-t">
+            <div className="flex p-4 bg-base-100 border-t">
             <button
               className="btn btn-sm btn-outline no-animation"
               onClick={() =>

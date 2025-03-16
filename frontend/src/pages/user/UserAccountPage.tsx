@@ -72,24 +72,28 @@ function UserAccountPage() {
                 <p>{userDetail?.bio || "자기소개 없음"}</p>
               </div>
             </div>
+            {/* 태그 정보 */}
+            {userDetail?.tags && userDetail.tags.length > 0 && (
+              <div className="grid grid-cols-[1fr_6fr] gap-4">
+                <div className="text-right font-semibold">
+                  <p>태그</p>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {userDetail.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="bg-transparent px-2 py-1 rounded-full text-sm border border-primary text-primary"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           
-          {/* 태그 정보 */}
-          {userDetail?.tags && userDetail.tags.length > 0 && (
-            <div className="mt-3">
-              <p>태그:</p>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {userDetail.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="bg-gray-200 px-2 py-1 rounded text-sm"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+          
+          
     </div>
     
         <div className="flex justify-end p-3">

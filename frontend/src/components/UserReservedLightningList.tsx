@@ -150,7 +150,7 @@ function UserReservedLightningList({
         ) : (
           groupedLightnings.map((group, groupIndex) => (
             <div key={groupIndex} className="mb-6 ">
-              <div className="text-2xl font-bold p-2 border-b-[3px] border-gray-300 w-[87%] mx-auto">
+              <div className="text-lg font-semiold p-2 border-b-[3px] border-gray-300 w-[87%] mx-auto">
                 {group.formattedDate}
               </div>
               <div className="flex flex-col items-center">

@@ -47,7 +47,7 @@ function ClubCard({ club }: { club: ClubList }) {
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
-                  className="size-7 text-gray-600 absolute top-3 right-3 z-10 cursor-pointer"
+                  className="size-7 text-blue-500 absolute top-3 right-3 z-10 cursor-pointer"
                   onClick={handleBookmarkToggle}
                 >
                   <path
@@ -63,7 +63,7 @@ function ClubCard({ club }: { club: ClubList }) {
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
-                  className="size-7 text-gray-600 absolute top-3 right-3 z-10 cursor-pointer"
+                  className="size-7 text-blue-500 absolute top-3 right-3 z-10 cursor-pointer"
                   onClick={handleBookmarkToggle}
                 >
                   <path
@@ -118,9 +118,8 @@ function ClubCard({ club }: { club: ClubList }) {
             </div>
           </Link>
         </div>
+        <div className="divider w-full -my-2 -mb-1"></div>
       </div>
-      
-      <div className="divider w-full -my-2 -mb-1"></div>
     </>
   );
 }
