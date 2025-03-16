@@ -52,6 +52,9 @@ public class StravaLinkController {
     @Value("${strava.redirect.uri}")
     private String redirectUri;
 
+    @Value("${app.cors.allowed-origins}")
+    private String[] allowedOrigins;
+
     private final UserRepository userRepository;
     private final LightningRepository lightningRepository;
     private final UserStravaDataRepository userStravaDataRepository;
@@ -94,7 +97,7 @@ public class StravaLinkController {
 
         // 프론트엔드 리다이렉트 URI가 없으면 기본값 사용
         if (frontendRedirectUri == null || frontendRedirectUri.isEmpty()) {
-            frontendRedirectUri = "http://localhost:3000/strava-success"; // 기본 리다이렉트 URL 설정
+            frontendRedirectUri = allowedOrigins[0] + "/strava-success"; // 기본 리다이렉트 URL 설정
         }
 
         try {

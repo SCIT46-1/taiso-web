@@ -26,7 +26,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false
     # 스키마 생성 후에 data.sql 스크립트 실행
     defer-datasource-initialization: true
@@ -49,9 +49,9 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
+  # flyway:
+  #   enabled: true
+  #   locations: classpath:db/migration
 
 jwt:
   secret: abcdefghijklmnsdfghnkuwbnvuijbvouiwbowuouvouwrbouoopqrstuvwxyz123456
