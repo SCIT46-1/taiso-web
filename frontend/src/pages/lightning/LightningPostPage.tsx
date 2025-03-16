@@ -10,9 +10,9 @@ import lightningService, {
 
 // 옵션 상수들
 const GENDER_OPTIONS = ["자유", "남", "여"];
-const LEVEL_OPTIONS = ["초보", "중급", "고급", "자유"];
+const LEVEL_OPTIONS = ["초급", "중급", "고급", "입문"];
 const RECRUIT_TYPE_OPTIONS = ["참가형", "수락형"];
-const BIKE_TYPE_OPTIONS = ["로드", "따릉이", "하이브리드", "자유"];
+const BIKE_TYPE_OPTIONS = ["로드", "MTB", "하이브리드", "기타"];
 const REGION_OPTIONS = ["서울", "경기", "대구", "강원"];
 const TAG_OPTIONS = [
   "장거리",
