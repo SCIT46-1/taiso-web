@@ -331,6 +331,12 @@ function UserOnboardingPage() {
       return;
     }
 
+    if (nickname.length > 25) {
+      setIsNicknameValid(false);
+      setNicknameErrorMessage("닉네임은 최대 25자 이하여야 합니다.");
+      return;
+    }
+
     try {
       setIsCheckingNickname(true);
       const isAvailable = await authService.checkNickname(nickname);

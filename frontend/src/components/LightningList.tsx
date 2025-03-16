@@ -252,7 +252,7 @@ function LightningList({
                           </svg>
                           {lightning.currentParticipants}/{lightning.capacity}명
                         </div>
-                        <div className="flex flex-wrap gap-1 mt-2 md:justify-start justify-center">
+                        <div className="flex flex-wrap gap-1 mt-2 md:justify-start justify-center max-w-[400px]">
                           <div className="badge badge-primary badge-outline">
                             {lightning.gender}
                           </div>

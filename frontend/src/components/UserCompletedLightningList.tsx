@@ -410,7 +410,7 @@ function UserCompletedLightningList() {
                                   {lightning.lightning.currentParticipants} /{" "}
                                   {lightning.lightning.capacity}
                                 </div>
-                                <div className="flex flex-wrap gap-1 mt-2 md:justify-start justify-center">
+                                <div className="flex flex-wrap gap-1 mt-2 md:justify-start justify-center max-w-[400px]">
                                   {lightning.tags.tags.map((tag, tagIndex) => (
                                     <div
                                       key={tagIndex}
