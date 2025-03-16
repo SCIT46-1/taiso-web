@@ -139,9 +139,18 @@ public class S3Service {
                 .region(Region.of(awsRegion))
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
                 .build()) {
+            
+            // 파일명 추출
+            String fileName = objectKey.substring(objectKey.lastIndexOf('/') + 1);
+            
+            // AWS SDK v2에서는 ResponseHeaderOverrides 대신 GetObjectRequest에 직접 설정
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucket)
                     .key(objectKey)
+                    .responseContentDisposition("attachment; filename=\"" + fileName + "\"")
+                    .responseContentType("application/octet-stream")
+                    .responseCacheControl("no-cache")
+                    .responseExpires(null) // 응답 만료 설정 안함
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -157,5 +166,18 @@ public class S3Service {
         return "https://" + bucket + ".s3." + awsRegion + ".amazonaws.com/" + key;
     }
     
+    /**
+     * 지정된 S3 객체에 대한 presigned URL을 생성합니다.
+     * @param objectKey S3 객체 키
+     * @param expirationHours URL의 유효 시간(시간 단위)
+     * @return 생성된 presigned URL
+     */
+    public String generatePresignedUrl(String objectKey, int expirationHours) {
+        // 주어진 시간을 Duration으로 변환
+        Duration duration = Duration.ofHours(expirationHours);
+        
+        // 기존 메서드 호출
+        return generatePresignedUrl(objectKey, duration);
+    }
 }
 
