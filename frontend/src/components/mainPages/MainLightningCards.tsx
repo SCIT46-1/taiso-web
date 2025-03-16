@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import lightningService, { Lightning } from "../../services/lightningService";
 import ImageWithSkeleton from "../ImageWithSkeleton";
-import bookmarkService from "../../services/bookmarkService";
 
 function MainLightningCards() {
   const [lightningList, setLightningList] = useState<Lightning[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMainLightnings = async () => {
@@ -34,39 +32,39 @@ function MainLightningCards() {
   };
 
   // 북마크 토글 처리
-  const handleBookmarkToggle = async (
-    e: React.MouseEvent,
-    lightning: Lightning
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // const handleBookmarkToggle = async (
+  //   e: React.MouseEvent,
+  //   lightning: Lightning
+  // ) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
 
-    try {
-      if (!lightning.bookmarked) {
-        await bookmarkService.bookmarkLightning(lightning.lightningId);
-      } else {
-        await bookmarkService.deleteBookmarkLightning(lightning.lightningId);
-      }
+  //   try {
+  //     if (!lightning.bookmarked) {
+  //       await bookmarkService.bookmarkLightning(lightning.lightningId);
+  //     } else {
+  //       await bookmarkService.deleteBookmarkLightning(lightning.lightningId);
+  //     }
 
-      // 상태 업데이트
-      setLightningList((prevList) =>
-        prevList.map((item) =>
-          item.lightningId === lightning.lightningId
-            ? { ...item, bookmarked: !item.bookmarked }
-            : item
-        )
-      );
-    } catch (error) {
-      console.error("Bookmark operation failed:", error);
-      if (
-        error instanceof Error &&
-        "response" in (error as any) &&
-        (error as any).response?.status === 401
-      ) {
-        navigate("/auth/landing");
-      }
-    }
-  };
+  //     // 상태 업데이트
+  //     setLightningList((prevList) =>
+  //       prevList.map((item) =>
+  //         item.lightningId === lightning.lightningId
+  //           ? { ...item, bookmarked: !item.bookmarked }
+  //           : item
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.error("Bookmark operation failed:", error);
+  //     if (
+  //       error instanceof Error &&
+  //       "response" in (error as any) &&
+  //       (error as any).response?.status === 401
+  //     ) {
+  //       navigate("/auth/landing");
+  //     }
+  //   }
+  // };
 
   if (isLoading) {
     return (
