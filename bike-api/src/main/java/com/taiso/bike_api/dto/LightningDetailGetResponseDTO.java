@@ -61,7 +61,6 @@ public class LightningDetailGetResponseDTO {
     private LightningDetailClubDTO club;
 
     // 번개 참여자
-    private Long lightningUserId;
     private List<LightningDetailMemberDTO> member;
 
     // 번개 태그

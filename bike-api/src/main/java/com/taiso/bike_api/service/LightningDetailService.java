@@ -320,7 +320,6 @@ if (userEmail != null) {
                 .route(routeDTO)
                 .isClubOnly(temp.getIsClubOnly())
                 .club(clubDTO)
-                .lightningUserId(temp.getLightningId())
                 .member(memberDTOs)
                 .lightningTag(tagNames)
                 .bookmarked(bookmarked)
