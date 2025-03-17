@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from "react-router";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import clubService, {
   ClubDetailResponse,
@@ -31,12 +31,6 @@ function ClubDetailPage() {
     notification: { message: "", type: "success" as "success" | "error" },
     confirm: { message: "", onConfirm: () => {} },
   });
-
-  // 상태: 피드백용 알림 (모달로 표시)
-  const [_notification, setNotification] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
 
   // Club detail 상태
   const [clubDetail, setClubDetail] = useState<ClubDetailResponse | null>(null);
@@ -75,7 +69,7 @@ function ClubDetailPage() {
   const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
   const [isMembershipLoading, setIsMembershipLoading] = useState(false);
 
-  // Add state for club lightning events
+  // 클럽 번개 이벤트 상태
   const [clubLightningList, setClubLightningList] = useState<any>(null);
   const [isLightningLoading, setIsLightningLoading] = useState(false);
   const [lightningPage, setLightningPage] = useState(0);
@@ -117,12 +111,10 @@ function ClubDetailPage() {
       const memberName =
         pendingMembers.find((m) => m.userId === userId)?.userNickname || "회원";
 
-      // 현재 pendingMembers에서 처리된 회원을 제외한 새 배열 생성
       const updatedPendingMembers = pendingMembers.filter(
         (member) => member.userId !== userId
       );
 
-      // 상태 업데이트
       setPendingMembers(updatedPendingMembers);
 
       showNotification(
@@ -130,24 +122,22 @@ function ClubDetailPage() {
         "success"
       );
 
-      // 남은 회원이 있으면 멤버십 모달 다시 열기
       if (updatedPendingMembers.length > 0) {
         setTimeout(() => {
           openModal("membership");
         }, 300);
       }
 
-      return updatedPendingMembers; // 업데이트된 배열 반환
+      return updatedPendingMembers;
     } catch (error) {
       console.error("회원 거절에 실패했습니다.", error);
       showNotification("회원 거절에 실패했습니다.", "error");
 
-      // 오류 발생 시에도 멤버십 모달 다시 열기
       setTimeout(() => {
         openModal("membership");
       }, 300);
 
-      return pendingMembers; // 오류 시 기존 배열 반환
+      return pendingMembers;
     } finally {
       setIsMembershipLoading(false);
     }
@@ -225,10 +215,7 @@ function ClubDetailPage() {
       membershipStatus !== "승인" &&
       clubDetail?.clubLeader.leaderId !== user?.userId
     ) {
-      setNotification({
-        message: "승인된 클럽 멤버만 게시글을 볼 수 있습니다.",
-        type: "error",
-      });
+      showNotification("승인된 클럽 멤버만 게시글을 볼 수 있습니다.", "error");
       return;
     }
     setIsBoardLoading(true);
@@ -317,7 +304,6 @@ function ClubDetailPage() {
     openModal("delete");
   };
 
-  // 실제 클럽 가입 신청 실행
   const doApplyClub = async () => {
     if (!clubId) return;
     setIsMembershipLoading(true);
@@ -333,7 +319,6 @@ function ClubDetailPage() {
     }
   };
 
-  // 클럽 탈퇴를 위한 실제 실행 함수
   const doLeaveClub = async () => {
     if (!clubId) return;
     setIsMembershipLoading(true);
@@ -351,61 +336,45 @@ function ClubDetailPage() {
     }
   };
 
-  // 회원 수락 버튼 핸들러 수정
   const handleAcceptMember = async (userId: number) => {
     if (!clubId) return;
     setIsMembershipLoading(true);
-    closeModal("membership"); // 작업 중 모달 닫기
-
+    closeModal("membership");
     try {
       await clubService.acceptClubMember(Number(clubId), userId);
       const memberName =
         pendingMembers.find((m) => m.userId === userId)?.userNickname || "회원";
-
-      // 현재 pendingMembers에서 처리된 회원을 제외한 새 배열 생성
       const updatedPendingMembers = pendingMembers.filter(
         (member) => member.userId !== userId
       );
-
-      // 상태 업데이트
       setPendingMembers(updatedPendingMembers);
-
-      // 클럽 정보 업데이트
       const data = await clubService.getClubDetail(Number(clubId));
       setClubDetail(data);
-
       showNotification(
         `${memberName} 님의 가입 신청을 수락했습니다.`,
         "success"
       );
-
-      // 남은 회원이 있으면 멤버십 모달 다시 열기
       if (updatedPendingMembers.length > 0) {
         openModal("membership");
       }
     } catch (error) {
       console.error("회원 수락에 실패했습니다.", error);
       showNotification("회원 수락에 실패했습니다.", "error");
-      openModal("membership"); // 오류 발생해도 멤버십 모달 다시 열기
+      openModal("membership");
     } finally {
       setIsMembershipLoading(false);
     }
   };
 
-  // 클럽 가입 신청 거절 핸들러 수정
   const handleRejectMember = (userId: number) => {
-    // 멤버십 모달을 먼저 완전히 닫고 확인 모달 열기
     closeModal("membership");
-
-    // 약간의 지연 후 확인 모달 표시
     setTimeout(() => {
       showConfirm("정말로 이 가입 신청을 거절하시겠습니까?", async () => {
         await doRejectMember(userId);
       });
-    }, 100); // 약간의 지연으로 모달 전환이 더 자연스럽게
+    }, 100);
   };
 
-  // 가입 신청 목록 조회
   const fetchPendingMembers = async () => {
     if (!clubId) return;
     setIsMembershipLoading(true);
@@ -427,7 +396,6 @@ function ClubDetailPage() {
     }
   };
 
-  // 가입, 탈퇴, 재가입 등의 멤버십 액션 렌더링
   const renderMembershipActions = () => {
     if (!user) {
       return (
@@ -515,7 +483,6 @@ function ClubDetailPage() {
     }
   };
 
-  // 게시판 접근 및 작성 권한 체크
   const canAccessBoardDetail = () => {
     return (
       membershipStatus === "승인" ||
@@ -530,7 +497,6 @@ function ClubDetailPage() {
     );
   };
 
-  // 게시글 목록 렌더링
   const renderBoardList = () => {
     if (isBoardLoading && !boardList) {
       return (
@@ -543,70 +509,13 @@ function ClubDetailPage() {
     return (
       <div className="px-3">
         <div className="flex justify-end items-center">
-          {canCreatePost() ? (
+          {canCreatePost() && (
             <button
               className="btn btn-primary btn-sm mr-2"
               onClick={handleNewPostClick}
             >
               글쓰기
             </button>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="table w-full">
-                <thead className="text-sm">
-                  <tr>
-                    <th className="w-16 text-center">번호</th>
-                    <th>제목</th>
-                    <th className="w-32">작성자</th>
-                    <th className="w-32">작성일</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {boardList.content.map((post) => (
-                    <tr
-                      key={post.postId}
-                      className={`hover:bg-base-200 cursor-pointer ${
-                        post.isNotice ? "bg-base-200" : ""
-                      }`}
-                      onClick={() => {
-                        if (canAccessBoardDetail()) {
-                          fetchPostDetail(post.postId);
-                        } else {
-                          setNotification({
-                            message:
-                              "승인된 클럽 멤버만 게시글을 볼 수 있습니다.",
-                            type: "error",
-                          });
-                        }
-                      }}
-                    >
-                      <td className="flex items-center justify-center text-center px-3 h-full w-18">
-                        {post.isNotice ? (
-                          <span className="badge badge-primary badge-sm py-2">공지</span>
-                        ) : (
-                          post.postId
-                        )}
-                      </td>
-                      <td className="font-medium">
-                        {post.postTitle}
-                        {!canAccessBoardDetail() && (
-                          <span className="ml-2 text-xs text-warning">
-                            (승인된 멤버만 볼 수 있음)
-                          </span>
-                        )}
-                      </td>
-                      <td>{post.writerNickname}</td>
-                      <td>{new Date(post.createdAt).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            user && (
-              <div className="text-sm text-warning">
-                승인된 멤버만 글을 작성할 수 있습니다
-              </div>
-            )
           )}
         </div>
         {boardList.content.length === 0 ? (
@@ -635,11 +544,10 @@ function ClubDetailPage() {
                       if (canAccessBoardDetail()) {
                         fetchPostDetail(post.postId);
                       } else {
-                        setNotification({
-                          message:
-                            "승인된 클럽 멤버만 게시글을 볼 수 있습니다.",
-                          type: "error",
-                        });
+                        showNotification(
+                          "승인된 클럽 멤버만 게시글을 볼 수 있습니다.",
+                          "error"
+                        );
                       }
                     }}
                   >
@@ -687,15 +595,24 @@ function ClubDetailPage() {
     );
   };
 
-  // 멤버 목록 렌더링
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "승인":
-        return <span className="badge badge-success badge-sm !text-white">승인됨</span>;
+        return (
+          <span className="badge badge-success badge-sm !text-white">
+            승인됨
+          </span>
+        );
       case "신청대기":
-        return <span className="badge badge-warning badge-sm !text-white">대기중</span>;
+        return (
+          <span className="badge badge-warning badge-sm !text-white">
+            대기중
+          </span>
+        );
       case "탈퇴":
-        return <span className="badge badge-error badge-sm !text-white">탈퇴</span>;
+        return (
+          <span className="badge badge-error badge-sm !text-white">탈퇴</span>
+        );
       default:
         return null;
     }
@@ -777,10 +694,7 @@ function ClubDetailPage() {
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    <div className="font-medium">
-                      {member.userNickname}
-                      
-                    </div>
+                    <div className="font-medium">{member.userNickname}</div>
                     <div className="text-xs">{member.bio || ""}</div>
                   </div>
                 </div>
@@ -793,23 +707,22 @@ function ClubDetailPage() {
                 )}
                 {clubDetail.clubLeader.leaderId === user?.userId &&
                   member.userId !== user?.userId && (
-                  <div className="flex items-center gap-2 flex-[1] justify-end">
+                    <div className="flex items-center gap-2 flex-[1] justify-end">
                       {getStatusBadge(member.participantStatus)}
                       {member.participantStatus === "신청대기" && (
                         <div className="flex gap-1">
-                        <button
-                          className="btn btn-xs btn-success !text-white"
-                          onClick={() => handleAcceptMember(member.userId)}
-                        >
-                          수락
-                        </button>
-                        <button
-                          className="btn btn-xs btn-error !text-white"
-                          onClick={() => handleRejectMember(member.userId)}
-                        >
-                          거절
-                        </button>
-
+                          <button
+                            className="btn btn-xs btn-success !text-white"
+                            onClick={() => handleAcceptMember(member.userId)}
+                          >
+                            수락
+                          </button>
+                          <button
+                            className="btn btn-xs btn-error !text-white"
+                            onClick={() => handleRejectMember(member.userId)}
+                          >
+                            거절
+                          </button>
                         </div>
                       )}
                     </div>
@@ -821,7 +734,6 @@ function ClubDetailPage() {
     );
   };
 
-  // 게시글 상세 렌더링
   const renderPostDetail = () => {
     if (!selectedPost) return null;
     return (
@@ -890,12 +802,10 @@ function ClubDetailPage() {
     );
   };
 
-  // 게시판 컨텐츠 렌더링
   const renderBoardContent = () => {
     return !selectedPost ? renderBoardList() : renderPostDetail();
   };
 
-  // 클럽 전용 번개 목록 조회
   const fetchClubLightningList = async (page = lightningPage) => {
     if (!clubId) return;
     setIsLightningLoading(true);
@@ -918,12 +828,10 @@ function ClubDetailPage() {
     }
   };
 
-  // 클럽 전용 번개 생성 페이지로 이동
   const handleCreateLightningClick = () => {
     navigate(`/lightning/post?clubId=${clubId}&isClubOnly=true`);
   };
 
-  // 클럽 전용 번개 목록 렌더링
   const renderClubLightningList = () => {
     if (isLightningLoading && !clubLightningList) {
       return (
@@ -1076,8 +984,8 @@ function ClubDetailPage() {
   }월 ${createdDate.getDate()}일`;
 
   return (
-    <div className="mb-10 max-w-screen-lg no-animation relative w-full ">
-      {/* 다른 모달들 먼저 렌더링 */}
+    <div className="mb-10 max-w-screen-lg no-animation relative w-full">
+      {/* 알림 모달 */}
       {modals.notification && (
         <div className="modal modal-open" style={{ zIndex: 99 }}>
           <div className="modal-box">
@@ -1099,6 +1007,7 @@ function ClubDetailPage() {
         </div>
       )}
 
+      {/* 멤버십 모달 */}
       {modals.membership && (
         <div className="modal modal-open" style={{ zIndex: 90 }}>
           <div className="modal-box">
@@ -1161,7 +1070,6 @@ function ClubDetailPage() {
                             <button
                               className="btn btn-sm btn-error !text-white"
                               onClick={() => handleRejectMember(member.userId)}
-                              disabled={isMembershipLoading}
                             >
                               거절
                             </button>
@@ -1181,6 +1089,7 @@ function ClubDetailPage() {
         </div>
       )}
 
+      {/* 게시글 작성/수정 모달 */}
       {modals.post && (
         <div className="modal modal-open" style={{ zIndex: 90 }}>
           <div className="modal-box">
@@ -1253,6 +1162,7 @@ function ClubDetailPage() {
         </div>
       )}
 
+      {/* 게시글 삭제 모달 */}
       {modals.delete && (
         <div className="modal modal-open" style={{ zIndex: 90 }}>
           <div className="modal-box">
@@ -1284,7 +1194,7 @@ function ClubDetailPage() {
         </div>
       )}
 
-      {/* 확인 모달을 항상 마지막에 렌더링 (DOM에서 가장 위에 위치) */}
+      {/* 확인 모달 */}
       {modals.confirm && (
         <div className="modal modal-open" style={{ zIndex: 100 }}>
           <div className="modal-box">
@@ -1312,8 +1222,8 @@ function ClubDetailPage() {
         </div>
       )}
 
-      {/* 나머지 UI 컴포넌트들 */}
-      <div className=" mx-auto mb-10 max-w-screen-lg no-animation relative ">
+      {/* 메인 컨텐츠 */}
+      <div className="mx-auto mb-10 max-w-screen-lg no-animation relative">
         {/* 클럽 헤더 */}
         <div className="card bg-base-100 shadow-md rounded-lg border border-base-300 mb-4">
           <div className="card-body p-4">
@@ -1447,15 +1357,16 @@ function ClubDetailPage() {
                       </p>
                     </div>
                   </div>
-                    <div className="bg-gray-100">
-                      <div className="card-body px-8 py-5">
-                        <h3 className="font-semibold">클럽 태그</h3>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {clubDetail.tags.map((tag, index) => (
-                        <div key={index} className="badge badge-lg">
-                          #{tag}
-                        </div>
-                      ))}
+                  <div className="bg-gray-100">
+                    <div className="card-body px-8 py-5">
+                      <h3 className="font-semibold">클럽 태그</h3>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {clubDetail.tags.map((tag, index) => (
+                          <div key={index} className="badge badge-lg">
+                            #{tag}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
