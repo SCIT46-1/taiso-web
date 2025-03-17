@@ -147,7 +147,7 @@ export interface ClubLightningListResponse {
   last: boolean;
 }
 
-const getClubList = async (page = 0, size = 5): Promise<ClubListResponse> => {
+const getClubList = async (page = 0, size = 6): Promise<ClubListResponse> => {
   return await get(`/clubs?page=${page}&size=${size}`);
 };
 
