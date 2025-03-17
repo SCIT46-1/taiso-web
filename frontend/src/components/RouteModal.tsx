@@ -9,7 +9,12 @@ import bookmarkService, {
 } from "../services/bookmarkService";
 
 interface RouteModalProps {
-  onSelectRoute: (routeId: number, routeName: string, distance: number) => void;
+  onSelectRoute: (
+    routeId: number,
+    routeName: string,
+    distance: number,
+    imageUrl?: string
+  ) => void;
   selectedRouteId?: number;
 }
 
@@ -227,7 +232,7 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
                   : "border-gray-200"
               }`}
               onClick={() =>
-                onSelectRoute(route.id, route.name, route.distance)
+                onSelectRoute(route.id, route.name, route.distance, route.imgId)
               }
             >
               <div className="card-body">

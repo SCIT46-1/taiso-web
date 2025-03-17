@@ -80,6 +80,9 @@ const BookMarkedUserPage = Loadable(
 const BookMarkedClubPage = Loadable(
   lazy(() => import("./pages/bookmark/BookMarkedClubPage"))
 );
+const ServerErrorPage = Loadable(
+  lazy(() => import("./pages/error/ServerErrorPage"))
+);
 
 const router = createBrowserRouter([
   {
@@ -87,6 +90,7 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       // 인증 없이 접근 가능한 페이지
+
       { path: "", element: <MainPage /> },
       { path: "onboarding", element: <UserOnboardingPage /> },
       { path: "oauth/callback", element: <OAuthCallback /> },
@@ -175,6 +179,10 @@ const router = createBrowserRouter([
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
     ],
+  },
+  {
+    path: "error",
+    element: <ServerErrorPage />,
   },
   {
     path: "*",

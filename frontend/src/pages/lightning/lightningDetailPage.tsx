@@ -443,7 +443,7 @@ function LightningDetailPage() {
   }
 
   return (
-    <div className="w-screen grid grid-cols-[2fr,1fr] gap-4 max-w-screen-lg mb-10 no-animation">
+    <div className="w-screen grid grid-cols-[2fr,1fr] gap-4 max-w-screen-lg mb-10 no-animation px-6">
       {/* 상단 지도 영역 */}
       <div className="col-span-2 shadow-sm relative">
         {lightningDetail?.route.routePoints && (
