@@ -32,8 +32,8 @@ public class LightningDetailController {
     private LightningDetailService lightningDetailService;
 
     @Operation(summary = "번개 디테일 조회", description = "특정 번개 상세 페이지 조회 API")
-    @GetMapping("/{lightning}")
-    public ResponseEntity<LightningDetailGetResponseDTO> getLightningDetail (@PathVariable("lightning") Long lightningId, @AuthenticationPrincipal String userEmail) {
+    @GetMapping("/{lightningId}")
+    public ResponseEntity<LightningDetailGetResponseDTO> getLightningDetail (@PathVariable("lightningId") Long lightningId, @AuthenticationPrincipal String userEmail) {
 
         LightningDetailGetResponseDTO lightningDetailGetResponseDTO = lightningDetailService.getLightningDetail(lightningId, userEmail);
 

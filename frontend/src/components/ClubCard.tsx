@@ -1,9 +1,9 @@
 import { Link, useNavigate } from "react-router";
-import { ClubList } from "../services/clubService";
+import { IClubList } from "../services/clubService";
 import bookmarkService from "../services/bookmarkService";
 import { useState } from "react";
 
-function ClubCard({ club }: { club: ClubList }) {
+function ClubCard({ club }: { club: IClubList }) {
   const [isBookmarked, setIsBookmarked] = useState(club.bookmarked || false);
   const navigate = useNavigate();
 

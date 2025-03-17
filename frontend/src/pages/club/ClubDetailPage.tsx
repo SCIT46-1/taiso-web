@@ -541,27 +541,15 @@ function ClubDetailPage() {
     }
     if (!boardList) return null;
     return (
-        <div className="px-3">
-          <div className="flex justify-end items-center">
-            {canCreatePost() ? (
-              <button
-                className="btn btn-primary btn-sm mr-2"
-                onClick={handleNewPostClick}
-              >
-                글쓰기
-              </button>
-            ) : (
-              user && (
-                <div className="text-sm text-warning">
-                  승인된 멤버만 글을 작성할 수 있습니다
-                </div>
-              )
-            )}
-          </div>
-          {boardList.content.length === 0 ? (
-            <div className="text-center py-8">
-              <p>게시글이 없습니다.</p>
-            </div>
+      <div className="px-3">
+        <div className="flex justify-end items-center">
+          {canCreatePost() ? (
+            <button
+              className="btn btn-primary btn-sm mr-2"
+              onClick={handleNewPostClick}
+            >
+              글쓰기
+            </button>
           ) : (
             <div className="overflow-x-auto">
               <table className="table w-full">
@@ -614,25 +602,88 @@ function ClubDetailPage() {
                 </tbody>
               </table>
             </div>
-          )}
-          {boardList.totalPages > 1 && (
-            <div className="flex justify-center mt-4">
-              <div className="join">
-                {Array.from({ length: boardList.totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    className={`join-item btn btn-sm ${
-                      currentPage === i ? "btn-active" : ""
-                    }`}
-                    onClick={() => fetchBoardList(i)}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
+            user && (
+              <div className="text-sm text-warning">
+                승인된 멤버만 글을 작성할 수 있습니다
               </div>
-            </div>
+            )
           )}
         </div>
+        {boardList.content.length === 0 ? (
+          <div className="text-center py-8">
+            <p>게시글이 없습니다.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="table w-full">
+              <thead className="text-sm">
+                <tr>
+                  <th className="w-16 text-center">번호</th>
+                  <th>제목</th>
+                  <th className="w-32">작성자</th>
+                  <th className="w-32">작성일</th>
+                </tr>
+              </thead>
+              <tbody>
+                {boardList.content.map((post) => (
+                  <tr
+                    key={post.postId}
+                    className={`hover:bg-base-200 cursor-pointer ${
+                      post.isNotice ? "bg-base-200" : ""
+                    }`}
+                    onClick={() => {
+                      if (canAccessBoardDetail()) {
+                        fetchPostDetail(post.postId);
+                      } else {
+                        setNotification({
+                          message:
+                            "승인된 클럽 멤버만 게시글을 볼 수 있습니다.",
+                          type: "error",
+                        });
+                      }
+                    }}
+                  >
+                    <td className="text-center">
+                      {post.isNotice ? (
+                        <span className="badge badge-primary">공지</span>
+                      ) : (
+                        post.postId
+                      )}
+                    </td>
+                    <td className="font-medium">
+                      {post.postTitle}
+                      {!canAccessBoardDetail() && (
+                        <span className="ml-2 text-xs text-warning">
+                          (승인된 멤버만 볼 수 있음)
+                        </span>
+                      )}
+                    </td>
+                    <td>{post.writerNickname}</td>
+                    <td>{new Date(post.createdAt).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {boardList.totalPages > 1 && (
+          <div className="flex justify-center mt-4">
+            <div className="join">
+              {Array.from({ length: boardList.totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  className={`join-item btn btn-sm ${
+                    currentPage === i ? "btn-active" : ""
+                  }`}
+                  onClick={() => fetchBoardList(i)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -656,10 +707,21 @@ function ClubDetailPage() {
       <div className="card bg-base-100 shadow-md rounded-lg border border-base-300 w-full">
         <div className="card-body p-6 gap-1">
           <div className="flex justify-start items-center gap-1.5 mb-2">
-            <svg data-Slot="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            <svg
+              data-Slot="icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
               strokeWidth="2"
-              className="size-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+              className="size-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
+              />
             </svg>
             <h2 className="card-title">클럽 멤버</h2>
           </div>
@@ -686,7 +748,7 @@ function ClubDetailPage() {
               max="100"
             ></progress>
           </div>
-          
+
           <div className="divider my-2"></div>
           {clubDetail?.users
             .filter(
@@ -899,93 +961,90 @@ function ClubDetailPage() {
     }
 
     return (
-        <div className="px-3">
+      <div className="px-3">
         <div className="flex justify-end items-center">
-            {canCreatePost() && (
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={handleCreateLightningClick}
-              >
-                번개 만들기
-              </button>
-            )}
-          </div>
-          <div className="flex flex-col gap-2 ">
-            {clubLightningList.content.map((lightning: any) => (
-              <div key={lightning.lightningId} className="w-full relative">
-                <div className="md:flex block items-start">
-                  <Link
-                    to={`/lightning/${lightning.lightningId}`}
-                    className="flex-1 group"
-                  >
-                    <div className="bg-base-100 w-full md:flex block items-center">
-                      <figure className="size-40 flex items-center justify-center md:ml-4 mx-auto md:mx-0 relative overflow-hidden my-2 md:my-0">
-                        <ImageWithSkeleton
-                          src={lightning.routeImgId}
-                          alt={lightning.title}
-                        />
-                      </figure>
-                      <div className="flex flex-col p-2 md:ml-6 md:text-left text-center flex-1">
-                        <div className="flex flex-col gap-1">
-                          <div className="text-lg font-bold">
-                            {new Date(lightning.eventDate).toLocaleTimeString(
-                              [],
-                              { hour: "2-digit", minute: "2-digit" }
-                            )}{" "}
-                            ({lightning.duration}분)
-                          </div>
-                          <div className="text-base truncate w-full text-overflow-ellipsis overflow-hidden">
-                            {lightning.title}
-                          </div>
-                          <div className="text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-                            <svg
-                              data-slot="icon"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                              aria-hidden="true"
-                              className="size-4 flex-shrink-0"
-                            >
-                              <path
-                                clipRule="evenodd"
-                                fillRule="evenodd"
-                                d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
-                              ></path>
-                            </svg>
-                            <span className="truncate w-full">
-                              {lightning.address}
-                            </span>
-                          </div>
+          {canCreatePost() && (
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={handleCreateLightningClick}
+            >
+              번개 만들기
+            </button>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 ">
+          {clubLightningList.content.map((lightning: any) => (
+            <div key={lightning.lightningId} className="w-full relative">
+              <div className="md:flex block items-start">
+                <Link
+                  to={`/lightning/${lightning.lightningId}`}
+                  className="flex-1 group"
+                >
+                  <div className="bg-base-100 w-full md:flex block items-center">
+                    <figure className="size-40 flex items-center justify-center md:ml-4 mx-auto md:mx-0 relative overflow-hidden my-2 md:my-0">
+                      <ImageWithSkeleton
+                        src={lightning.routeImgId}
+                        alt={lightning.title}
+                      />
+                    </figure>
+                    <div className="flex flex-col p-2 md:ml-6 md:text-left text-center flex-1">
+                      <div className="flex flex-col gap-1">
+                        <div className="text-lg font-bold">
+                          {new Date(lightning.eventDate).toLocaleTimeString(
+                            [],
+                            { hour: "2-digit", minute: "2-digit" }
+                          )}{" "}
+                          ({lightning.duration}분)
+                        </div>
+                        <div className="text-base truncate w-full text-overflow-ellipsis overflow-hidden">
+                          {lightning.title}
+                        </div>
+                        <div className="text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
+                          <svg
+                            data-slot="icon"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                            className="size-4 flex-shrink-0"
+                          >
+                            <path
+                              clipRule="evenodd"
+                              fillRule="evenodd"
+                              d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.544l.062.029.018.008.006.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
+                            ></path>
+                          </svg>
+                          <span className="truncate w-full">
+                            {lightning.address}
+                          </span>
                         </div>
                       </div>
                     </div>
-                  </Link>
-                </div>
-                <div className="divider w-full -my-2"></div>
+                  </div>
+                </Link>
               </div>
-            ))}
-          </div>
-          {clubLightningList.totalPages && clubLightningList.totalPages > 1 && (
-            <div className="flex justify-center mt-4">
-              <div className="join">
-                {Array.from(
-                  { length: clubLightningList.totalPages },
-                  (_, i) => (
-                    <button
-                      key={i}
-                      className={`join-item btn btn-sm ${
-                        lightningPage === i ? "btn-active" : ""
-                      }`}
-                      onClick={() => fetchClubLightningList(i)}
-                    >
-                      {i + 1}
-                    </button>
-                  )
-                )}
-              </div>
+              <div className="divider w-full -my-2"></div>
             </div>
-          )}
+          ))}
         </div>
+        {clubLightningList.totalPages && clubLightningList.totalPages > 1 && (
+          <div className="flex justify-center mt-4">
+            <div className="join">
+              {Array.from({ length: clubLightningList.totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  className={`join-item btn btn-sm ${
+                    lightningPage === i ? "btn-active" : ""
+                  }`}
+                  onClick={() => fetchClubLightningList(i)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -1017,7 +1076,7 @@ function ClubDetailPage() {
   }월 ${createdDate.getDate()}일`;
 
   return (
-    <div className="w-screen mx-auto mb-10 max-w-screen-lg no-animation relative">
+    <div className="mb-10 max-w-screen-lg no-animation relative w-full ">
       {/* 다른 모달들 먼저 렌더링 */}
       {modals.notification && (
         <div className="modal modal-open" style={{ zIndex: 99 }}>
@@ -1254,7 +1313,7 @@ function ClubDetailPage() {
       )}
 
       {/* 나머지 UI 컴포넌트들 */}
-      <div className="w-screen mx-auto mb-10 max-w-screen-lg no-animation relative">
+      <div className=" mx-auto mb-10 max-w-screen-lg no-animation relative ">
         {/* 클럽 헤더 */}
         <div className="card bg-base-100 shadow-md rounded-lg border border-base-300 mb-4">
           <div className="card-body p-4">
@@ -1306,7 +1365,7 @@ function ClubDetailPage() {
                       maxWidth: "100%",
                     }}
                   >
-                    {clubDetail.clubDescription}
+                    {clubDetail.clubShortDescription}
                   </p>
                 </div>
               </div>
@@ -1322,34 +1381,37 @@ function ClubDetailPage() {
                 <div role="tablist" className="tabs tabs-lifted tabs-lg">
                   <a
                     role="tab"
-                    className={`tab font-semibold text-base ${activeTab === "info" ? "tab-active" : ""
-                      }`}
+                    className={`tab font-semibold text-base ${
+                      activeTab === "info" ? "tab-active" : ""
+                    }`}
                     onClick={() => setActiveTab("info")}
                   >
                     클럽 정보
                   </a>
-                    <a
-                      role="tab"
-                    className={`tab font-semibold text-base ${activeTab === "board" ? "tab-active" : ""
-                        }`}
-                      onClick={() => {
-                        setActiveTab("board");
-                        if (!boardList) fetchBoardList();
-                      }}
-                    >
-                      게시판
-                    </a>
-                    <a
-                      role="tab"
-                    className={`tab font-semibold text-base ${activeTab === "lightning" ? "tab-active" : ""
-                        }`}
-                      onClick={() => {
-                        setActiveTab("lightning");
-                        if (!clubLightningList) fetchClubLightningList();
-                      }}
-                    >
-                      번개
-                    </a>
+                  <a
+                    role="tab"
+                    className={`tab font-semibold text-base ${
+                      activeTab === "board" ? "tab-active" : ""
+                    }`}
+                    onClick={() => {
+                      setActiveTab("board");
+                      if (!boardList) fetchBoardList();
+                    }}
+                  >
+                    게시판
+                  </a>
+                  <a
+                    role="tab"
+                    className={`tab font-semibold text-base ${
+                      activeTab === "lightning" ? "tab-active" : ""
+                    }`}
+                    onClick={() => {
+                      setActiveTab("lightning");
+                      if (!clubLightningList) fetchClubLightningList();
+                    }}
+                  >
+                    번개
+                  </a>
                 </div>
 
                 <div>
@@ -1357,34 +1419,32 @@ function ClubDetailPage() {
                     {activeTab === "info"
                       ? "클럽의 상세 정보와 멤버 목록을 확인하세요."
                       : activeTab === "board"
-                        ? "클럽 게시판에서 멤버들과 소통하세요."
-                        : "클럽 전용 번개를 확인하고 함께 라이딩하세요."}
+                      ? "클럽 게시판에서 멤버들과 소통하세요."
+                      : "클럽 전용 번개를 확인하고 함께 라이딩하세요."}
                   </p>
                 </div>
               </div>
-
             </div>
             {activeTab === "board" ? (
               renderBoardContent()
             ) : activeTab === "lightning" ? (
               renderClubLightningList()
-              ) : (
-                <>
-                  <div className="bg-gray-100">
-                    <div className="card-body">
-                      <h2 className="font-semibold">클럽 상세 소개</h2>
-                      <div className="w-full">
-                        <p
-                            className="whitespace-pre-line break-all text-base"
+            ) : (
+              <>
+                <div className="bg-gray-100">
+                  <div className="card-body">
+                    <h2 className="font-semibold">클럽 상세 소개</h2>
+                    <div className="w-full">
+                      <p
+                        className="whitespace-pre-line break-all text-base"
                         style={{
                           wordBreak: "break-all",
                           overflowWrap: "break-word",
                           maxWidth: "100%",
                         }}
                       >
-                          {clubDetail.clubDescription || "상세 설명이 없습니다."}
-                        </p>
-                      </div>
+                        {clubDetail.clubDescription || "상세 설명이 없습니다."}
+                      </p>
                     </div>
                   </div>
                     <div className="bg-gray-100">
@@ -1392,21 +1452,21 @@ function ClubDetailPage() {
                         <h3 className="font-semibold">클럽 태그</h3>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {clubDetail.tags.map((tag, index) => (
-                      <div key={index} className="badge badge-lg">
-                        #{tag}
-                      </div>
+                        <div key={index} className="badge badge-lg">
+                          #{tag}
+                        </div>
                       ))}
                     </div>
-                    </div>
                   </div>
-                </>
+                </div>
+              </>
             )}
           </div>
 
           {/* 사이드바 */}
           <div className="flex flex-col items-start justify-start gap-2 self-start w-full">
             <div className="w-full h-auto">
-                <div className="my-2">{renderMembershipActions()}</div>
+              <div className="my-2">{renderMembershipActions()}</div>
             </div>
             {renderMemberList()}
           </div>

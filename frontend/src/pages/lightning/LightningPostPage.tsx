@@ -58,6 +58,7 @@ function LightningPostPage() {
   const [searchParams] = useSearchParams();
   const clubId = searchParams.get("clubId");
   const isClubOnly = searchParams.get("isClubOnly") === "true";
+  const [routeImg, setRouteImg] = useState<string | null>(null);
 
   // 모든 폼 상태를 하나의 객체로 관리
   const [formData, setFormData] = useState({
@@ -166,7 +167,8 @@ function LightningPostPage() {
   const handleRouteSelect = (
     routeId: number,
     routeName: string,
-    distance: number
+    distance: number,
+    imageUrl?: string
   ) => {
     setFormData({
       ...formData,
@@ -178,6 +180,7 @@ function LightningPostPage() {
       name: routeName,
       distance: distance.toString(),
     });
+    setRouteImg(imageUrl || null);
     setFormErrors((prev) => ({ ...prev, routeId: "", distance: "" }));
   };
 
@@ -625,14 +628,17 @@ function LightningPostPage() {
                 )}
               </div>
             </div>
+            {/* 경로 이미지 */}
             <div className="grid grid-cols-1 gap-4 mb-4">
-              {/* 경로 이미지 */}
-              {selectedRoute.id && (
-                <ImageWithSkeleton
-                  src="https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp"
-                  alt={selectedRoute.name}
-                  className="w-full h-300"
-                />
+              {selectedRoute.id && routeImg && (
+                <div className="w-full">
+                  <h3 className="text-sm font-medium mb-2">경로 이미지</h3>
+                  <ImageWithSkeleton
+                    src={routeImg}
+                    alt={selectedRoute.name}
+                    className="w-full h-[300px] object-cover rounded-lg"
+                  />
+                </div>
               )}
             </div>
 

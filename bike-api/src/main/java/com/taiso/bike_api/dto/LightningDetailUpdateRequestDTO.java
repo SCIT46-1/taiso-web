@@ -31,7 +31,6 @@ public class LightningDetailUpdateRequestDTO {
     private String bikeType;
     private String region;
 
-    private Long tagId;
     private Set<String> lightningTag;
 
 }

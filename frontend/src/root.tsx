@@ -4,7 +4,7 @@ import Footer from "./components/Footer";
 
 function Root() {
   return (
-    <div className="flex flex-col items-center justify-center max-w-screen-lg mx-auto">
+    <div className="flex flex-col items-center justify-center max-w-screen-lg mx-auto bg-white px-4">
       <Navbar />
       <Outlet />
       <Footer />

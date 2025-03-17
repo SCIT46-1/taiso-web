@@ -117,12 +117,15 @@ function RoutePage() {
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full no-animation">
       <MainNavbar />
       <div className="flex-1 mx-auto w-full">
         <div className="flex items-center mb-2 gap-2">
           {/* 데이지UI 탭 컴포넌트를 이용한 정렬 UI */}
-          <div role="tablist" className="tabs tabs-boxed w-fit sm:ml-8 ml-4 bg-transparent border-t border-b border-l border-r">
+          <div
+            role="tablist"
+            className="tabs tabs-boxed w-fit sm:ml-8 ml-4 bg-transparent border-t border-b border-l border-r"
+          >
             <Link
               role="tab"
               to={getSortLink("createdAt")}
@@ -171,7 +174,7 @@ function RoutePage() {
         </div>
         <div className="flex items-center gap justify-start my-4">
           {/* 선택된 필터 태그 표시 영역 */}
-          {(selectedAvailableTags.length > 0) && (
+          {selectedAvailableTags.length > 0 && (
             <div className="flex flex-wrap md:gap-2 gap-1 md:ml-12 md:justify-start justify-center">
               {selectedAvailableTags.map((tag) => (
                 <span
@@ -191,24 +194,36 @@ function RoutePage() {
               selectedDistance ||
               selectedAltitude ||
               selectedRoadType) && (
-                <button
-                  className="btn btn-outline border-red-500 btn-xs btn-circle hover:bg-red-200 hover:border-red-500"
-                  onClick={() => {
-                    setSelectedAvailableTags([]);
-                    setSelectedLocation(null);
-                    setSelectedDistance(null);
-                    setSelectedAltitude(null);
-                    setSelectedRoadType(null);
-                  }}>
-                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="red" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="h-4 w-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
+              <button
+                className="btn btn-outline border-red-500 btn-xs btn-circle hover:bg-red-200 hover:border-red-500"
+                onClick={() => {
+                  setSelectedAvailableTags([]);
+                  setSelectedLocation(null);
+                  setSelectedDistance(null);
+                  setSelectedAltitude(null);
+                  setSelectedRoadType(null);
+                }}
+              >
+                <svg
+                  data-Slot="icon"
+                  fill="none"
+                  strokeWidth={1.5}
+                  stroke="red"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="h-4 w-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
-
-
 
         {/* 모달 컴포넌트 */}
         <dialog id="my_modal_2" className="modal">
@@ -227,10 +242,12 @@ function RoutePage() {
                 }}
               >
                 닫기
-                </button>
+              </button>
             </div>
 
-            <p className="mt-4 mb-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">원하는 태그를 선택하세요:</p>
+            <p className="mt-4 mb-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
+              원하는 태그를 선택하세요:
+            </p>
             {/* 일반 태그 (다중 선택) */}
             <div className="flex flex-wrap gap-2">
               {availableTags.map((tag) => (
@@ -251,7 +268,8 @@ function RoutePage() {
             </div>
             {/* 지역 (단일 선택) */}
             <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-              지역</div>
+              지역
+            </div>
             <div className="flex flex-wrap gap-2">
               {locationTags.map((tag) => (
                 <button
@@ -269,7 +287,8 @@ function RoutePage() {
             </div>
             {/* 거리 (단일 선택) */}
             <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-              거리</div>
+              거리
+            </div>
             <div className="flex flex-wrap gap-2">
               {distanceTags.map((tag) => (
                 <button
@@ -287,7 +306,8 @@ function RoutePage() {
             </div>
             {/* 고도 (단일 선택) */}
             <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-              고도</div>
+              고도
+            </div>
             <div className="flex flex-wrap gap-2">
               {altitudeTags.map((tag) => (
                 <button
@@ -305,7 +325,8 @@ function RoutePage() {
             </div>
             {/* 도로 유형 (단일 선택) */}
             <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-              도로 유형</div>
+              도로 유형
+            </div>
             <div className="flex flex-wrap gap-2">
               {roadTypeTags.map((tag) => (
                 <button
@@ -322,7 +343,11 @@ function RoutePage() {
               ))}
             </div>
             <div className="modal-action mt-4">
-              <button type="button" className="btn btn-primary w-full" onClick={handleSearch}>
+              <button
+                type="button"
+                className="btn btn-primary w-full"
+                onClick={handleSearch}
+              >
                 검색
               </button>
             </div>

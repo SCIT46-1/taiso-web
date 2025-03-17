@@ -29,6 +29,12 @@ function RouteDetailPage() {
   }, [routeId]);
 
   const handleToggleLike = async () => {
+    // Return early if user is not logged in
+    if (!user) {
+      navigate("/auth/landing");
+      return;
+    }
+
     if (likePending || !routeDetail) return;
     setLikePending(true);
     const previousLikedState = routeDetail.liked;
@@ -134,15 +140,18 @@ function RouteDetailPage() {
   return (
     <div className="flex flex-col mt-2 gap-2 md:w-full w-[90%]">
       <div className="flex justify-between">
-        <div className="px-2 pt-2">
+        <div className="px-2 pt-2 mt-2">
           {/* 루트 이름 */}
-          <div className="px-1 text-2xl font-semibold">
+          <div className="px-1 text-3xl font-bold">
             {routeDetail?.routeName}
           </div>
           {/* 태그들 */}
           <div className="flex flex-wrap gap-1 pt-2 md:justify-start justify-center">
             {routeDetail?.tag.map((tag, index) => (
-              <div key={index} className="badge badge-outline badge-primary">
+              <div
+                key={index}
+                className="badge badge-outline badge-primary p-3"
+              >
                 {tag}
               </div>
             ))}
@@ -157,7 +166,7 @@ function RouteDetailPage() {
             </div>
           </div>
           {/* 루트 한줄 소개 */}
-          <div className="flex justify-between p-2">
+          <div className="flex justify-between p-2 mt-1">
             {routeDetail?.description}
           </div>
         </div>
@@ -173,7 +182,7 @@ function RouteDetailPage() {
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
-              className="size-5 text-gray-600 top-3 right-5 z-10 cursor-pointer"
+              className="size-10 text-gray-600 top-3 right-5 z-10 cursor-pointer"
               onClick={handleToggleBookmark}
             >
               <path
@@ -189,7 +198,7 @@ function RouteDetailPage() {
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
-              className="size-5 text-blue-500 top-3 right-5 z-10 cursor-pointer"
+              className="size-10 text-blue-500 top-3 right-5 z-10 cursor-pointer"
               onClick={handleToggleBookmark}
             >
               <path
@@ -211,7 +220,7 @@ function RouteDetailPage() {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
-                className="size-6 text-gray-600 top-3 right-5 z-10 cursor-pointer"
+                className="size-10 text-gray-600 top-3 right-5 z-10 cursor-pointer"
                 onClick={handleToggleLike}
               >
                 <path
@@ -227,13 +236,13 @@ function RouteDetailPage() {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
-                className="size-6 text-red-500 top-3 right-5 z-10 cursor-pointer"
+                className="size-10 text-red-500 top-3 right-5 z-10 cursor-pointer"
                 onClick={handleToggleLike}
               >
                 <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"></path>
               </svg>
             )}
-            <span className="font-semibold flex items-center justify-center h-5">
+            <span className="font-semibold flex items-center justify-center h-5 text-black">
               {routeDetail?.likeCount || 0}
             </span>
           </div>
@@ -261,7 +270,12 @@ function RouteDetailPage() {
           </svg>
           <div className="link">{routeDetail?.fileName}</div>
         </div>
-        <button className="btn btn-sm btn-primary p-3 flex items-center justify-center">
+        <button
+          className="btn btn-sm btn-primary"
+          onClick={() =>
+            window.open(`${routeDetail?.originalFilePath}`, "_blank")
+          }
+        >
           GPX 다운로드
         </button>
       </div>

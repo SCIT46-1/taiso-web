@@ -7,6 +7,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -52,8 +53,13 @@ public class StravaLinkController {
     @Value("${strava.redirect.uri}")
     private String redirectUri;
 
+    @Autowired
     private final UserRepository userRepository;
+    
+    @Autowired
     private final LightningRepository lightningRepository;
+    
+    @Autowired
     private final UserStravaDataRepository userStravaDataRepository;
 
     public StravaLinkController(UserRepository userRepository, 

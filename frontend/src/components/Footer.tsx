@@ -1,7 +1,7 @@
 function Footer() {
   return (
-    <div className="mt-24">
-      <div className="w-screen h-[1.5px] bg-base-200 shadow-2xl -mt-1 mb-2"></div>
+    <div className="mt-24 w-full">
+      <div className=" h-[1.5px] bg-base-200 shadow-2xl -mt-1 mb-2"></div>
       <footer className="footer footer-center text-base-content rounded p-8">
         <nav className="grid grid-flow-col gap-4">
           <a className="link link-hover">About us</a>

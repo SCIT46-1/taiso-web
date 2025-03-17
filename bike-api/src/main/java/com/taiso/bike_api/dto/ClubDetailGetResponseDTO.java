@@ -30,6 +30,7 @@ public class ClubDetailGetResponseDTO {
     private String clubName;
     private ClubDetailGetResponseLeaderDTO clubLeader;
     private String clubDescription;
+    private String clubShortDescription;
     private LocalDateTime createdAt;
     private Integer maxUser;
     private Integer currentScale;
@@ -43,6 +44,7 @@ public class ClubDetailGetResponseDTO {
                                        .clubId(entity.getClubId())
                                        .clubProfileImageId(entity.getClubProfileImageId())
                                        .clubName(entity.getClubName())
+                                       .clubShortDescription(entity.getClubShortDescription())
                                        .clubLeader(ClubDetailGetResponseLeaderDTO.toDTO(entity.getClubLeader()))
                                        .clubDescription(entity.getClubDescription())
                                        .createdAt(entity.getCreatedAt())

@@ -30,7 +30,7 @@ public class LightningMemberController {
 
 	@PostMapping("{lightningId}/participants")
   	@Operation(summary = "번개 참가 및 참가 신청", description = "번개에 현재 사용자 참가 및 참가 신청 API")
-	public ResponseEntity<JoinParticipantsPostResponseDTO> joinLightning(
+	public ResponseEntity<Void> joinLightning(
     		@PathVariable(name = "lightningId") Long lightningId,
 			Authentication authentication
 			) {
@@ -54,7 +54,7 @@ public class LightningMemberController {
     // 번개 강제 마감
     @Operation(summary = "번개 강제 마감", description = "번개 강제 마감 API")
     @PatchMapping("{lightningId}/close")  
-    public ResponseEntity<JoinParticipantsPostResponseDTO> lightningClose(
+    public ResponseEntity<Void> lightningClose(
     		@PathVariable(name = "lightningId") Long lightningId,
 			Authentication authentication
     		) {
@@ -121,11 +121,11 @@ public class LightningMemberController {
 	// 번개 종료
 	@Operation(summary = "번개 종료", description = "번개 종료 API")
 	@PatchMapping("/{lightningId}/end")
-	public ResponseEntity<JoinParticipantsPostResponseDTO> lightningEnd(
+	public ResponseEntity<Void> lightningEnd(
 			@PathVariable(name = "lightningId") Long lightningId,
 			Authentication authentication) {
 		lightningMemberService.lightningEnd(lightningId, authentication);
-		return ResponseEntity.status(HttpStatus.CREATED).body(null);
+		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 	
 

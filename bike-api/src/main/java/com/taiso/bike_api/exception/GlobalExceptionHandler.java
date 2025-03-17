@@ -194,8 +194,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LightningFullMemberException.class)
     public ResponseEntity<ErrorResponseDTO> handleLightningFullMemberException(LightningFullMemberException ex, HttpServletRequest request) {
         ErrorResponseDTO errorResponse = ErrorResponseDTO.makeErrorResponse(
-                ex.getMessage(), HttpStatus.FORBIDDEN, request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+                ex.getMessage(), HttpStatus.CONFLICT, request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     // 이미 참여한 번개 예외 처리
