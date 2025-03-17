@@ -16,9 +16,9 @@ import com.taiso.bike_api.exception.BookmarkAlreadyExistsException;
 import com.taiso.bike_api.exception.BookmarkNotFoundException;
 import com.taiso.bike_api.exception.LightningNotFoundException;
 import com.taiso.bike_api.exception.UserNotFoundException;
-
 import com.taiso.bike_api.repository.BookmarkRepository;
 import com.taiso.bike_api.repository.LightningRepository;
+import com.taiso.bike_api.repository.LightningUserRepository;
 import com.taiso.bike_api.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -36,6 +36,9 @@ public class BookmarkLightningService {
 
     @Autowired
     private BookmarkRepository bookmarkRepository;
+
+    @Autowired
+    private LightningUserRepository lightningUserRepository;
 
     // 북마크 번개 생성
     @Transactional
@@ -78,15 +81,18 @@ public class BookmarkLightningService {
         List<BookmarkEntity> bookmarkEntity = bookmarkRepository.findByUserAndTargetType(user, BookmarkEntity.BookmarkType.LIGHTNING);
         //북마크 = 0 예외처리
         if (bookmarkEntity == null) {
-            throw new BookmarkNotFoundException("북마크가 존재하지 않습니다.");
+                throw new BookmarkNotFoundException("북마크가 존재하지 않습니다.");
         }
-
+        
         // 각 북마크 번개 조회
         List<BookmarkLightningResponseDTO> lightningList = bookmarkEntity.stream()
                 .map((BookmarkEntity bookmark) ->
                 {
                     LightningEntity lightning = lightningRepository.findById(bookmark.getTargetId())
                             .orElseThrow(() -> new UserNotFoundException("북마크된 번개를 찾을 수 없습니다."));
+
+                    // 현재 참여자 수 계산
+                    int currentParticipants = lightningUserRepository.countByLightning_LightningIdAndParticipantStatusInApprovedAndCompleted(lightning.getLightningId());
 
                     return BookmarkLightningResponseDTO.builder()
                             .lightningId(lightning.getLightningId())
@@ -97,6 +103,7 @@ public class BookmarkLightningService {
                             .createdAt(lightning.getCreatedAt())
                             .status(lightning.getStatus())
                             .capacity(lightning.getCapacity())
+                            .currentParticipants(currentParticipants)  // 현재 참여자 수 설정
                             .gender(lightning.getGender())
                             .level(lightning.getLevel())
                             .bikeType(lightning.getBikeType())

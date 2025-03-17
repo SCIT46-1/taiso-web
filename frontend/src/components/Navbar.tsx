@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import authService from "../services/authService";
 import { useAuthStore } from "../stores/useAuthStore";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import userDetailService from "../services/userDetailService";
 import stravaService from "../services/stravaService";
 
@@ -10,6 +10,7 @@ function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [profileImg, setProfileImg] = useState("");
   const [imageError, setImageError] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfileImg = async () => {
@@ -28,7 +29,12 @@ function Navbar() {
     }
   }, [isAuthenticated]);
 
+  const handleSidebarLinkClick = () => {
+    setIsSidebarOpen(false);
+  };
+
   const handleLogout = () => {
+    navigate("/");
     authService.logout();
     logout();
   };
@@ -126,30 +132,63 @@ function Navbar() {
           <ul className="menu mb-4 mt-4">
             <>
               <li>
-                <Link to={`/users/${user?.userId}`}>내 페이지</Link>
+                <Link
+                  to={`/users/${user?.userId}`}
+                  onClick={handleSidebarLinkClick}
+                >
+                  내 페이지
+                </Link>
               </li>
               <li>
-                <Link to="/user/me/account">계정 정보 수정</Link>
+                <Link to="/user/me/account" onClick={handleSidebarLinkClick}>
+                  계정 정보 수정
+                </Link>
               </li>
               <li>
-                <Link to="/user/me/lightning-reservation">
+                <Link
+                  to="/user/me/lightning-reservation"
+                  onClick={handleSidebarLinkClick}
+                >
                   내 번개 예약 정보
                 </Link>
               </li>
               <li>
-                <Link to="/user/me/lightning-completed">내 번개 완료 정보</Link>
+                <Link
+                  to="/user/me/lightning-completed"
+                  onClick={handleSidebarLinkClick}
+                >
+                  내 번개 완료 정보
+                </Link>
               </li>
               <li>
-                <Link to="/user/me/club">내 클럽 정보</Link>
+                <Link to="/user/me/club" onClick={handleSidebarLinkClick}>
+                  내 클럽 정보
+                </Link>
               </li>
               <li>
-                <Link to="/bookmark/lightning">북마크</Link>
+                <Link to="/bookmark/lightning" onClick={handleSidebarLinkClick}>
+                  북마크
+                </Link>
               </li>
               <li>
-                <div onClick={handleStravaLink}>스트라바 연동</div>
+                <div
+                  onClick={() => {
+                    handleSidebarLinkClick();
+                    handleStravaLink();
+                  }}
+                >
+                  스트라바 연동
+                </div>
               </li>
               <li>
-                <div onClick={handleLogout}>로그아웃</div>
+                <div
+                  onClick={() => {
+                    handleLogout();
+                    handleSidebarLinkClick();
+                  }}
+                >
+                  로그아웃
+                </div>
               </li>
             </>
           </ul>
