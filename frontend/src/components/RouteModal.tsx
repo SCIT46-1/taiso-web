@@ -146,20 +146,20 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
   // Function to get route image URL
 
   return (
-    <div className="route-modal w-full p-12 h-full">
+    <div className="route-modal w-full px-6 pt-6 h-full">
       <h2 className="text-2xl font-bold mb-4">경로 선택</h2>
 
       {/* Search bar */}
-      <div className="form-control my-4 w-2/3 ">
+      <div className="form-control my-4 w-2/3 my-2">
         <div className="input-group flex items-center gap-2">
           <input
             type="text"
             placeholder="경로 검색..."
-            className="input input-bordered w-full"
+            className="input input-bordered w-full h-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className="btn btn-square">
+          <button className="btn btn-square h-7 w-11">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -179,7 +179,7 @@ function RouteModal({ onSelectRoute, selectedRouteId }: RouteModalProps) {
       </div>
 
       {/* Tabs */}
-      <div className="tabs tabs-boxed mb-4 w-2/5">
+      <div className="tabs tabs-boxed mb-2 w-2/5">
         <a
           className={`tab ${activeTab === "all" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("all")}

@@ -448,7 +448,7 @@ function ClubDetailPage() {
           >
             가입 신청 관리
             {pendingMembers.length > 0 && (
-              <span className="badge badge-accent ml-2">
+              <span className="badge badge-accent">
                 {pendingMembers.length}
               </span>
             )}
@@ -551,6 +551,57 @@ function ClubDetailPage() {
               글쓰기
             </button>
           ) : (
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead className="text-sm">
+                  <tr>
+                    <th className="w-16 text-center">번호</th>
+                    <th>제목</th>
+                    <th className="w-32">작성자</th>
+                    <th className="w-32">작성일</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {boardList.content.map((post) => (
+                    <tr
+                      key={post.postId}
+                      className={`hover:bg-base-200 cursor-pointer ${
+                        post.isNotice ? "bg-base-200" : ""
+                      }`}
+                      onClick={() => {
+                        if (canAccessBoardDetail()) {
+                          fetchPostDetail(post.postId);
+                        } else {
+                          setNotification({
+                            message:
+                              "승인된 클럽 멤버만 게시글을 볼 수 있습니다.",
+                            type: "error",
+                          });
+                        }
+                      }}
+                    >
+                      <td className="flex items-center justify-center text-center px-3 h-full w-18">
+                        {post.isNotice ? (
+                          <span className="badge badge-primary badge-sm py-2">공지</span>
+                        ) : (
+                          post.postId
+                        )}
+                      </td>
+                      <td className="font-medium">
+                        {post.postTitle}
+                        {!canAccessBoardDetail() && (
+                          <span className="ml-2 text-xs text-warning">
+                            (승인된 멤버만 볼 수 있음)
+                          </span>
+                        )}
+                      </td>
+                      <td>{post.writerNickname}</td>
+                      <td>{new Date(post.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             user && (
               <div className="text-sm text-warning">
                 승인된 멤버만 글을 작성할 수 있습니다
@@ -640,11 +691,11 @@ function ClubDetailPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "승인":
-        return <span className="badge badge-success badge-sm">승인됨</span>;
+        return <span className="badge badge-success badge-sm !text-white">승인됨</span>;
       case "신청대기":
-        return <span className="badge badge-warning badge-sm">대기중</span>;
+        return <span className="badge badge-warning badge-sm !text-white">대기중</span>;
       case "탈퇴":
-        return <span className="badge badge-error badge-sm">탈퇴</span>;
+        return <span className="badge badge-error badge-sm !text-white">탈퇴</span>;
       default:
         return null;
     }
@@ -710,7 +761,7 @@ function ClubDetailPage() {
                 key={member.userId}
                 className="flex items-center justify-between gap-2 p-2 border-b"
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-[3]">
                   <div className="avatar">
                     <div className="w-10 h-10 rounded-full">
                       {member.userProfileImage ? (
@@ -728,33 +779,37 @@ function ClubDetailPage() {
                   <div className="flex flex-col">
                     <div className="font-medium">
                       {member.userNickname}
-                      {member.userId === clubDetail.clubLeader.leaderId && (
-                        <span className="ml-2 text-xs text-primary">
-                          클럽 리더
-                        </span>
-                      )}
+                      
                     </div>
                     <div className="text-xs">{member.bio || ""}</div>
                   </div>
                 </div>
+                {member.userId === clubDetail.clubLeader.leaderId && (
+                  <div className="flex items-center gap-2 flex-[1] justify-end">
+                    <span className="badge badge-primary badge-sm py-2">
+                      리더
+                    </span>
+                  </div>
+                )}
                 {clubDetail.clubLeader.leaderId === user?.userId &&
                   member.userId !== user?.userId && (
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-[1] justify-end">
                       {getStatusBadge(member.participantStatus)}
                       {member.participantStatus === "신청대기" && (
                         <div className="flex gap-1">
-                          <button
-                            className="btn btn-xs btn-success"
-                            onClick={() => handleAcceptMember(member.userId)}
-                          >
-                            수락
-                          </button>
-                          <button
-                            className="btn btn-xs btn-error"
-                            onClick={() => handleRejectMember(member.userId)}
-                          >
-                            거절
-                          </button>
+                        <button
+                          className="btn btn-xs btn-success !text-white"
+                          onClick={() => handleAcceptMember(member.userId)}
+                        >
+                          수락
+                        </button>
+                        <button
+                          className="btn btn-xs btn-error !text-white"
+                          onClick={() => handleRejectMember(member.userId)}
+                        >
+                          거절
+                        </button>
+
                         </div>
                       )}
                     </div>
@@ -1072,7 +1127,7 @@ function ClubDetailPage() {
                   <thead>
                     <tr>
                       <th>사용자</th>
-                      <th className="text-right">처리</th>
+                      <th className="text-right pr-5">처리</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1098,13 +1153,13 @@ function ClubDetailPage() {
                         <td className="text-right">
                           <div className="flex gap-2 justify-end">
                             <button
-                              className="btn btn-sm btn-success"
+                              className="btn btn-sm btn-success !text-white"
                               onClick={() => handleAcceptMember(member.userId)}
                             >
                               수락
                             </button>
                             <button
-                              className="btn btn-sm btn-error"
+                              className="btn btn-sm btn-error !text-white"
                               onClick={() => handleRejectMember(member.userId)}
                               disabled={isMembershipLoading}
                             >
@@ -1392,10 +1447,9 @@ function ClubDetailPage() {
                       </p>
                     </div>
                   </div>
-                </div>
-                <div className="bg-gray-100">
-                  <div className="card-body">
-                    <h3 className="font-semibold">클럽 태그</h3>
+                    <div className="bg-gray-100">
+                      <div className="card-body px-8 py-5">
+                        <h3 className="font-semibold">클럽 태그</h3>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {clubDetail.tags.map((tag, index) => (
                         <div key={index} className="badge badge-lg">

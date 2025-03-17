@@ -34,7 +34,7 @@ function ClubCard({ club }: { club: IClubList }) {
 
   return (
     <>
-      <div className="mx-auto w-[100%] rounded-lg hover:bg-base-200">
+      <div className="mx-auto w-full max-w-4xl rounded-lg hover:bg-base-200">
         <div className="flex mb-1">
           <Link to={`/club/${club.clubId}`} className="flex-1">
             <div className="w-full flex items-center p-4 relative">
@@ -104,10 +104,7 @@ function ClubCard({ club }: { club: IClubList }) {
                   </div>
                   <div className="flex flex-wrap gap-1 max-w-[400px] mt-2">
                     {club.tags.map((tag, index) => (
-                      <div
-                        key={index}
-                        className="badge badge-primary badge-outline"
-                      >
+                      <div key={index} className="badge badge-primary badge-outline">
                         {tag}
                       </div>
                     ))}
@@ -119,6 +116,7 @@ function ClubCard({ club }: { club: IClubList }) {
         </div>
         <div className="divider w-full -my-2 -mb-1"></div>
       </div>
+
     </>
   );
 }

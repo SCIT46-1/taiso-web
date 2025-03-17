@@ -50,13 +50,12 @@ function ClubList() {
   }
 
   return (
-    <div className="w-full mx-auto flex flex-col">
-      <div className="w-full">
-        {clubList.map((club) => (
-          <ClubCard key={club.clubId} club={club} />
-        ))}
-      </div>
-
+    <div className="w-full mx-auto mt-7">
+        <div className="grid grid-cols-2 justify-center gap-2 mt-4">
+          {clubList?.content.map((club) => (
+            <ClubCard key={club.clubId} club={club} />
+          ))}
+        </div>
       {!isLastPage && (
         <div className="w-full flex justify-center my-6">
           <button
