@@ -117,6 +117,17 @@ function ReviewModal({ lightning, modalId }: ReviewModalProps) {
         lightning.lightning.lightningId
       );
       setReviewData(updatedData || []);
+
+      // 업데이트 된 데이터에서 선택된 유저를 찾아서 업데이트
+      if (selectedUser) {
+        const updatedSelectedUser =
+          updatedData?.find(
+            (user) =>
+              user.userDetailDTO.userId === selectedUser.userDetailDTO.userId
+          ) || null;
+        setSelectedUser(updatedSelectedUser);
+      }
+
       checkAllReviewsCompleted(updatedData || []);
 
       setModalState("delete-success");

@@ -9,5 +9,7 @@ import com.taiso.bike_api.domain.UserTagCategoryEntity;
 public interface UserTagCategoryRepository extends JpaRepository<UserTagCategoryEntity, Long> {
 
     Optional<UserTagCategoryEntity> findByName(String tag);
+
     
+
 }
