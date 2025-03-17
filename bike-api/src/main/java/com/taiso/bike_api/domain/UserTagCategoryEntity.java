@@ -49,7 +49,7 @@ public class UserTagCategoryEntity {
     private Set<UserDetailEntity> users = new HashSet<>();
 
     public enum ActivityTime {
-        오전, 오후, 저녁
+        아침, 오전, 오후, 저녁, 밤
     }
 
     public enum ActivityDay {
