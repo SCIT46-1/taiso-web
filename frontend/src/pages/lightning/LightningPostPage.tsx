@@ -773,7 +773,7 @@ function LightningPostPage() {
                       className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.region === option
                           ? "btn-primary"
-                          : "btn-outline"
+                        : "btn-outline"
                       }`}
                     >
                       {option}
@@ -983,7 +983,7 @@ function LightningPostPage() {
 
             {/* Add club-only indicator when creating a club-only lightning */}
             {isClubOnly && clubId && (
-              <div className="alert alert-info mb-4">
+              <div className="alert alert-info mb-4 bg-transparent border-primary">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

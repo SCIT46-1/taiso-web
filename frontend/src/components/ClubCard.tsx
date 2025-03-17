@@ -34,7 +34,7 @@ function ClubCard({ club }: { club: ClubList }) {
 
   return (
     <>
-      <div className="mx-auto w-[100%] rounded-lg hover:bg-base-200">
+      <div className="mx-auto w-full max-w-4xl rounded-lg hover:bg-base-200">
         <div className="flex mb-1">
           <Link to={`/club/${club.clubId}`} className="flex-1">
             <div className="w-full flex items-center p-4 relative">
@@ -80,9 +80,8 @@ function ClubCard({ club }: { club: ClubList }) {
                 <img
                   src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${club.clubProfileImageId}`}
                   alt={club.clubName}
-                    className="h-24 w-24 rounded-2xl"
-                  />
-                  
+                  className="h-24 w-24 rounded-2xl"
+                />
               )}
               <div className="flex flex-col p-2 ml-2">
                 <div className="flex flex-col">
@@ -103,12 +102,9 @@ function ClubCard({ club }: { club: ClubList }) {
                     </svg>
                     {club.currentScale}/{club.maxScale}명
                   </div>
-                  <div className="flex flex-wrap gap-1 max-w-[400px]">
+                  <div className="flex flex-wrap gap-1 max-w-[400px] mt-2">
                     {club.tags.map((tag, index) => (
-                      <div
-                        key={index}
-                        className="badge badge-primary badge-outline"
-                      >
+                      <div key={index} className="badge badge-primary badge-outline">
                         {tag}
                       </div>
                     ))}
@@ -120,6 +116,7 @@ function ClubCard({ club }: { club: ClubList }) {
         </div>
         <div className="divider w-full -my-2 -mb-1"></div>
       </div>
+
     </>
   );
 }

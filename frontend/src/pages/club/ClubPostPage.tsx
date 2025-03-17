@@ -62,110 +62,115 @@ function ClubPostPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">새 클럽 만들기</h1>
+    <div className="flex justify-center items-center relative sm:w-full">
+      <div className="w-full max-w-lg bg-base-100 p-4">
+        <h1 className="text-2xl font-bold mb-6">새 클럽 만들기</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block mb-2">클럽 이름</label>
-          <input
-            type="text"
-            value={clubName}
-            onChange={(e) => setClubName(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-2">클럽 프로필 이미지</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-2">간단한 소개</label>
-          <input
-            type="text"
-            value={clubShortDescription}
-            onChange={(e) => setClubShortDescription(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-2">상세 설명</label>
-          <textarea
-            value={clubDescription}
-            onChange={(e) => setClubDescription(e.target.value)}
-            className="w-full p-2 border rounded h-32"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-2">최대 인원</label>
-          <input
-            type="number"
-            value={maxUser}
-            onChange={(e) => setMaxUser(Number(e.target.value))}
-            min="1"
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-2">태그</label>
-          <div className="flex">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block mb-2">클럽 이름</label>
             <input
               type="text"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              className="flex-1 p-2 border rounded-l"
-              placeholder="태그 입력 후 추가"
+              value={clubName}
+              onChange={(e) => setClubName(e.target.value)}
+              className="w-full p-2 border rounded"
+              required
             />
-            <button
-              type="button"
-              onClick={handleTagAdd}
-              className="bg-blue-500 text-white px-4 py-2 rounded-r"
-            >
-              추가
-            </button>
           </div>
 
-          <div className="flex flex-wrap mt-2 gap-2">
-            {tags.map((tag) => (
-              <div
-                key={tag}
-                className="bg-gray-200 px-3 py-1 rounded-full flex items-center"
+          <div>
+            <label className="block mb-2">클럽 프로필 이미지</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2">간단한 소개</label>
+            <div className="text-xs text-red-500 mt-2 mb-3">클럽 리스트에 보여질 간단한 한줄 소개</div>
+            <input
+              type="text"
+              value={clubShortDescription}
+              onChange={(e) => setClubShortDescription(e.target.value)}
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2">상세 설명</label>
+            <div className="text-xs text-red-500 mt-2 mb-3">클럽 페이지에 보여질 우리 클럽 소개글</div>
+            <textarea
+              value={clubDescription}
+              onChange={(e) => setClubDescription(e.target.value)}
+              className="w-full p-2 border rounded h-32"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2">최대 인원</label>
+            <input
+              type="number"
+              value={maxUser}
+              onChange={(e) => setMaxUser(Number(e.target.value))}
+              min="1"
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block">태그</label>
+            <div className="text-xs text-red-500 mt-2 mb-3">우리 클럽을 표현하는 태그를 자유롭게 추가해보세요!</div>
+            <div className="flex">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                className="flex-1 p-2 border rounded-l"
+                placeholder="태그 입력 후 추가"
+              />
+              <button
+                type="button"
+                onClick={handleTagAdd}
+                className="bg-blue-500 text-white px-4 py-2 rounded-r"
               >
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => handleTagRemove(tag)}
-                  className="ml-2 text-red-500"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+                추가
+              </button>
+            </div>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400"
-        >
-          {isLoading ? "처리 중..." : "클럽 생성하기"}
-        </button>
-      </form>
+            <div className="flex flex-wrap mt-2 gap-2">
+              {tags.map((tag) => (
+                <div
+                  key={tag}
+                  className="bg-gray-200 px-3 py-1 rounded-full flex items-center"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => handleTagRemove(tag)}
+                    className="ml-2 text-red-500"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400"
+          >
+            {isLoading ? "처리 중..." : "클럽 생성하기"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

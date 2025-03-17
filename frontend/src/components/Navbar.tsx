@@ -62,7 +62,7 @@ function Navbar() {
             {isAuthenticated ? (
               <>
                 <li>
-                  <Link to="/profile">프로필</Link>
+                  <Link to={`/users/${user?.userId}`}>프로필</Link>
                 </li>
                 <li>
                   <div onClick={handleLogout}>로그아웃</div>

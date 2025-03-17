@@ -203,7 +203,7 @@ function ReviewModal({ lightning, modalId }: ReviewModalProps) {
                 className="btn btn-outline btn-sm no-animation"
                 onClick={() => setModalState("review")}
               >
-                리뷰 등록으로 돌아가기
+                추가로 리뷰쓰기
               </button>
             </div>
           </div>
@@ -267,8 +267,7 @@ function ReviewModal({ lightning, modalId }: ReviewModalProps) {
     if (modalState === "delete-success") {
       return (
         <div>
-          <h3 className="font-bold text-lg mb-4 text-center">리뷰 삭제 완료</h3>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center justify-center">
             <div className="mb-3">
               <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
                 <svg
@@ -287,6 +286,7 @@ function ReviewModal({ lightning, modalId }: ReviewModalProps) {
                 </svg>
               </div>
             </div>
+            <h3 className="font-bold text-lg mb-4 text-center">리뷰 삭제 완료</h3>
             <p className="text-center mb-6">
               리뷰가 성공적으로 삭제되었습니다.
             </p>
@@ -301,7 +301,7 @@ function ReviewModal({ lightning, modalId }: ReviewModalProps) {
                 className="btn btn-outline btn-sm no-animation"
                 onClick={() => setModalState("review")}
               >
-                리뷰 등록으로 돌아가기
+                추가로 리뷰쓰기
               </button>
             </div>
           </div>
