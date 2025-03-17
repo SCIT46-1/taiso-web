@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.taiso.bike_api.domain.BookmarkEntity.BookmarkType;
 import com.taiso.bike_api.domain.UserDetailEntity;
 import com.taiso.bike_api.domain.UserEntity;
+import com.taiso.bike_api.domain.UserTagCategoryEntity;
 import com.taiso.bike_api.dto.UserDetailRequestDTO;
 import com.taiso.bike_api.dto.UserDetailResponseDTO;
 import com.taiso.bike_api.exception.InvalidFileExtensionException;
@@ -64,9 +65,21 @@ public class UserDetailService {
             throw new IllegalArgumentException(userDetailRequestDTO.getUserId() + " 값은 올바르지 않음");
         }
 
+        // 파일 관련 로그 처리
         log.info("저장전 : {}", userDetailRequestDTO.toString());
-        log.info("profileImg : {}",profileImg.getOriginalFilename());
-        log.info("backgroundImg : {}",backgroundImg.getOriginalFilename());
+        
+        // null 체크 후 로그 출력
+        if (profileImg != null) {
+            log.info("profileImg : {}", profileImg.getOriginalFilename());
+        } else {
+            log.info("profileImg : null");
+        }
+        
+        if (backgroundImg != null) {
+            log.info("backgroundImg : {}", backgroundImg.getOriginalFilename());
+        } else {
+            log.info("backgroundImg : null");
+        }
 
         // profileImg null 체크
         if (profileImg != null && !profileImg.isEmpty()) {
@@ -116,6 +129,10 @@ public class UserDetailService {
 
         // 업데이트
         entity.setUserNickname(userDetailRequestDTO.getUserNickname());
+        entity.setBio(userDetailRequestDTO.getBio());
+        entity.setGender(UserDetailEntity.Gender.valueOf(userDetailRequestDTO.getGender()));
+        entity.setLevel(UserDetailEntity.Level.valueOf(userDetailRequestDTO.getLevel()));
+        entity.setTags(userDetailRequestDTO.getTags().stream().map(tag -> UserTagCategoryEntity.builder().name(tag).build()).collect(Collectors.toSet()));
         entity.setUserProfileImg(userDetailRequestDTO.getProfileImg());
         entity.setUserBackgroundImg(userDetailRequestDTO.getBackgroundImg());
     }

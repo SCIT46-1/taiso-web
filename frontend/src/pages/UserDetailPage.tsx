@@ -172,11 +172,6 @@ function UserDetailPage() {
   };
 
   const handleSubmit = async () => {
-    if (!nickName || !bio || !gender || !level || !tags.length) {
-      alert("모든 값을 입력해주세요.");
-      return;
-    }
-
     const userIdNumber = Number(userId);
 
     // userProfileRequest 객체 생성 (파일을 제외한 데이터만)
@@ -350,12 +345,16 @@ function UserDetailPage() {
             )}
           </div>
           <div className="ml-2">
-            <div className="badge badge-primary badge-outline mr-1">
-              {userDetail?.level}
-            </div>
-            <div className="badge badge-primary badge-outline mr-1">
-              {userDetail?.gender}
-            </div>
+            {userDetail?.level && (
+              <div className="badge badge-primary badge-outline mr-1">
+                {userDetail?.level}
+              </div>
+            )}
+            {userDetail?.gender && (
+              <div className="badge badge-primary badge-outline mr-1">
+                {userDetail?.gender}
+              </div>
+            )}
             {(userDetail?.tags ?? []).map((tag) => (
               <div key={tag} className="badge badge-primary badge-outline mr-1">
                 {tag}
@@ -441,14 +440,14 @@ function UserDetailPage() {
         </div>
       </div>
       {/* 스트라바 통계 */}
-        <div className="border bg-blue-300 flex flex-col items-center justify-center mt-8 mb-8 pt-2 pb-4">
+      <div className="border bg-blue-300 flex flex-col items-center justify-center mt-8 mb-8 pt-2 pb-4">
         <div className="text-2xl font-bold mb-3 mt-2 text-white">STRAVA</div>
-            {!userDetail?.stravaConnected && (
-            <div className="text-white">
-                <div>아직 스트라바를 연동하지 않았습니다.</div>
-              </div>
-            )}
-          {userDetail?.stravaConnected && (
+        {!userDetail?.stravaConnected && (
+          <div className="text-white">
+            <div>아직 스트라바를 연동하지 않았습니다.</div>
+          </div>
+        )}
+        {userDetail?.stravaConnected && (
           <div className="flex justify-center first:before:w-fit mx-auto gap-2 ">
             <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
               <div>횟수</div>
@@ -462,9 +461,9 @@ function UserDetailPage() {
               <div>획득고도</div>
               <div>{userDetail?.userStravaElevation} M</div>
             </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
       {/* 리뷰 */}
       <div className="mb-4 justify-center flex">
         <ReviewList userId={Number(userId)} />
@@ -651,7 +650,8 @@ function UserDetailPage() {
                         );
                       }}
                       className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary 
-                        ${tags.includes(option) ? "btn-primary" : "btn-outline"
+                        ${
+                          tags.includes(option) ? "btn-primary" : "btn-outline"
                         }`}
                     >
                       {option}

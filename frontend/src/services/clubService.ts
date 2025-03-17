@@ -21,7 +21,7 @@ export interface ClubListResponse {
   last: boolean;
 }
 
-export interface ClubList {
+export interface IClubList {
   bookmarked: boolean;
   clubId: number;
   clubLeaderId: number;
@@ -38,6 +38,7 @@ export interface ClubList {
 export interface ClubDetailResponse {
   clubId: number;
   clubProfileImageId: string | null;
+  clubShortDescription: string;
   clubName: string;
   clubLeader: {
     leaderId: number;
@@ -146,8 +147,8 @@ export interface ClubLightningListResponse {
   last: boolean;
 }
 
-const getClubList = async (): Promise<ClubListResponse> => {
-  return await get(`/clubs`);
+const getClubList = async (page = 0, size = 5): Promise<ClubListResponse> => {
+  return await get(`/clubs?page=${page}&size=${size}`);
 };
 
 const getClubDetail = async (clubId: number): Promise<ClubDetailResponse> => {

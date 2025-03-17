@@ -357,7 +357,7 @@ function UserOnboardingPage() {
   const debouncedValidateNickname = debounce(validateNickname, 500);
 
   return (
-    <div className="flex flex-col items-center justify-center max-w-screen-sm mx-auto gap-4 p-4 mb-16 mt-4">
+    <div className="flex flex-col items-center justify-center max-w-screen-sm mx-auto gap-4 p-4 mb-16 mt-4 no-animation">
       <ul className="steps w-full mb-8">
         <li className={`step ${step >= 1 ? "step-primary" : ""} text-xs`}>
           닉네임 설정
