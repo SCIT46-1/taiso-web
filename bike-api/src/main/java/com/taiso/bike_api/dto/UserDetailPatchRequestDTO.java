@@ -18,6 +18,7 @@ import lombok.ToString;
 @ToString
 public class UserDetailPatchRequestDTO {
     private String nickname;
+    private String fullName;
     private String userProfileImg;
     private String userBackgroundImg;
     private String phoneNumber;

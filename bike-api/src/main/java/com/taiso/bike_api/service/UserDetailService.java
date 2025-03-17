@@ -1,7 +1,10 @@
 package com.taiso.bike_api.service;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import com.taiso.bike_api.repository.RouteRepository;
 import com.taiso.bike_api.repository.UserDetailRepository;
 import com.taiso.bike_api.repository.UserRepository;
 import com.taiso.bike_api.repository.UserStravaDataRepository;
+import com.taiso.bike_api.repository.UserTagCategoryRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -54,88 +58,119 @@ public class UserDetailService {
     @Autowired
     private UserStravaDataRepository userStravaDataRepository;
 
-    //이미지를 S3에 저장하기 + 정보 업데이트
-    @Transactional
-    public void updateUserDetail (UserDetailRequestDTO userDetailRequestDTO,
-                                  MultipartFile profileImg,
-                                  MultipartFile backgroundImg) {
-
-        // 입력값 오류 처리
-        if (userDetailRequestDTO == null || userDetailRequestDTO.getUserId() <= 0) {
-            throw new IllegalArgumentException(userDetailRequestDTO.getUserId() + " 값은 올바르지 않음");
-        }
-
-        // 파일 관련 로그 처리
-        log.info("저장전 : {}", userDetailRequestDTO.toString());
-        
-        // null 체크 후 로그 출력
-        if (profileImg != null) {
-            log.info("profileImg : {}", profileImg.getOriginalFilename());
-        } else {
-            log.info("profileImg : null");
-        }
-        
-        if (backgroundImg != null) {
-            log.info("backgroundImg : {}", backgroundImg.getOriginalFilename());
-        } else {
-            log.info("backgroundImg : null");
-        }
-
-        // profileImg null 체크
-        if (profileImg != null && !profileImg.isEmpty()) {
-
-            // 들어온 파일 존재 여부 및 확장자 확인
-            String originalFilename = profileImg.getOriginalFilename();
-            if (originalFilename == null ||
-                    (!originalFilename.toLowerCase().endsWith(".jpg") && !originalFilename.toLowerCase().endsWith(".png") && !originalFilename.toLowerCase().endsWith(".jpeg"))) {
-                throw new InvalidFileExtensionException("지원하지 않는 파일 타입");
-            }
-
-            // null&확장자 확인되면 S3에 업로드 후 DB에 저장할 Id 생성
-            String profileImgId = s3Service.uploadFile(profileImg, userDetailRequestDTO.getUserId());
-            // 프로필 이미지 Id 업데이트
-            userDetailRequestDTO.setProfileImg(profileImgId);
-        } else {
-            log.info("프로필 이미지는 null이거나 빈 파일이므로 업데이트하지 않고 기존 DTO의 값 사용");
-        }
-
-        // backgroundImg null 체크
-        if (backgroundImg != null && !backgroundImg.isEmpty()) {
-
-            // 들어온 파일 존재 여부 및 확장자 확인
-            String originalFilename = backgroundImg.getOriginalFilename();
-            if (originalFilename == null ||
-                    (!originalFilename.toLowerCase().endsWith(".jpg") && !originalFilename.toLowerCase().endsWith(".png") && !originalFilename.toLowerCase().endsWith(".jpeg"))) {
-                throw new InvalidFileExtensionException("지원하지 않는 파일 타입");
-            }
-
-            // null&확장자 확인되면 S3에 업로드 후 DB에 저장할 Id 생성
-            String backgroundImgId = s3Service.uploadFile(backgroundImg, userDetailRequestDTO.getUserId());
-            // 배경 이미지 Id 업데이트
-            userDetailRequestDTO.setBackgroundImg(backgroundImgId);
-        } else {
-            log.info("배경 이미지는 null이거나 빈 파일이므로 업데이트하지 않고 기존 DTO의 값 사용");
-        }
-
-        log.info("저장 직전 : {}",userDetailRequestDTO.toString());
-
-        //userId로 업데이트할 데이터 DB에서 찾아오기
-        Optional<UserDetailEntity> temp = userDetailRepository.findById(userDetailRequestDTO.getUserId());
-        //존재하는지 체크
-        if(!temp.isPresent()) {
-            throw new NoSuchElementException("존재하지 않는 사용자");
-        }
-        UserDetailEntity entity = temp.get();
-
-        // 업데이트
-        entity.setUserNickname(userDetailRequestDTO.getUserNickname());
-        entity.setBio(userDetailRequestDTO.getBio());
-        entity.setGender(UserDetailEntity.Gender.valueOf(userDetailRequestDTO.getGender()));
-        entity.setLevel(UserDetailEntity.Level.valueOf(userDetailRequestDTO.getLevel()));
-        entity.setTags(userDetailRequestDTO.getTags().stream().map(tag -> UserTagCategoryEntity.builder().name(tag).build()).collect(Collectors.toSet()));
-        entity.setUserProfileImg(userDetailRequestDTO.getProfileImg());
-        entity.setUserBackgroundImg(userDetailRequestDTO.getBackgroundImg());
+    @Autowired
+    private UserTagCategoryRepository userTagCategoryRepository;
+@Transactional
+public void updateUserDetail(UserDetailRequestDTO userDetailRequestDTO,
+                             MultipartFile profileImg,
+                             MultipartFile backgroundImg) {
+    // 1. DTO 및 userId 유효성 체크
+    if (userDetailRequestDTO == null) {
+        throw new IllegalArgumentException("UserDetailRequestDTO가 null입니다.");
     }
+    if (userDetailRequestDTO.getUserId() <= 0) {
+        throw new IllegalArgumentException("올바르지 않은 userId: " + userDetailRequestDTO.getUserId());
+    }
+    log.info("저장 전 DTO: {}", userDetailRequestDTO);
+
+    // 2. 이미지 처리: 프로필/배경 이미지 파일이 존재하면 S3 업로드 후 DTO 업데이트
+    if (profileImg != null && !profileImg.isEmpty()) {
+        String originalFilename = profileImg.getOriginalFilename();
+        if (originalFilename == null ||
+            (!originalFilename.toLowerCase().endsWith(".jpg") &&
+             !originalFilename.toLowerCase().endsWith(".png") &&
+             !originalFilename.toLowerCase().endsWith(".jpeg"))) {
+            throw new InvalidFileExtensionException("지원하지 않는 파일 타입");
+        }
+        String profileImgId = s3Service.uploadFile(profileImg, userDetailRequestDTO.getUserId());
+        userDetailRequestDTO.setProfileImg(profileImgId);
+    } else {
+        log.info("프로필 이미지는 null이거나 빈 파일이므로 기존 값을 사용합니다.");
+    }
+
+    if (backgroundImg != null && !backgroundImg.isEmpty()) {
+        String originalFilename = backgroundImg.getOriginalFilename();
+        if (originalFilename == null ||
+            (!originalFilename.toLowerCase().endsWith(".jpg") &&
+             !originalFilename.toLowerCase().endsWith(".png") &&
+             !originalFilename.toLowerCase().endsWith(".jpeg"))) {
+            throw new InvalidFileExtensionException("지원하지 않는 파일 타입");
+        }
+        String backgroundImgId = s3Service.uploadFile(backgroundImg, userDetailRequestDTO.getUserId());
+        userDetailRequestDTO.setBackgroundImg(backgroundImgId);
+    } else {
+        log.info("배경 이미지는 null이거나 빈 파일이므로 기존 값을 사용합니다.");
+    }
+
+    log.info("저장 직전 DTO: {}", userDetailRequestDTO);
+
+    // 3. 기존 사용자 엔티티 조회
+    Optional<UserDetailEntity> optionalEntity = userDetailRepository.findById(userDetailRequestDTO.getUserId());
+    if (!optionalEntity.isPresent()) {
+        throw new NoSuchElementException("존재하지 않는 사용자입니다.");
+    }
+    UserDetailEntity entity = optionalEntity.get();
+
+    // 4. 개별 필드 업데이트: DTO 값이 있으면 변경, 없으면 기존 값 유지
+    entity.setUserNickname(userDetailRequestDTO.getUserNickname() != null
+            ? userDetailRequestDTO.getUserNickname() : entity.getUserNickname());
+    entity.setBio(userDetailRequestDTO.getBio() != null
+            ? userDetailRequestDTO.getBio() : entity.getBio());
+
+    // Gender 업데이트
+    if (userDetailRequestDTO.getGender() != null) {
+        try {
+            entity.setGender(UserDetailEntity.Gender.valueOf(userDetailRequestDTO.getGender()));
+        } catch (IllegalArgumentException e) {
+            // 가능한 모든 값을 에러 메시지에 포함
+            String validValues = String.join(", ", 
+                Arrays.stream(UserDetailEntity.Gender.values())
+                    .map(Enum::name)
+                    .collect(Collectors.toList()));
+                    
+            throw new IllegalArgumentException("올바르지 않은 성별 값: " + userDetailRequestDTO.getGender() + 
+                ". 허용된 값: " + validValues);
+        }
+    }
+
+    // Level 업데이트
+    if (userDetailRequestDTO.getLevel() != null) {
+        try {
+            entity.setLevel(UserDetailEntity.Level.valueOf(userDetailRequestDTO.getLevel()));
+        } catch (IllegalArgumentException e) {
+            // 가능한 모든 값을 에러 메시지에 포함
+            String validValues = String.join(", ", 
+                Arrays.stream(UserDetailEntity.Level.values())
+                    .map(Enum::name)
+                    .collect(Collectors.toList()));
+                    
+            throw new IllegalArgumentException("올바르지 않은 레벨 값: " + userDetailRequestDTO.getLevel() + 
+                ". 허용된 값: " + validValues);
+        }
+    }
+
+    // 5. 태그 업데이트 처리
+    // 사용자는 미리 정의된 태그 목록에서 선택하므로, 신규 엔티티 생성 없이
+    // DTO에 포함된 태그 이름으로 기존 엔티티를 조회하여 할당함
+    if (userDetailRequestDTO.getTags() != null) {
+        Set<UserTagCategoryEntity> selectedTags = new HashSet<>();
+        for (String tagName : userDetailRequestDTO.getTags()) {
+            Optional<UserTagCategoryEntity> tagOpt = userTagCategoryRepository.findByName(tagName);
+            if (tagOpt.isPresent()) {
+                selectedTags.add(tagOpt.get());
+            } else {
+                throw new IllegalArgumentException("유효하지 않은 태그입니다: " + tagName);
+            }
+        }
+        entity.setTags(selectedTags);
+    }
+
+    // 6. 이미지 필드 업데이트: DTO에 값이 있으면 업데이트, 없으면 기존 값 유지
+    entity.setUserProfileImg(userDetailRequestDTO.getProfileImg() != null
+            ? userDetailRequestDTO.getProfileImg() : entity.getUserProfileImg());
+    entity.setUserBackgroundImg(userDetailRequestDTO.getBackgroundImg() != null
+            ? userDetailRequestDTO.getBackgroundImg() : entity.getUserBackgroundImg());
+}
 
 
     @Transactional

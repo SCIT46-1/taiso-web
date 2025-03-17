@@ -34,7 +34,6 @@ const ACTIVITYLOCATION_OPTION = [
 
 // 태그 통합
 const categories = [
-  { title: "레벨", options: LEVEL_OPTIONS, key: "level" },
   { title: "활동 시간", options: ACTIVITYTIME_OPTION, key: "activityTime" },
   { title: "활동 요일", options: ACTIVITYDAY_OPTION, key: "activityDay" },
   {

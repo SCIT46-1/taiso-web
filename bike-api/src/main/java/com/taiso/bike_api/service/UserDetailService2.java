@@ -144,6 +144,9 @@ public void saveUserDetail(UserDetailPostRequestDTO requestDTO, String userEmail
         if (requestDTO.getNickname() != null) {
             userDetail.setUserNickname(requestDTO.getNickname());
         }
+        if (requestDTO.getFullName() != null) {
+            userDetail.setFullName(requestDTO.getFullName());
+        }
         if (requestDTO.getUserProfileImg() != null) {
             userDetail.setUserProfileImg(requestDTO.getUserProfileImg());
         }
