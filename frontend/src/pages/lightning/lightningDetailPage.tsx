@@ -845,7 +845,10 @@ function LightningDetailPage() {
               {lightningDetail?.member
                 .filter((member) => member.participantStatus === "신청대기")
                 .map((member, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2">
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 p-2 justify-between"
+                  >
                     <UserProfileCard
                       userProfileId={member.lightningUserId}
                       userProfileImg={member.memberProfileImg || ""}
@@ -853,7 +856,6 @@ function LightningDetailPage() {
                       userRole="member"
                     />
                     <div className="flex flex-col">
-                      <div className="font-medium">{member.memberNickname}</div>
                       <div className="text-sm text-gray-500">
                         상태: {member.participantStatus}
                       </div>

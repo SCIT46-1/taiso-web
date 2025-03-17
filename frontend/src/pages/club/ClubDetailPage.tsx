@@ -898,10 +898,13 @@ function ClubDetailPage() {
                     <div className="flex flex-col p-2 md:ml-6 md:text-left text-center flex-1">
                       <div className="flex flex-col gap-1">
                         <div className="text-lg font-bold">
-                          {new Date(lightning.eventDate).toLocaleTimeString(
-                            [],
-                            { hour: "2-digit", minute: "2-digit" }
-                          )}{" "}
+                          {new Date(lightning.eventDate).toLocaleString([], {
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}{" "}
                           ({lightning.duration}분)
                         </div>
                         <div className="text-base truncate w-full text-overflow-ellipsis overflow-hidden">

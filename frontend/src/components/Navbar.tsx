@@ -12,11 +12,16 @@ function Navbar() {
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
 
+  console.log(profileImg);
+  console.log(imageError);
   useEffect(() => {
     const fetchProfileImg = async () => {
       try {
         const profileImg = await userDetailService.getUserDetailProfileImg();
-        setProfileImg(profileImg);
+        setProfileImg(
+          "https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/" +
+            profileImg
+        );
         setImageError(false);
       } catch (error) {
         console.error("Failed to fetch profile image:", error);
