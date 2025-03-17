@@ -9,17 +9,24 @@ function Navbar() {
   const { logout, isAuthenticated, user } = useAuthStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [profileImg, setProfileImg] = useState("");
+  const [imageError, setImageError] = useState(false);
+
   useEffect(() => {
     const fetchProfileImg = async () => {
-      const profileImg = await userDetailService.getUserDetailProfileImg();
-      setProfileImg(profileImg);
+      try {
+        const profileImg = await userDetailService.getUserDetailProfileImg();
+        setProfileImg(profileImg);
+        setImageError(false);
+      } catch (error) {
+        console.error("Failed to fetch profile image:", error);
+        setImageError(true);
+      }
     };
-    try {
+
+    if (isAuthenticated) {
       fetchProfileImg();
-    } catch (error) {
-      console.error(error);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   const handleLogout = () => {
     authService.logout();
@@ -30,6 +37,13 @@ function Navbar() {
     const stravaLink = await stravaService.getStravaLink();
     window.location.href = stravaLink;
   };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // 기본 이미지 경로를 절대 경로로 수정
+  const defaultImagePath = "/userDefault.png";
 
   return (
     <>
@@ -66,7 +80,13 @@ function Navbar() {
               className="btn btn-ghost btn-circle avatar cursor-pointer no-animation"
             >
               <div className="w-10 rounded-full ">
-                <img alt="Avatar" src={profileImg || "userDefault.png"} />
+                <img
+                  alt="Avatar"
+                  src={
+                    !imageError && profileImg ? profileImg : defaultImagePath
+                  }
+                  onError={handleImageError}
+                />
               </div>
             </div>
           )}
@@ -92,7 +112,13 @@ function Navbar() {
           <div className="flex items-center gap-2">
             <div className="btn btn-ghost btn-circle avatar cursor-pointer no-animation ">
               <div className="w-10 rounded-full">
-                <img alt="Avatar" src={profileImg || "userDefault.png"} />
+                <img
+                  alt="Avatar"
+                  src={
+                    !imageError && profileImg ? profileImg : defaultImagePath
+                  }
+                  onError={handleImageError}
+                />
               </div>
             </div>
             <div className="text-sm font-bold">{user?.userNickname}</div>

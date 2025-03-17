@@ -30,18 +30,20 @@ function BookmarkClubList() {
 
   return (
     <div className="w-full mx-auto">
-      {bookmarkClubs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 p-4">
-          <div className="text-lg font-medium mb-2">
-            북마크한 클럽이 없습니다
+      <div className="grid grid-cols-2 justify-center gap-2 mt-4 px-12">
+        {bookmarkClubs.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 p-4">
+            <div className="text-lg font-medium mb-2">
+              북마크한 클럽이 없습니다
+            </div>
+            <p className="text-gray-500 text-center">
+              관심있는 클럽을 북마크해보세요!
+            </p>
           </div>
-          <p className="text-gray-500 text-center">
-            관심있는 클럽을 북마크해보세요!
-          </p>
-        </div>
-      ) : (
-        bookmarkClubs.map((club) => <ClubCard key={club.clubId} club={club} />)
-      )}
+        ) : (
+          bookmarkClubs.map((club) => <ClubCard key={club.clubId} club={club} />)
+          )}
+     </div>
     </div>
   );
 }

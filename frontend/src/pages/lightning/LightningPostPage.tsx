@@ -10,9 +10,9 @@ import lightningService, {
 
 // 옵션 상수들
 const GENDER_OPTIONS = ["자유", "남", "여"];
-const LEVEL_OPTIONS = ["초보", "중급", "고급", "자유"];
+const LEVEL_OPTIONS = ["초급", "중급", "고급", "입문"];
 const RECRUIT_TYPE_OPTIONS = ["참가형", "수락형"];
-const BIKE_TYPE_OPTIONS = ["로드", "따릉이", "하이브리드", "자유"];
+const BIKE_TYPE_OPTIONS = ["로드", "MTB", "하이브리드", "기타"];
 const REGION_OPTIONS = ["서울", "경기", "대구", "강원"];
 const TAG_OPTIONS = [
   "장거리",
@@ -770,7 +770,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, region: option });
                         setFormErrors((prev) => ({ ...prev, region: "" }));
                       }}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.region === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -819,7 +819,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, gender: option });
                         setFormErrors((prev) => ({ ...prev, gender: "" }));
                       }}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.gender === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -868,7 +868,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, level: option });
                         setFormErrors((prev) => ({ ...prev, level: "" }));
                       }}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.level === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -917,7 +917,7 @@ function LightningPostPage() {
                         setFormData({ ...formData, bikeType: option });
                         setFormErrors((prev) => ({ ...prev, bikeType: "" }));
                       }}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.bikeType === option
                           ? "btn-primary"
                           : "btn-outline"
@@ -963,7 +963,7 @@ function LightningPostPage() {
                       key={option}
                       type="button"
                       onClick={() => handleTagToggle(option)}
-                      className={`btn px-5 rounded-full flex items-center justify-center ${
+                      className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.tags.includes(option)
                           ? "btn-primary"
                           : "btn-outline "

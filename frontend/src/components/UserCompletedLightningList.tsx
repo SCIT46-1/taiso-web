@@ -46,6 +46,7 @@ function UserCompletedLightningList() {
     const checkStravaConnection = async () => {
       try {
         const data = await stravaService.getStravaActivities(1, 1);
+        console.log(data);
         setIsStravaConnected(true);
       } catch (error) {
         console.error("Strava not connected:", error);
@@ -247,7 +248,7 @@ function UserCompletedLightningList() {
           className="btn btn-outline btn-primary md:w-[150px] w-full no-animation"
           onClick={handleStravaConnect}
         >
-          스트라바 연결하기
+          스트라바 연동
         </button>
       );
     }
@@ -345,7 +346,7 @@ function UserCompletedLightningList() {
           ) : (
             groupedLightnings.map((group, groupIndex) => (
               <div key={groupIndex} className="mb-6 ">
-                <div className="text-2xl font-bold p-2 border-b-[3px] border-gray-300 w-[87%] mx-auto">
+                <div className="text-lg font-semiold p-2 border-b-[3px] border-gray-300 w-[87%] mx-auto">
                   {group.formattedDate}
                 </div>
                 <div className="flex flex-col items-center">
@@ -409,7 +410,7 @@ function UserCompletedLightningList() {
                                   {lightning.lightning.currentParticipants} /{" "}
                                   {lightning.lightning.capacity}
                                 </div>
-                                <div className="flex flex-wrap gap-1 mt-2 md:justify-start justify-center">
+                                <div className="flex flex-wrap gap-1 mt-2 md:justify-start justify-center max-w-[400px]">
                                   {lightning.tags.tags.map((tag, tagIndex) => (
                                     <div
                                       key={tagIndex}

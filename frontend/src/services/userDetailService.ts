@@ -115,6 +115,11 @@ export interface UserPageDetailResponse {
   userRegisteredRoutesCount: number;
 
   bookmarked: boolean;
+
+  userStravaDataCount: number;
+  userStravaKm: number;
+  userStravaElevation: number;
+  stravaConnected: boolean;
 }
 
 export interface UserAuthInfoResponse {

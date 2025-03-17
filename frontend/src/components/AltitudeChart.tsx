@@ -70,11 +70,12 @@ const AltitudeChart: React.FC<AltitudeChartProps> = ({
 
   return (
     <div className="my-6">
-      <h3 className="text-xl font-semibold mb-2">고도표</h3>
-      <ResponsiveContainer width="100%" height={100}>
+      <h3 className="text-xl font-semibold flex ml-4">
+        고도표</h3>
+      <ResponsiveContainer width="100%" height={200}>
         <AreaChart
           data={processedPoints}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 5, right: 5, left: 0, bottom: 12 }}
           onMouseMove={(e: any) => {
             if (e && e.activePayload && e.activePayload[0]) {
               onPointHover(e.activePayload[0].payload);
@@ -83,28 +84,46 @@ const AltitudeChart: React.FC<AltitudeChartProps> = ({
             }
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3"/>
           <XAxis
             dataKey="distance"
             label={{
-              value: "Distance (km)",
+              value: "거리(km)",
               position: "insideBottom",
-              offset: -5,
+              offset: -10,
             }}
+            tickLine={false}
+            tick={{ fontSize: 14, fill: "#666" }}
           />
           <YAxis
             label={{
-              value: "Elevation (m)",
+              value: "고도(m)",
               angle: -90,
+              offset: 20,
               position: "insideLeft",
             }}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: "#666" }}
           />
-          <Tooltip />
+          <Tooltip
+            wrapperStyle={{ fontSize: "16px", backgroundColor: "#fff" }}
+            labelStyle={{ fontWeight: "bold", color: "#333" }}
+            itemStyle={{ color: "black" }}
+            formatter={(value) => [
+              <>
+                <span style={{ fontSize: "14px"}}>
+                  고도 {value} m
+                </span>
+              </>
+            ]}
+
+          />
           <Area
             type="monotone"
             dataKey="elevation"
-            stroke="#8884d8"
-            fill="grey"
+            stroke="red"
+            strokeWidth={1}
+            fill="#D3D3D3"
             fillOpacity={0.5}
           />
         </AreaChart>

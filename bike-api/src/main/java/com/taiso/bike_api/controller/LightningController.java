@@ -85,7 +85,15 @@ public class LightningController {
     @Operation(summary = "번개 참가 확인", description = "번개 참가 확인 API")
     public ResponseEntity<LightingParticipationCheckResponseDTO> getLightningParticipationCheck(
                 @PathVariable(name = "lightningId") Long lightningId
-              , @AuthenticationPrincipal String userEmail) {
-        return ResponseEntity.status(HttpStatus.OK).body(lightningService.getParticipationCheck(lightningId, userEmail));
+            , @AuthenticationPrincipal String userEmail) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(lightningService.getParticipationCheck(lightningId, userEmail));
+    }
+    
+    @GetMapping("/main")
+    @Operation(summary = "메인 페이지 조회", description = "메인 페이지 조회 API")
+    public ResponseEntity<LightningListResponseDTO> getMainPage(
+        @AuthenticationPrincipal String userEmail) {
+        return ResponseEntity.status(HttpStatus.OK).body(lightningService.getMainPage(userEmail));
     }
 }

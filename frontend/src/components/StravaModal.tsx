@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import stravaService, {
-  StravaActivity,
-  StravaActivityPagedResponse,
-} from "../services/stravaService";
+import stravaService, { StravaActivity } from "../services/stravaService";
 
 interface StravaModalProps {
   modalId: string;

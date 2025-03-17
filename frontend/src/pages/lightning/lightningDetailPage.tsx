@@ -489,6 +489,17 @@ function LightningDetailPage() {
                   )}
                 </div>
                 <div className="collapse-content">
+                  <div className="text-lg font-semibold -mt-1 mb-2 ml-1">
+                    {lightningDetail?.eventDate
+                      ? new Date(lightningDetail.eventDate).toLocaleDateString(
+                          "ko-KR",
+                          {
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )
+                      : ""}
+                  </div>
                   <WeatherDisplay
                     weatherInfo={weatherInfo}
                     hourlyForecasts={hourlyForecasts}

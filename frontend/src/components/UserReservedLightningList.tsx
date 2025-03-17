@@ -150,7 +150,7 @@ function UserReservedLightningList({
         ) : (
           groupedLightnings.map((group, groupIndex) => (
             <div key={groupIndex} className="mb-6 ">
-              <div className="text-2xl font-bold p-2 border-b-[3px] border-gray-300 w-[87%] mx-auto">
+              <div className="text-lg font-semiold p-2 border-b-[3px] border-gray-300 w-[87%] mx-auto">
                 {group.formattedDate}
               </div>
               <div className="flex flex-col items-center">
@@ -217,7 +217,7 @@ function UserReservedLightningList({
                                 {lightning.lightning.currentParticipants} /{" "}
                                 {lightning.lightning.capacity}
                               </div>
-                              <div className="flex flex-wrap gap-1 mt-2 md:justify-start justify-center">
+                              <div className="flex flex-wrap gap-1 mt-2 md:justify-start justify-center max-w-[400px]">
                                 {lightning.tags.tags.map((tag, index) => (
                                   <div
                                     key={index}

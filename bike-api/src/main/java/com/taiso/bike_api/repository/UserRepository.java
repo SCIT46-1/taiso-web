@@ -10,4 +10,12 @@ import com.taiso.bike_api.domain.UserEntity;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
+
+
+    //유저의 스트라바 ID 존재 여부 확인
+    boolean existsByUserIdAndStravaIdIsNull(Long userId);
+
+
+    
+
 }

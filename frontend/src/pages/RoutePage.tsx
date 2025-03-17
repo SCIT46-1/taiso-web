@@ -169,10 +169,10 @@ function RoutePage() {
             </svg>
           </Link>
         </div>
-        <div className="flex flex-wrap items-center gap">
+        <div className="flex items-center gap justify-start my-4">
           {/* 선택된 필터 태그 표시 영역 */}
           {(selectedAvailableTags.length > 0) && (
-            <div className="flex flex-wrap md:gap-2 gap-1 mt-4 md:ml-14 md:justify-start justify-center">
+            <div className="flex flex-wrap md:gap-2 gap-1 md:ml-12 md:justify-start justify-center">
               {selectedAvailableTags.map((tag) => (
                 <span
                   key={tag}
@@ -185,30 +185,29 @@ function RoutePage() {
             </div>
           )}
           {/* 태그 일괄 삭제 버튼 */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center px-2">
             {(selectedAvailableTags.length > 0 ||
               selectedLocation ||
               selectedDistance ||
               selectedAltitude ||
               selectedRoadType) && (
-                <>
-                  <button
-                    className="btn btn-outline border-red-500 btn-xs btn-circle hover:bg-red-200 hover:border-red-500"
-                    onClick={() => {
-                      setSelectedAvailableTags([]);
-                      setSelectedLocation(null);
-                      setSelectedDistance(null);
-                      setSelectedAltitude(null);
-                      setSelectedRoadType(null);
-                    }}>
-                    <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="red" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="h-4 w-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </>
+                <button
+                  className="btn btn-outline border-red-500 btn-xs btn-circle hover:bg-red-200 hover:border-red-500"
+                  onClick={() => {
+                    setSelectedAvailableTags([]);
+                    setSelectedLocation(null);
+                    setSelectedDistance(null);
+                    setSelectedAltitude(null);
+                    setSelectedRoadType(null);
+                  }}>
+                  <svg data-Slot="icon" fill="none" strokeWidth={1.5} stroke="red" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="h-4 w-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                </button>
               )}
           </div>
         </div>
+
 
 
         {/* 모달 컴포넌트 */}
