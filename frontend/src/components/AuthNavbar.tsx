@@ -1,16 +1,6 @@
 import { Link } from "react-router";
 
 function AuthNavbar() {
-  const handleThemeToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      // 다크 테마 적용
-      document.documentElement.setAttribute("data-theme", "dark");
-    } else {
-      // 라이트 테마 적용
-      document.documentElement.setAttribute("data-theme", "light");
-    }
-  };
-
   return (
     <>
       <div className="navbar -mt-[0.4rem] -mb-1">

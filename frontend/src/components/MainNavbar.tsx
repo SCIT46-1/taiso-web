@@ -1,8 +1,6 @@
-import { Link, NavLink } from "react-router-dom";
-import { useAuthStore } from "../stores/useAuthStore";
+import { NavLink } from "react-router-dom";
 
 function MainNavbar() {
-  const { isAuthenticated } = useAuthStore();
   return (
     <div className="flex flex-col items-center justify-center mt-1 mb-1">
       <div className="flex no-animation gap-12">
