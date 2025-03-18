@@ -331,8 +331,8 @@ function RoutePage() {
             </div>
 
             {/* 적용된 필터 영역 - 고정 위치로 표시 */}
-            <div className="absolute bottom-0 left-0 right-0 bg-base-100 border-t border-gray-200 shadow-md">
-              <div className="p-3 mx-4 mt-3 bg-base-200 rounded-lg border border-gray-300 shadow-sm">
+            <div className="absolute bottom-0 left-0 right-0 shadow-md">
+              <div className="p-3 mx-4 mt-3 rounded-lg border shadow-sm">
                 {selectedAvailableTags.length > 0 ||
                 selectedLocation ||
                 selectedDistance ||

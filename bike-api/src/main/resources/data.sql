@@ -44,6 +44,9 @@ VALUES ('무보급', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO lightning_tag_category (name, created_at, updated_at)
 VALUES ('무정차', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+
+
+
 -- 4. user_tage 테이블에 태그 추가가
 INSERT INTO user_tag_category (category, name)
 VALUES ('활동시간', '아침');
