@@ -1,80 +1,42 @@
-name: Build Frontend
+name: Deploy Frontend
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+  release:
+    types: [published]
 
 jobs:
-  build:
-    if: github.event.pull_request.merged == true
+  deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: taiso-web/frontend
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-		
-      - name: Get latest Git tag (or use default)
-        id: get_version
-        run: |
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Download release asset
+        uses: actions/download-release-asset@v1
         with:
-          node-version: 16
+          tag: ${{ github.event.release.tag_name }}
+          asset_name: frontend-dist.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: npm install
+      - name: Unzip build artifact
+        run: unzip -o frontend-dist.zip -d frontend-dist
 
-      - name: Build the project
-        run: npm run build
-          
-      - name: Archive build output
+      - name: Create .env file in build artifact
         run: |
-          cd dist
-          zip -r ../frontend-dist.zip .
-          cd ..
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > frontend-dist/.env
+          echo "VITE_NAVER_CLIENT_ID=${{ secrets.VITE_NAVER_CLIENT_ID }}" >> frontend-dist/.env
+          echo "VITE_KAKAO_CLIENT_ID=${{ secrets.VITE_KAKAO_CLIENT_ID }}" >> frontend-dist/.env
+          echo "VITE_KAKAO_APP_KEY=${{ secrets.VITE_KAKAO_APP_KEY }}" >> frontend-dist/.env
+          echo "VITE_WEATHER_API_KEY=${{ secrets.VITE_WEATHER_API_KEY }}" >> frontend-dist/.env
 
-      - name: Check if release exists
-        id: check_release
-        continue-on-error: true
-        run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.VERSION }})
-          if [[ "$STATUS" == "404" ]]; then
-            echo "CREATE_RELEASE=true" >> $GITHUB_ENV
-          else
-            echo "CREATE_RELEASE=false" >> $GITHUB_ENV
-          fi
-          
-      - name: Create GitHub Release (if not exists)
-        if: env.CREATE_RELEASE == 'true'
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
-          draft: false
-          prerelease: false
+          role-to-assume: arn:aws:iam::767397981389:role/Github_Frontend_OIDC
+          aws-region: ap-northeast-1
 
-      - name: Upload frontend build to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: frontend-dist.zip
-          asset_name: frontend/frontend-dist.zip
-          asset_content_type: application/zip
+      - name: Delete existing files from S3
+        run: aws s3 rm s3://taiso.site --recursive
 
-      - name: Notify on failure
-        if: ${{ always() && failure() }}
-        run: echo "::warning::Build failed! Please check the logs for more details."
+      - name: Upload new files to S3
+        run: aws s3 cp frontend-dist/ s3://taiso.site --recursive
+
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id E2YPDLTI2S2HJG --paths "/"
