@@ -138,11 +138,11 @@ function RouteDetailPage() {
   }
 
   return (
-    <div className="flex flex-col mt-2 gap-2 md:w-full w-[90%]">
+    <div className="flex flex-col mt-2 gap-2 w-[90%]">
       <div className="flex justify-between">
         <div className="px-2 pt-2 mt-2">
           {/* 루트 이름 */}
-          <div className="px-1 text-3xl font-bold">
+          <div className="pb-1 text-3xl font-bold">
             {routeDetail?.routeName}
           </div>
           {/* 태그들 */}
@@ -165,11 +165,8 @@ function RouteDetailPage() {
               {routeDetail?.roadType}
             </div>
           </div>
-          {/* 루트 한줄 소개 */}
-          <div className="flex justify-between p-2 mt-1">
-            {routeDetail?.description}
-          </div>
         </div>
+
         {/* 좋아요, 북마크 아이콘 */}
         <div className="pt-3 flex items-start gap-1 mt-1 pr-3">
           {/* 북마크 아이콘 */}
@@ -182,7 +179,7 @@ function RouteDetailPage() {
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
-              className="size-10 text-gray-600 top-3 right-5 z-10 cursor-pointer"
+              className="size-7 text-gray-600 top-3 right-5 z-10 cursor-pointer"
               onClick={handleToggleBookmark}
             >
               <path
@@ -198,7 +195,7 @@ function RouteDetailPage() {
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
-              className="size-10 text-blue-500 top-3 right-5 z-10 cursor-pointer"
+              className="size-7 text-blue-500 top-3 right-5 z-10 cursor-pointer"
               onClick={handleToggleBookmark}
             >
               <path
@@ -220,7 +217,7 @@ function RouteDetailPage() {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
-                className="size-10 text-gray-600 top-3 right-5 z-10 cursor-pointer"
+                className="size-7 text-gray-600 top-3 right-5 z-10 cursor-pointer"
                 onClick={handleToggleLike}
               >
                 <path
@@ -236,7 +233,7 @@ function RouteDetailPage() {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
-                className="size-10 text-red-500 top-3 right-5 z-10 cursor-pointer"
+                className="size-7 text-red-500 top-3 right-5 z-10 cursor-pointer"
                 onClick={handleToggleLike}
               >
                 <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"></path>
@@ -249,8 +246,14 @@ function RouteDetailPage() {
         </div>
       </div>
 
+      {/* 루트 한줄 소개 */}
+      <div className="mt-1">
+        <div className="divider -mt-1 -mb-[0.5px]"></div>
+        <div className="py-4 pl-2">{routeDetail?.description}</div>
+      </div>
+
       {/* 파일 */}
-      <div className="flex justify-between p-3 mb-1 board board-1 rounded-lg border border-gray-300">
+      <div className="flex justify-between p-3 mb-1 border bg-gray-100">
         {/* 루트 파일 */}
         <div
           className="flex items-center gap-1 hover:bg-base-200 p-1 rounded-md w-fit"

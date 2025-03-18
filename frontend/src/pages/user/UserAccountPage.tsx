@@ -31,7 +31,7 @@ function UserAccountPage() {
 
   return (
     <div className="md:w-full max-w-screen-md rounded-xl w-[90%] mt-2 border-base-300 border-[1px] shadow-xl">
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 w-full">
           <div className="flex justify-between items-center p-3">
             <h1 className="text-xl font-bold">내 계정 정보</h1>
             <div className="flex gap-4">

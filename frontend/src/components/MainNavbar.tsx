@@ -5,14 +5,6 @@ function MainNavbar() {
   const { isAuthenticated } = useAuthStore();
   return (
     <div className="flex flex-col items-center justify-center mt-1 mb-1">
-      {!isAuthenticated && (
-        <div className="text-center text-sm text-gray-500 bg-base-200 p-4 px-8 rounded-xl mt-2 mb-8">
-          <Link to="/auth/landing" className=" font-bold">
-            <span className="text-primary hover:underline">로그인 하고</span>{" "}
-            번개에 참여해보세요!
-          </Link>
-        </div>
-      )}
       <div className="flex no-animation gap-12">
         <NavLink
           to="/lightning"

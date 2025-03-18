@@ -231,6 +231,7 @@ function LightningPostPage() {
       const response = await lightningService.createLightning(payload);
       console.log("Response:", response);
 
+
       // 클럽 전용 번개인 경우 해당 클럽 페이지로 리다이렉트
       if (formData.isClubOnly && formData.clubId) {
         navigate(`/club/${formData.clubId}`);

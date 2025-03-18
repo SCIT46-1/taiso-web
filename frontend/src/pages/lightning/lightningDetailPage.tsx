@@ -161,8 +161,8 @@ function LightningDetailPage() {
   const currentMemberStatus = useMemo(() => {
     return lightningDetail && user
       ? lightningDetail.member.find(
-          (member) => member.lightningUserId === user.userId
-        ) || null
+        (member) => member.lightningUserId === user.userId
+      ) || null
       : null;
   }, [lightningDetail, user]);
 
@@ -492,12 +492,12 @@ function LightningDetailPage() {
                   <div className="text-lg font-semibold -mt-1 mb-2 ml-1">
                     {lightningDetail?.eventDate
                       ? new Date(lightningDetail.eventDate).toLocaleDateString(
-                          "ko-KR",
-                          {
-                            month: "long",
-                            day: "numeric",
-                          }
-                        )
+                        "ko-KR",
+                        {
+                          month: "long",
+                          day: "numeric",
+                        }
+                      )
                       : ""}
                   </div>
                   <WeatherDisplay
@@ -592,23 +592,22 @@ function LightningDetailPage() {
             <div className="font-semibold text-lg my-1">
               {lightningDetail?.eventDate
                 ? new Date(lightningDetail.eventDate).toLocaleString("ko-KR", {
-                    month: "long",
-                    day: "numeric",
-                    weekday: "long",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
+                  month: "long",
+                  day: "numeric",
+                  weekday: "long",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
                 : ""}
             </div>
             <div className="flex gap-1 text-m text-gray-500 mb-4">
               <p className="font-semibold">
                 {lightningDetail?.duration
                   ? lightningDetail.duration >= 60
-                    ? `${Math.floor(lightningDetail.duration / 60)}시간${
-                        lightningDetail.duration % 60 > 0
-                          ? ` ${lightningDetail.duration % 60}분`
-                          : ""
-                      }`
+                    ? `${Math.floor(lightningDetail.duration / 60)}시간${lightningDetail.duration % 60 > 0
+                      ? ` ${lightningDetail.duration % 60}분`
+                      : ""
+                    }`
                     : `${lightningDetail.duration}분`
                   : ""}
               </p>
@@ -806,14 +805,14 @@ function LightningDetailPage() {
               )}
               {(lightningDetail?.status === "마감" ||
                 lightningDetail?.status === "강제마감") && (
-                <button
-                  className="btn mt-4 w-full"
-                  disabled={loadingLightningEnd}
-                  onClick={() => showModal("lightning-end-modal")}
-                >
-                  {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
-                </button>
-              )}
+                  <button
+                    className="btn mt-4 w-full"
+                    disabled={loadingLightningEnd}
+                    onClick={() => showModal("lightning-end-modal")}
+                  >
+                    {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
+                  </button>
+                )}
             </div>
           )}
           {isCreator && lightningDetail?.recruitType === "참가형" && (
@@ -829,14 +828,14 @@ function LightningDetailPage() {
               )}
               {(lightningDetail?.status === "마감" ||
                 lightningDetail?.status === "강제마감") && (
-                <button
-                  className="btn mt-4 w-full"
-                  disabled={loadingLightningEnd}
-                  onClick={() => showModal("lightning-end-modal")}
-                >
-                  {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
-                </button>
-              )}
+                  <button
+                    className="btn mt-4 w-full"
+                    disabled={loadingLightningEnd}
+                    onClick={() => showModal("lightning-end-modal")}
+                  >
+                    {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
+                  </button>
+                )}
             </div>
           )}
           {!isCreator && lightningDetail?.recruitType === "수락형" && (
@@ -865,10 +864,10 @@ function LightningDetailPage() {
               {lightningDetail?.member.filter(
                 (member) => member.participantStatus === "신청대기"
               ).length === 0 && (
-                <div className="text-center py-2 text-gray-500">
-                  신청 대기 중인 참가자가 없습니다
-                </div>
-              )}
+                  <div className="text-center py-2 text-gray-500">
+                    신청 대기 중인 참가자가 없습니다
+                  </div>
+                )}
             </div>
           )}
         </div>
@@ -938,11 +937,10 @@ function LightningDetailPage() {
               </svg>
               {lightningDetail?.duration
                 ? lightningDetail.duration >= 60
-                  ? `${Math.floor(lightningDetail.duration / 60)}시간${
-                      lightningDetail.duration % 60 > 0
-                        ? ` ${lightningDetail.duration % 60}분`
-                        : ""
-                    }`
+                  ? `${Math.floor(lightningDetail.duration / 60)}시간${lightningDetail.duration % 60 > 0
+                    ? ` ${lightningDetail.duration % 60}분`
+                    : ""
+                  }`
                   : `${lightningDetail.duration}분`
                 : ""}
             </div>
@@ -1171,11 +1169,10 @@ function LightningDetailPage() {
             </svg>
             {lightningDetail?.duration
               ? lightningDetail.duration >= 60
-                ? `${Math.floor(lightningDetail.duration / 60)}시간${
-                    lightningDetail.duration % 60 > 0
-                      ? ` ${lightningDetail.duration % 60}분`
-                      : ""
-                  }`
+                ? `${Math.floor(lightningDetail.duration / 60)}시간${lightningDetail.duration % 60 > 0
+                  ? ` ${lightningDetail.duration % 60}분`
+                  : ""
+                }`
                 : `${lightningDetail.duration}분`
               : ""}
           </div>

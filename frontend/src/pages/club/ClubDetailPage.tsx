@@ -551,7 +551,7 @@ function ClubDetailPage() {
                       }
                     }}
                   >
-                    <td className="text-center">
+                    <td className="text-center px-2">
                       {post.isNotice ? (
                         <span className="badge badge-primary">공지</span>
                       ) : (
@@ -599,19 +599,19 @@ function ClubDetailPage() {
     switch (status) {
       case "승인":
         return (
-          <span className="badge badge-success badge-sm !text-white">
-            승인됨
+          <span className="badge badge-success badge-sm py-2 !text-white">
+            승인
           </span>
         );
       case "신청대기":
         return (
-          <span className="badge badge-warning badge-sm !text-white">
-            대기중
+          <span className="badge badge-warning badge-sm py-2 !text-white">
+            대기
           </span>
         );
       case "탈퇴":
         return (
-          <span className="badge badge-error badge-sm !text-white">탈퇴</span>
+          <span className="badge badge-error badge-sm py-2 !text-white">탈퇴</span>
         );
       default:
         return null;
@@ -737,55 +737,56 @@ function ClubDetailPage() {
   const renderPostDetail = () => {
     if (!selectedPost) return null;
     return (
-      <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
-        <div className="card-body">
-          <div className="flex justify-between items-center mb-2">
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => setSelectedPost(null)}
+      <div className="">
+        <div className="flex justify-between items-center mb-2 px-3">
+          <button
+            className="btn btn-ghost btn-sm px-1"
+            onClick={() => setSelectedPost(null)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-5 h-5"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-5 h-5"
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            목록
+          </button>
+          {selectedPost.canEdit && (
+            <div className="flex gap-2">
+              <button
+                className="btn btn-gray btn-sm"
+                onClick={handleEditClick}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              목록
-            </button>
-            {selectedPost.canEdit && (
-              <div className="flex gap-2">
+                수정
+              </button>
+              {selectedPost.canDelete && (
                 <button
-                  className="btn btn-outline btn-sm"
-                  onClick={handleEditClick}
+                  className="btn btn-error btn-sm text-white"
+                  onClick={() => handleDeleteClick(selectedPost.postId)}
                 >
-                  수정
+                  삭제
                 </button>
-                {selectedPost.canDelete && (
-                  <button
-                    className="btn btn-error btn-sm"
-                    onClick={() => handleDeleteClick(selectedPost.postId)}
-                  >
-                    삭제
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-          <h2 className="text-2xl font-bold mb-2">
+              )}
+            </div>
+          )}
+        </div>
+        <div className="card-body p-6 border border-gray-300 rounded-lg shadow-md">
+          
+          <h2 className="text-xl font-semibold mb-1">
             {selectedPost.isNotice && (
               <span className="badge badge-primary mr-2">공지</span>
             )}
             {selectedPost.postTitle}
           </h2>
-          <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+          <div className="flex items-center justify-between mb-1 text-sm text-gray-600">
             <div>작성자: {selectedPost.writerNickname}</div>
             <div className="flex gap-4">
               <div>
@@ -873,7 +874,7 @@ function ClubDetailPage() {
         <div className="flex justify-end items-center">
           {canCreatePost() && (
             <button
-              className="btn btn-primary btn-sm"
+              className="btn btn-primary btn-sm mr-2"
               onClick={handleCreateLightningClick}
             >
               번개 만들기
@@ -888,8 +889,8 @@ function ClubDetailPage() {
                   to={`/lightning/${lightning.lightningId}`}
                   className="flex-1 group"
                 >
-                  <div className="bg-base-100 w-full md:flex block items-center">
-                    <figure className="size-40 flex items-center justify-center md:ml-4 mx-auto md:mx-0 relative overflow-hidden my-2 md:my-0">
+                  <div className="bg-base-100 w-full md:flex block items-center" style={{ height: '150px' }}>
+                    <figure className="size-40 flex items-center justify-center md:ml-4 mx-auto md:mx-0 relative overflow-hidden md:my-0">
                       <ImageWithSkeleton
                         src={lightning.routeImgId}
                         alt={lightning.title}
@@ -1343,7 +1344,7 @@ function ClubDetailPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-500 mt-3 mb-1">
+                  <p className="text-sm text-blue-400 mt-3 mb-1 pl-2">
                     {activeTab === "info"
                       ? "클럽의 상세 정보와 멤버 목록을 확인하세요."
                       : activeTab === "board"

@@ -58,7 +58,7 @@ function ClubCard({
       <div className="mx-auto w-full max-w-4xl rounded-lg hover:bg-base-200">
         <div className="flex mb-1">
           <Link to={`/club/${club.clubId}`} className="flex-1">
-            <div className="w-full flex items-center p-4 relative">
+            <div className="w-full flex items-center px-4 py-2 relative">
               {!isBookmarked ? (
                 <svg
                   data-slot="icon"
