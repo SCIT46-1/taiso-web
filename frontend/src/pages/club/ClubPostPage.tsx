@@ -9,18 +9,24 @@ function ClubPostPage() {
   const [clubDescription, setClubDescription] = useState("");
   const [maxUser, setMaxUser] = useState(10);
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
   const [clubProfileImage, setClubProfileImage] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
-  const handleTagAdd = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput("");
-      setFormErrors({ ...formErrors, tags: "" });
-    }
-  };
+  // Add predefined tag categories based on the SQL data
+  const predefinedTags = [
+    "장거리",
+    "친목",
+    "가볍게",
+    "따릉이",
+    "아마추어",
+    "훈련",
+    "샤방",
+    "커피 라이딩",
+    "초 장거리",
+    "무보급",
+    "무정차",
+  ];
 
   const handleTagRemove = (tagToRemove: string) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
@@ -30,6 +36,15 @@ function ClubPostPage() {
     if (e.target.files && e.target.files[0]) {
       setClubProfileImage(e.target.files[0]);
       setFormErrors({ ...formErrors, clubProfileImage: "" });
+    }
+  };
+
+  const handlePredefinedTagToggle = (tag: string) => {
+    if (tags.includes(tag)) {
+      handleTagRemove(tag);
+    } else {
+      setTags([...tags, tag]);
+      setFormErrors({ ...formErrors, tags: "" });
     }
   };
 
@@ -305,10 +320,10 @@ function ClubPostPage() {
             )}
           </div>
 
-          {/* 태그 */}
+          {/* Tag section with updated styling */}
           <div className="form-control mb-4">
             <label
-              htmlFor="tagInput"
+              htmlFor="tags"
               className="label flex items-center gap-2 justify-start"
             >
               <svg
@@ -327,47 +342,45 @@ function ClubPostPage() {
               </svg>
               <span className="label-text">태그</span>
             </label>
-            <div className="flex">
-              <input
-                id="tagInput"
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleTagAdd();
-                  }
-                }}
-                className="flex-1 input input-bordered rounded-r-none placeholder:text-sm focus:input-primary"
-                placeholder="태그 입력 후 추가"
-              />
-              <button
-                type="button"
-                onClick={handleTagAdd}
-                className="btn bg-blue-500 text-white rounded-l-none hover:bg-blue-600"
-              >
-                추가
-              </button>
+
+            <div className="mb-4">
+              <label className="label flex items-center gap-1 justify-start text-blue-500">
+                <svg
+                  data-Slot="icon"
+                  fill="none"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5"
+                  />
+                </svg>
+                <span className="label-text font-semibold text-blue-500">
+                  태그 선택
+                </span>
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {predefinedTags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => handlePredefinedTagToggle(tag)}
+                    className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
+                      tags.includes(tag) ? "btn-primary" : "btn-outline"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="flex flex-wrap mt-2 gap-2">
-              {tags.map((tag) => (
-                <div
-                  key={tag}
-                  className="badge badge-lg gap-1 px-3 py-3 bg-blue-100 text-blue-800"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => handleTagRemove(tag)}
-                    className="ml-1 text-red-500"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
             {formErrors.tags && (
               <span className="text-red-500 mt-2 block">{formErrors.tags}</span>
             )}

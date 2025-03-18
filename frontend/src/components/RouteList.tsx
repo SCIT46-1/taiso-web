@@ -253,6 +253,7 @@ function RouteList({
                 <div className="flex text-xs text-gray-500 gap-2">
                   <span>{route.distance}km</span>
                   <span>{route.altitude}m</span>
+                  <span>좋아요 {route.likeCount}</span>
                 </div>
               </div>
             </div>

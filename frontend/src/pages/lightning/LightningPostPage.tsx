@@ -12,7 +12,17 @@ import lightningService, {
 const GENDER_OPTIONS = ["자유", "남", "여"];
 const LEVEL_OPTIONS = ["초급", "중급", "고급", "입문"];
 const RECRUIT_TYPE_OPTIONS = ["참가형", "수락형"];
-const BIKE_TYPE_OPTIONS = ["로드", "MTB", "하이브리드", "기타"];
+const BIKE_TYPE_OPTIONS = [
+  "하이브리드",
+  "그래블",
+  "투어링",
+  "따릉이",
+  "픽시",
+  "로드",
+  "트라이애슬론",
+  "MTB",
+  "자유",
+];
 const REGION_OPTIONS = ["서울", "경기", "대구", "강원"];
 const TAG_OPTIONS = [
   "장거리",
@@ -217,10 +227,17 @@ function LightningPostPage() {
     console.log("Payload:", payload);
     try {
       setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       const response = await lightningService.createLightning(payload);
       console.log("Response:", response);
-      navigate("/lightning");
+
+      // 클럽 전용 번개인 경우 해당 클럽 페이지로 리다이렉트
+      if (formData.isClubOnly && formData.clubId) {
+        navigate(`/club/${formData.clubId}`);
+      } else {
+        // 일반 번개인 경우 번개 목록 페이지로 리다이렉트
+        navigate("/lightning");
+      }
     } catch (error) {
       console.error("이벤트 등록 에러:", error);
       setServerError("이벤트 등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -779,7 +796,7 @@ function LightningPostPage() {
                       className={`btn btn-sm px-4 rounded-full flex items-center justify-center ${
                         formData.region === option
                           ? "btn-primary"
-                        : "btn-outline"
+                          : "btn-outline"
                       }`}
                     >
                       {option}

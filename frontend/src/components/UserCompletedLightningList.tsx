@@ -159,6 +159,7 @@ function UserCompletedLightningList() {
     modalId: string;
   }) => {
     const stravaData = lightningStravaData[lightningId];
+    console.log(Number(stravaData?.movingTime));
 
     return (
       <dialog id={modalId} className="modal">
@@ -182,26 +183,26 @@ function UserCompletedLightningList() {
               <div className="flex justify-between">
                 <span className="font-semibold">시간:</span>
                 <span>
-                  {stravaData.moving_time
-                    ? `${Math.floor(stravaData.moving_time / 60)}분 ${
-                        stravaData.moving_time % 60
+                  {stravaData.movingTime
+                    ? `${Math.floor(Number(stravaData?.movingTime) / 60)}분 ${
+                        Number(stravaData?.movingTime) % 60
                       }초`
                     : "정보 없음"}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="font-semibold">평균 속도:</span>
+                <span className="font-semibold">칼로리 소모</span>
                 <span>
-                  {stravaData.average_speed
-                    ? `${(stravaData.average_speed * 3.6).toFixed(1)} km/h`
+                  {stravaData.calories
+                    ? `${stravaData.calories} kcal`
                     : "정보 없음"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold">고도 상승:</span>
                 <span>
-                  {stravaData.total_elevation_gain
-                    ? `${stravaData.total_elevation_gain}m`
+                  {stravaData.elevation
+                    ? `${stravaData.elevation}m`
                     : "정보 없음"}
                 </span>
               </div>
@@ -211,6 +212,31 @@ function UserCompletedLightningList() {
                   <span>
                     {new Date(stravaData.start_date).toLocaleString()}
                   </span>
+                </div>
+              )}
+
+              {stravaData.activityId && (
+                <div className="mt-4 flex justify-center">
+                  <a
+                    href={`https://www.strava.com/activities/${stravaData.activityId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn bg-[#FF4F00] text-white hover:bg-[#FF4F00]/90"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-5 h-5 mr-2"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M15.75 2.25H21a.75.75 0 0 1 .75.75v5.25a.75.75 0 0 1-1.5 0V4.81L8.03 17.03a.75.75 0 0 1-1.06-1.06L19.19 3.75h-3.44a.75.75 0 0 1 0-1.5Zm-10.5 4.5a1.5 1.5 0 0 0-1.5 1.5v10.5a1.5 1.5 0 0 0 1.5 1.5h10.5a1.5 1.5 0 0 0 1.5-1.5V10.5a.75.75 0 0 1 1.5 0v8.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V8.25a3 3 0 0 1 3-3h8.25a.75.75 0 0 1 0 1.5H5.25Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    스트라바에서 보기
+                  </a>
                 </div>
               )}
             </div>

@@ -959,6 +959,14 @@ function ClubDetailPage() {
     );
   };
 
+  // 클럽 번개 접근 권한 확인 함수 추가
+  const canAccessLightning = () => {
+    return (
+      membershipStatus === "승인" ||
+      clubDetail?.clubLeader.leaderId === user?.userId
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -1319,8 +1327,15 @@ function ClubDetailPage() {
                       activeTab === "lightning" ? "tab-active" : ""
                     }`}
                     onClick={() => {
-                      setActiveTab("lightning");
-                      if (!clubLightningList) fetchClubLightningList();
+                      if (canAccessLightning()) {
+                        setActiveTab("lightning");
+                        if (!clubLightningList) fetchClubLightningList();
+                      } else {
+                        showNotification(
+                          "승인된 클럽 멤버만 클럽 번개를 볼 수 있습니다.",
+                          "error"
+                        );
+                      }
                     }}
                   >
                     번개
@@ -1341,7 +1356,19 @@ function ClubDetailPage() {
             {activeTab === "board" ? (
               renderBoardContent()
             ) : activeTab === "lightning" ? (
-              renderClubLightningList()
+              canAccessLightning() ? (
+                renderClubLightningList()
+              ) : (
+                <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
+                  <div className="card-body">
+                    <div className="text-center py-8">
+                      <p className="text-error">
+                        승인된 클럽 멤버만 클럽 번개를 볼 수 있습니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )
             ) : (
               <>
                 <div className="bg-gray-100">
