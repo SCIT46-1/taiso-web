@@ -1,0 +1,36 @@
+name: Deploy Frontend
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release asset
+        uses: actions/download-release-asset@v1
+        with:
+          tag: ${{ github.event.release.tag_name }}
+          asset_name: frontend-dist.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Unzip build artifact
+        run: unzip -o frontend-dist.zip -d frontend-dist
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::767397981389:role/Github_Frontend_OIDC
+          aws-region: ap-northeast-1
+          # role-session-name is optional; if not provided, a default value is used.
+          # OIDC authentication will be used automatically in this configuration.
+
+      - name: Delete existing files from S3
+        run: aws s3 rm s3://taiso.site --recursive
+
+      - name: Upload new files to S3
+        run: aws s3 cp frontend-dist/ s3://taiso.site --recursive
+
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id E2YPDLTI2S2HJG --paths "/"
