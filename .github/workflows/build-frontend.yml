@@ -81,7 +81,7 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: frontend-dist.zip
           asset_name: frontend/frontend-dist.zip
-          asset_content_type: application/zip
+          asset_content_type: "application/zip"
 		  
       - name: List contents of dist folder
         run: ls -al dist
