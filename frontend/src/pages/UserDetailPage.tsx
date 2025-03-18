@@ -11,7 +11,7 @@ import bookmarkService from "../services/bookmarkService";
 // 태그 정의
 const GENDER_OPTIONS = ["남자", "여자", "그외"];
 const LEVEL_OPTIONS = ["무경력", "초보자", "입문자", "중수", "고수"];
-const ACTIVITYTIME_OPTION = ["새벽", "오전", "오후", "저녁", "밤", "종일"];
+const ACTIVITYTIME_OPTION = ["오전", "오후", "저녁", "밤", "종일"];
 const ACTIVITYDAY_OPTION = ["월", "화", "수", "목", "금", "토", "일"];
 const ACTIVITYLOCATION_OPTION = [
   "서울",
@@ -54,7 +54,7 @@ interface ModalProps {
 // 모달 구조 설정
 export function Modal({ id, title, children, actions }: ModalProps) {
   return (
-    <dialog id={id} className="modal">
+    <dialog id={id} className="modal modal-bottom sm:modal-middle">
       <div className="modal-box">
         <h3 className="font-bold text-lg">{title}</h3>
         <div className="py-4">{children}</div>
@@ -169,7 +169,6 @@ function UserDetailPage() {
     setBackgroundImgPatch(null);
     setBackgroundImgPreview(null);
   };
-
   const handleSubmit = async () => {
     const userIdNumber = Number(userId);
 
@@ -207,14 +206,19 @@ function UserDetailPage() {
       }
 
       setIsLoading(false);
-      alert("프로필이 업데이트되었습니다.");
 
-      // 모달 닫기
+      // **먼저 편집 모달 닫기**
       closeModal("profile-edit-modal");
+      // 그리고 성공 모달 보여주기
+      showModal("profile-update-success-modal");
+
+      // 모달 닫기는 성공 모달의 확인 버튼에서 처리
     } catch (error) {
       console.error("Failed to submit:", error);
       setIsLoading(false);
-      alert("프로필 업데이트에 실패했습니다. 다시 시도해 주세요.");
+
+      // 실패 시 에러 모달 보여주기
+      showModal("profile-update-error-modal");
     }
   };
 
@@ -254,13 +258,22 @@ function UserDetailPage() {
   // 모달 동작
   // 버튼에서 onClick으로 동작
   const closeModal = (id: string) => {
-    const modal = document.getElementById(id) as HTMLDialogElement;
-    modal?.close();
+    const modal = document.getElementById(id) as HTMLDialogElement | null;
+    if (modal) {
+      modal.close();
+    } else {
+      console.error(`Modal element with id ${id} not found`);
+    }
   };
 
   const showModal = (id: string) => {
-    const modal = document.getElementById(id) as HTMLDialogElement;
-    modal?.showModal();
+    console.log(`Showing modal: ${id}`); // 디버깅용 로그
+    const modal = document.getElementById(id) as HTMLDialogElement | null;
+    if (modal) {
+      modal.showModal();
+    } else {
+      console.error(`Modal element with id ${id} not found`);
+    }
   };
 
   return (
@@ -649,8 +662,7 @@ function UserDetailPage() {
                         );
                       }}
                       className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary 
-                        ${
-                          tags.includes(option) ? "btn-primary" : "btn-outline"
+                        ${tags.includes(option) ? "btn-primary" : "btn-outline"
                         }`}
                     >
                       {option}
@@ -661,6 +673,88 @@ function UserDetailPage() {
             ))}
           </div>
         </form>
+      </Modal>
+
+      {/* 성공 모달 추가 */}
+      <Modal
+        id="profile-update-success-modal"
+        title="업데이트 성공"
+        actions={
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              console.log("Closing modals"); // 디버깅용 로그
+              // HTML dialog 요소의 close 메서드를 직접 호출
+              const successModal = document.getElementById(
+                "profile-update-success-modal"
+              ) as HTMLDialogElement;
+              const editModal = document.getElementById(
+                "profile-edit-modal"
+              ) as HTMLDialogElement;
+              if (successModal) successModal.close();
+              if (editModal) editModal.close();
+            }}
+          >
+            확인
+          </button>
+        }
+      >
+        <div className="flex flex-col items-center justify-center gap-4">
+          <svg
+            className="text-success w-24 h-24"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <p className="text-lg font-medium">
+            프로필이 성공적으로 업데이트되었습니다.
+          </p>
+        </div>
+      </Modal>
+
+      {/* 에러 모달 추가 */}
+      <Modal
+        id="profile-update-error-modal"
+        title="업데이트 실패"
+        actions={
+          <button
+            className="btn btn-error"
+            onClick={() => {
+              const errorModal = document.getElementById(
+                "profile-update-error-modal"
+              ) as HTMLDialogElement;
+              if (errorModal) errorModal.close();
+            }}
+          >
+            확인
+          </button>
+        }
+      >
+        <div className="flex flex-col items-center justify-center gap-4">
+          <svg
+            className="text-error w-24 h-24"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <p className="text-lg font-medium">
+            프로필 업데이트에 실패했습니다. 다시 시도해 주세요.
+          </p>
+        </div>
       </Modal>
     </div>
   );

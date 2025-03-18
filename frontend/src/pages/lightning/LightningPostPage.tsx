@@ -220,7 +220,10 @@ function LightningPostPage() {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const response = await lightningService.createLightning(payload);
       console.log("Response:", response);
-      navigate("/lightning");
+      navigate(`/lightning/${response.lightningId}`);
+      
+
+      
     } catch (error) {
       console.error("이벤트 등록 에러:", error);
       setServerError("이벤트 등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
