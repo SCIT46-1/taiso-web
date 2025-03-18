@@ -142,7 +142,7 @@ function RoutePage() {
             </Link>
           </div>
           <div
-            className="btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary"
+            className="btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary flex items-center gap-2"
             onClick={() => {
               const modal = document.getElementById(
                 "my_modal_2"
@@ -153,6 +153,20 @@ function RoutePage() {
             }}
           >
             태그
+            {/* 선택된 태그 수 표시 */}
+            {(selectedAvailableTags.length > 0 ||
+              selectedLocation ||
+              selectedDistance ||
+              selectedAltitude ||
+              selectedRoadType) && (
+              <span className="badge badge-primary badge-sm">
+                {selectedAvailableTags.length +
+                  (selectedLocation ? 1 : 0) +
+                  (selectedDistance ? 1 : 0) +
+                  (selectedAltitude ? 1 : 0) +
+                  (selectedRoadType ? 1 : 0)}
+              </span>
+            )}
           </div>
         </div>
         <div className="fixed bottom-8 right-10 z-50">
@@ -172,36 +186,21 @@ function RoutePage() {
             </svg>
           </Link>
         </div>
-        <div className="flex items-center gap justify-start my-4">
-          {/* 선택된 필터 태그 표시 영역 */}
-          {selectedAvailableTags.length > 0 && (
-            <div className="flex flex-wrap md:gap-2 gap-1 md:ml-12 md:justify-start justify-center">
-              {selectedAvailableTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="badge badge-primary gap-1 md:text-sm text-xs h-6"
-                >
-                  {tag}
-                  <button onClick={() => toggleAvailableTag(tag)}>×</button>
-                </span>
-              ))}
-            </div>
-          )}
-          {/* 태그 일괄 삭제 버튼 */}
-          <div className="flex items-center justify-center px-2">
-            {(selectedAvailableTags.length > 0 ||
-              selectedLocation ||
-              selectedDistance ||
-              selectedAltitude ||
-              selectedRoadType) && (
+
+        {/* 모달 컴포넌트 */}
+        <dialog id="my_modal_2" className="modal modal-bottom sm:modal-middle">
+          <div className="modal-box p-4 pb-[140px] relative h-fit">
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-lg">태그 검색</h3>
+
               <button
+                type="button"
                 className="btn btn-outline border-red-500 btn-xs btn-circle hover:bg-red-200 hover:border-red-500"
                 onClick={() => {
-                  setSelectedAvailableTags([]);
-                  setSelectedLocation(null);
-                  setSelectedDistance(null);
-                  setSelectedAltitude(null);
-                  setSelectedRoadType(null);
+                  const modal = document.getElementById(
+                    "my_modal_2"
+                  ) as HTMLDialogElement | null;
+                  if (modal) modal.close();
                 }}
               >
                 <svg
@@ -221,138 +220,223 @@ function RoutePage() {
                   />
                 </svg>
               </button>
-            )}
+            </div>
+
+            <div className="overflow-y-auto max-h-[60vh] mt-4 pr-2 mb-16">
+              <p className="mb-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
+                원하는 태그를 선택하세요:
+              </p>
+              {/* 일반 태그 (다중 선택) */}
+              <div className="flex flex-wrap gap-2">
+                {availableTags.map((tag) => (
+                  <button
+                    type="button"
+                    key={tag}
+                    onClick={() => toggleAvailableTag(tag)}
+                    className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
+                      selectedAvailableTags.includes(tag)
+                        ? "bg-primary text-white border-primary"
+                        : "badge-outline"
+                    }`}
+                  >
+                    {tag}
+                    {selectedAvailableTags.includes(tag) && " ✓"}
+                  </button>
+                ))}
+              </div>
+              {/* 지역 (단일 선택) */}
+              <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
+                지역
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {locationTags.map((tag) => (
+                  <button
+                    type="button"
+                    key={tag}
+                    onClick={() => toggleLocationTag(tag)}
+                    className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
+                      selectedLocation === tag
+                        ? "bg-primary text-white border-primary"
+                        : "badge-outline"
+                    }`}
+                  >
+                    {tag}
+                    {selectedLocation === tag && " ✓"}
+                  </button>
+                ))}
+              </div>
+              {/* 거리 (단일 선택) */}
+              <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
+                거리
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {distanceTags.map((tag) => (
+                  <button
+                    type="button"
+                    key={tag}
+                    onClick={() => toggleDistanceTag(tag)}
+                    className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
+                      selectedDistance === tag
+                        ? "bg-primary text-white border-primary"
+                        : "badge-outline"
+                    }`}
+                  >
+                    {tag}
+                    {selectedDistance === tag && " ✓"}
+                  </button>
+                ))}
+              </div>
+              {/* 고도 (단일 선택) */}
+              <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
+                고도
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {altitudeTags.map((tag) => (
+                  <button
+                    type="button"
+                    key={tag}
+                    onClick={() => toggleAltitudeTag(tag)}
+                    className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
+                      selectedAltitude === tag
+                        ? "bg-primary text-white border-primary"
+                        : "badge-outline"
+                    }`}
+                  >
+                    {tag}
+                    {selectedAltitude === tag && " ✓"}
+                  </button>
+                ))}
+              </div>
+              {/* 도로 유형 (단일 선택) */}
+              <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
+                도로 유형
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {roadTypeTags.map((tag) => (
+                  <button
+                    type="button"
+                    key={tag}
+                    onClick={() => toggleRoadTypeTag(tag)}
+                    className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
+                      selectedRoadType === tag
+                        ? "bg-primary text-white border-primary"
+                        : "badge-outline"
+                    }`}
+                  >
+                    {tag}
+                    {selectedRoadType === tag && " ✓"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 적용된 필터 영역 - 고정 위치로 표시 */}
+            <div className="absolute bottom-0 left-0 right-0 bg-base-100 border-t border-gray-200 shadow-md">
+              <div className="p-3 mx-4 mt-3 bg-base-200 rounded-lg border border-gray-300 shadow-sm">
+                {selectedAvailableTags.length > 0 ||
+                selectedLocation ||
+                selectedDistance ||
+                selectedAltitude ||
+                selectedRoadType ? (
+                  <div className="flex flex-wrap gap-1 max-h-[60px] overflow-y-auto">
+                    {selectedAvailableTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="badge badge-primary gap-1 text-xs h-5"
+                      >
+                        {tag}
+                        <button onClick={() => toggleAvailableTag(tag)}>
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    {selectedLocation && (
+                      <span className="badge badge-primary gap-1 text-xs h-5">
+                        {selectedLocation}
+                        <button
+                          onClick={() => toggleLocationTag(selectedLocation)}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    )}
+                    {selectedDistance && (
+                      <span className="badge badge-primary gap-1 text-xs h-5">
+                        {selectedDistance}
+                        <button
+                          onClick={() => toggleDistanceTag(selectedDistance)}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    )}
+                    {selectedAltitude && (
+                      <span className="badge badge-primary gap-1 text-xs h-5">
+                        {selectedAltitude}
+                        <button
+                          onClick={() => toggleAltitudeTag(selectedAltitude)}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    )}
+                    {selectedRoadType && (
+                      <span className="badge badge-primary gap-1 text-xs h-5">
+                        {selectedRoadType}
+                        <button
+                          onClick={() => toggleRoadTypeTag(selectedRoadType)}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-500 py-2 text-center">
+                    선택된 필터가 없습니다
+                  </div>
+                )}
+              </div>
+
+              {/* 검색 버튼과 초기화 버튼을 나란히 배치 (비율 1:4) */}
+              <div className="mx-4 my-3 flex gap-2">
+                <button
+                  type="button"
+                  className="btn w-1/5 text-xs"
+                  onClick={() => {
+                    setSelectedAvailableTags([]);
+                    setSelectedLocation(null);
+                    setSelectedDistance(null);
+                    setSelectedAltitude(null);
+                    setSelectedRoadType(null);
+                  }}
+                  disabled={
+                    !(
+                      selectedAvailableTags.length > 0 ||
+                      selectedLocation ||
+                      selectedDistance ||
+                      selectedAltitude ||
+                      selectedRoadType
+                    )
+                  }
+                >
+                  태그 초기화
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary w-4/5"
+                  onClick={handleSearch}
+                >
+                  검색
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* 모달 컴포넌트 */}
-        <dialog id="my_modal_2" className="modal">
-          <form method="dialog" className="modal-box">
-            <div className="flex justify-between items-center">
-              <h3 className="font-bold text-lg">태그 검색</h3>
-
-              <button
-                type="button"
-                className="btnbtn btn-outline border-red-500 btn-xs btn-circle hover:bg-red-200 hover:border-red-500"
-                onClick={() => {
-                  const modal = document.getElementById(
-                    "my_modal_2"
-                  ) as HTMLDialogElement | null;
-                  if (modal) modal.close();
-                }}
-              >
-                닫기
-              </button>
-            </div>
-
-            <p className="mt-4 mb-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-              원하는 태그를 선택하세요:
-            </p>
-            {/* 일반 태그 (다중 선택) */}
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => (
-                <button
-                  type="button"
-                  key={tag}
-                  onClick={() => toggleAvailableTag(tag)}
-                  className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
-                    selectedAvailableTags.includes(tag)
-                      ? "badge-primary"
-                      : "badge-outline"
-                  }`}
-                >
-                  {tag}
-                  {selectedAvailableTags.includes(tag) && " ✓"}
-                </button>
-              ))}
-            </div>
-            {/* 지역 (단일 선택) */}
-            <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-              지역
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {locationTags.map((tag) => (
-                <button
-                  type="button"
-                  key={tag}
-                  onClick={() => toggleLocationTag(tag)}
-                  className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
-                    selectedLocation === tag ? "badge-primary" : "badge-outline"
-                  }`}
-                >
-                  {tag}
-                  {selectedLocation === tag && " ✓"}
-                </button>
-              ))}
-            </div>
-            {/* 거리 (단일 선택) */}
-            <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-              거리
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {distanceTags.map((tag) => (
-                <button
-                  type="button"
-                  key={tag}
-                  onClick={() => toggleDistanceTag(tag)}
-                  className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
-                    selectedDistance === tag ? "badge-primary" : "badge-outline"
-                  }`}
-                >
-                  {tag}
-                  {selectedAltitude === tag && " ✓"}
-                </button>
-              ))}
-            </div>
-            {/* 고도 (단일 선택) */}
-            <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-              고도
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {altitudeTags.map((tag) => (
-                <button
-                  type="button"
-                  key={tag}
-                  onClick={() => toggleAltitudeTag(tag)}
-                  className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
-                    selectedAltitude === tag ? "badge-primary" : "badge-outline"
-                  }`}
-                >
-                  {tag}
-                  {selectedAltitude === tag && " ✓"}
-                </button>
-              ))}
-            </div>
-            {/* 도로 유형 (단일 선택) */}
-            <div className="my-1 text-sm text-gray-500 flex items-center gap-1 md:justify-start justify-center">
-              도로 유형
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {roadTypeTags.map((tag) => (
-                <button
-                  type="button"
-                  key={tag}
-                  onClick={() => toggleRoadTypeTag(tag)}
-                  className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary ${
-                    selectedRoadType === tag ? "badge-primary" : "badge-outline"
-                  }`}
-                >
-                  {tag}
-                  {selectedRoadType === tag && " ✓"}
-                </button>
-              ))}
-            </div>
-            <div className="modal-action mt-4">
-              <button
-                type="button"
-                className="btn btn-primary w-full"
-                onClick={handleSearch}
-              >
-                검색
-              </button>
-            </div>
+          <form method="dialog" className="modal-backdrop">
+            <button>close</button>
           </form>
         </dialog>
+
         {/* 선택된 태그는 URL 쿼리로 전달되어 RouteList에서 활용 */}
         <RouteList
           sort={sort}
