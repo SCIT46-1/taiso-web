@@ -1,11 +1,27 @@
 import { Link, useNavigate } from "react-router";
 import { IClubList } from "../services/clubService";
 import bookmarkService from "../services/bookmarkService";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function ClubCard({ club }: { club: IClubList }) {
-  const [isBookmarked, setIsBookmarked] = useState(club.bookmarked || false);
+function ClubCard({
+  club,
+  isBookmarkPage,
+  onBookmarkRemove,
+}: {
+  club: IClubList;
+  isBookmarkPage?: boolean;
+  onBookmarkRemove?: (clubId: number) => void;
+}) {
+  const [isBookmarked, setIsBookmarked] = useState(
+    isBookmarkPage ? true : club.bookmarked || false
+  );
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isBookmarkPage) {
+      setIsBookmarked(true);
+    }
+  }, [isBookmarkPage]);
 
   const handleBookmarkToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -16,6 +32,11 @@ function ClubCard({ club }: { club: IClubList }) {
         await bookmarkService.bookmarkClub(club.clubId);
       } else {
         await bookmarkService.deleteBookmarkClub(club.clubId);
+
+        if (isBookmarkPage && onBookmarkRemove) {
+          onBookmarkRemove(club.clubId);
+          return;
+        }
       }
 
       setIsBookmarked(!isBookmarked);
@@ -104,7 +125,10 @@ function ClubCard({ club }: { club: IClubList }) {
                   </div>
                   <div className="flex flex-wrap gap-1 max-w-[400px] mt-2">
                     {club.tags.map((tag, index) => (
-                      <div key={index} className="badge badge-primary badge-outline">
+                      <div
+                        key={index}
+                        className="badge badge-primary badge-outline"
+                      >
                         {tag}
                       </div>
                     ))}
@@ -116,7 +140,6 @@ function ClubCard({ club }: { club: IClubList }) {
         </div>
         <div className="divider w-full -my-2 -mb-1"></div>
       </div>
-
     </>
   );
 }

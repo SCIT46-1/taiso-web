@@ -79,7 +79,6 @@ function StravaModal({ modalId, lightningId, onSuccess }: StravaModalProps) {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-
     return `${hours > 0 ? hours + "시간 " : ""}${minutes}분 ${secs}초`;
   };
 
@@ -125,15 +124,16 @@ function StravaModal({ modalId, lightningId, onSuccess }: StravaModalProps) {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="table table-zebra w-full">
+                <table className="table w-full">
+                  {/* 테이블 헤더 */}
                   <thead>
                     <tr>
-                      <th>선택</th>
+                      <th></th>
                       <th>활동명</th>
-                      <th>날짜</th>
+                      <th className="min-w-[110px]">날짜</th>
                       <th>타입</th>
                       <th>거리</th>
-                      <th>시간</th>
+                      <th className="min-w-[100px]">시간</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -146,23 +146,38 @@ function StravaModal({ modalId, lightningId, onSuccess }: StravaModalProps) {
                             : ""
                         }
                       >
-                        <td>
-                          <input
-                            type="radio"
-                            name="activity-select"
-                            className="radio radio-primary"
-                            checked={selectedActivity === activity.id}
-                            onChange={() => setSelectedActivity(activity.id)}
-                          />
-                        </td>
+                        <th>
+                          <label>
+                            <input
+                              type="radio"
+                              name="activity-select"
+                              className="radio"
+                              checked={selectedActivity === activity.id}
+                              onChange={() => setSelectedActivity(activity.id)}
+                            />
+                          </label>
+                        </th>
                         <td>{activity.name}</td>
-                        <td>{formatDate(activity.start_date)}</td>
+                        <td className="min-w-[100px]">
+                          {formatDate(activity.start_date)}
+                        </td>
                         <td>{activity.type}</td>
                         <td>{formatDistance(Number(activity.distance))}</td>
                         <td>{formatDuration(activity.moving_time)}</td>
                       </tr>
                     ))}
                   </tbody>
+                  {/* 필요에 따라 footer 추가 가능 */}
+                  {/* <tfoot>
+                    <tr>
+                      <th></th>
+                      <th>활동명</th>
+                      <th>날짜</th>
+                      <th>타입</th>
+                      <th>거리</th>
+                      <th>시간</th>
+                    </tr>
+                  </tfoot> */}
                 </table>
               </div>
             )}

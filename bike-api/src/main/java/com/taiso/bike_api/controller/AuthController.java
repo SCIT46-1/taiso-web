@@ -76,7 +76,7 @@ public class AuthController {
         jwtCookie.setHttpOnly(true);      // 자바스크립트에서 접근 불가능
         jwtCookie.setSecure(true);        // HTTPS 환경에서만 전송 (개발 환경이라면 false)
         jwtCookie.setPath("/");           // 모든 경로에서 쿠키 접근 허용
-        jwtCookie.setMaxAge(60 * 10);       // 쿠키 유효기간 설정 (예: 1시간)
+        jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 예: 30일 유효
     
         // 응답 헤더에 쿠키 추가
         response.addCookie(jwtCookie);
@@ -107,7 +107,7 @@ public class AuthController {
         jwtCookie.setHttpOnly(true);      // 자바스크립트에서 접근 불가
         jwtCookie.setSecure(true);        // HTTPS 환경에서만 전송 (개발 환경에서는 옵션 변경 가능)
         jwtCookie.setPath("/");           // 모든 경로에서 쿠키 접근 허용
-        jwtCookie.setMaxAge(60 * 60);      // 쿠키 유효기간 (예: 1시간)
+        jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 예: 30일 유효
 
         httpServletResponse.addCookie(jwtCookie);
 
@@ -151,7 +151,7 @@ public class AuthController {
         jwtCookie.setHttpOnly(true);
         jwtCookie.setSecure(true);
         jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(60 * 10); // 예: 10분 유효
+        jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 예: 30일 유효
         response.addCookie(jwtCookie);
 
         // LoginResponseDTO를 채워 응답으로 전달
@@ -198,7 +198,7 @@ public class AuthController {
         jwtCookie.setHttpOnly(true);      // 자바스크립트에서 접근 불가능
         jwtCookie.setSecure(true);        // HTTPS 환경에서만 전송 (개발 환경이라면 false)
         jwtCookie.setPath("/");           // 모든 경로에서 쿠키 접근 허용
-        jwtCookie.setMaxAge(60 * 10);       // 쿠키 유효기간 설정 (예: 1시간)
+        jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 예: 30일 유효
     
         // 응답 헤더에 쿠키 추가
         response.addCookie(jwtCookie);

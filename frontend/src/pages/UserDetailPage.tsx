@@ -41,6 +41,8 @@ const categories = [
     options: ACTIVITYLOCATION_OPTION,
     key: "activityLocation",
   },
+  { title: "성별", options: GENDER_OPTIONS, key: "gender" },
+  { title: "레벨", options: LEVEL_OPTIONS, key: "level" },
 ];
 
 // 모달
@@ -169,6 +171,30 @@ function UserDetailPage() {
     setBackgroundImgPatch(null);
     setBackgroundImgPreview(null);
   };
+
+
+  // 태그 선택 처리 함수 추가
+  const handleTagSelection = (key: string, option: string) => {
+    switch (key) {
+      case "gender":
+        // 성별은 하나만 선택 가능 (선택한 것과 같다면 선택 해제)
+        setGender(gender === option ? "" : option);
+        break;
+      case "level":
+        // 레벨도 하나만 선택 가능 (선택한 것과 같다면 선택 해제)
+        setLevel(level === option ? "" : option);
+        break;
+      default:
+        // 기존 태그 선택 로직
+        setTags((prevTags) =>
+          prevTags.includes(option)
+            ? prevTags.filter((tag) => tag !== option)
+            : [...prevTags, option]
+        );
+        break;
+    }
+  };
+
   const handleSubmit = async () => {
     const userIdNumber = Number(userId);
 
@@ -177,8 +203,8 @@ function UserDetailPage() {
       userId: userIdNumber,
       userNickname: nickName,
       bio: bio,
-      gender: gender,
-      level: level,
+      gender: gender, // 선택하지 않았을로 전송
+      level: level, // 선택하 경우 null로 전송
       tags: tags,
     };
 
@@ -207,10 +233,12 @@ function UserDetailPage() {
 
       setIsLoading(false);
 
-      // **먼저 편집 모달 닫기**
+
+      // 편집 모달 닫은 후 약간의 지연을 준 다음 성공 모달을 표시
       closeModal("profile-edit-modal");
-      // 그리고 성공 모달 보여주기
-      showModal("profile-update-success-modal");
+      setTimeout(() => {
+        showModal("profile-update-success-modal");
+      }, 100);
 
       // 모달 닫기는 성공 모달의 확인 버튼에서 처리
     } catch (error) {
@@ -452,29 +480,123 @@ function UserDetailPage() {
         </div>
       </div>
       {/* 스트라바 통계 */}
-      <div className="border bg-blue-300 flex flex-col items-center justify-center mt-8 mb-8 pt-2 pb-4">
-        <div className="text-2xl font-bold mb-3 mt-2 text-white">STRAVA</div>
-        {!userDetail?.stravaConnected && (
-          <div className="text-white">
-            <div>아직 스트라바를 연동하지 않았습니다.</div>
+      <div className="mt-8 mb-8 overflow-hidden shadow-lg">
+        {/* 스트라바 헤더 */}
+        <div className="bg-gradient-to-r from-[#fc4d02dc] to-[#ff8250a6] p-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-8 w-8 mr-2 text-white"
+              fill="currentColor"
+            >
+              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+            </svg>
+            <h2 className="text-2xl font-bold text-white tracking-wide">
+              STRAVA
+            </h2>
           </div>
-        )}
-        {userDetail?.stravaConnected && (
-          <div className="flex justify-center first:before:w-fit mx-auto gap-2 ">
-            <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
-              <div>횟수</div>
-              <div>{userDetail?.userStravaDataCount}</div>
+          {userDetail?.stravaConnected && (
+            <div className="bg-white text-[#FC4C02] text-xs font-semibold px-2 py-1 rounded-full">
+              연결됨
             </div>
-            <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
-              <div>주행거리</div>
-              <div>{userDetail?.userStravaKm}</div>
+          )}
+        </div>
+
+        {/* 스트라바 컨텐츠 */}
+        <div className="bg-white p-4">
+          {!userDetail?.stravaConnected ? (
+            <div className="flex flex-col items-center py-6 text-center">
+              <p className="text-gray-600 mb-4">
+                아직 스트라바를 연동하지 않았습니다.
+              </p>
+              {user?.userId == userDetail?.userId && (
+                <button className="btn btn-sm bg-[#FC4C02] hover:bg-[#E34402] text-white border-none">
+                  스트라바 연결하기
+                </button>
+              )}
             </div>
-            <div className="flex flex-col justify-center items-center border-2 border-base-300 p-2 rounded-xl">
-              <div>획득고도</div>
-              <div>{userDetail?.userStravaElevation} M</div>
+          ) : (
+            <div className="grid grid-cols-3 gap-3">
+              {/* 주행 횟수 */}
+              <div className="flex flex-col items-center justify-center bg-gray-50 p-4 rounded-xl transition-shadow">
+                <div className="bg-[#FFEEE8] p-2 rounded-full mb-2">
+                  <svg
+                    className="h-5 w-5 text-[#FC4C02]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                </div>
+                <div className="text-sm text-gray-500 font-medium">
+                  주행 횟수
+                </div>
+                <div className="text-xl font-bold text-gray-800">
+                  {userDetail?.userStravaDataCount || 0}
+                  <span className="text-xs text-gray-500 ml-1">회</span>
+                </div>
+              </div>
+
+              {/* 주행 거리 */}
+              <div className="flex flex-col items-center justify-center bg-gray-50 p-4 rounded-xl transition-shadow">
+                <div className="bg-[#FFEEE8] p-2 rounded-full mb-2">
+                  <svg
+                    className="h-5 w-5 text-[#FC4C02]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    />
+                  </svg>
+                </div>
+                <div className="text-sm text-gray-500 font-medium">
+                  주행 거리
+                </div>
+                <div className="text-xl font-bold text-gray-800">
+                  {userDetail?.userStravaKm || 0}
+                  <span className="text-xs text-gray-500 ml-1">km</span>
+                </div>
+              </div>
+
+              {/* 획득 고도 */}
+              <div className="flex flex-col items-center justify-center bg-gray-50 p-4 rounded-xl transition-shadow">
+                <div className="bg-[#FFEEE8] p-2 rounded-full mb-2">
+                  <svg
+                    className="h-5 w-5 text-[#FC4C02]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"
+                    />
+                  </svg>
+                </div>
+                <div className="text-sm text-gray-500 font-medium">
+                  획득 고도
+                </div>
+                <div className="text-xl font-bold text-gray-800">
+                  {userDetail?.userStravaElevation || 0}
+                  <span className="text-xs text-gray-500 ml-1">m</span>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       {/* 리뷰 */}
       <div className="mb-4 justify-center flex">
@@ -604,70 +726,36 @@ function UserDetailPage() {
             </div>
           </div>
 
-          {/* 성별 선택 */}
-          <label
-            className="label text-sm text-gray-500 mt-4 mr-auto"
-            htmlFor="gender"
-          >
-            성별
-          </label>
-          <select
-            id="gender"
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            className="select select-bordered w-full"
-          >
-            {GENDER_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-
-          {/* 레벨 선택 */}
-          <label
-            className="label text-sm text-gray-500 mt-4 mr-auto"
-            htmlFor="level"
-          >
-            레벨
-          </label>
-          <select
-            id="level"
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            className="select select-bordered w-full"
-          >
-            {LEVEL_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-
           {/* 태그 선택 */}
-          <div>
+          <div className="mt-4">
             {categories.map(({ title, options, key }) => (
               <div key={key} className="mb-4">
                 <p className="text-sm font-semibold text-gray-600">{title}</p>
                 <div className="flex gap-2 flex-wrap">
-                  {options.map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => {
-                        setTags((prevTags) =>
-                          prevTags.includes(option)
-                            ? prevTags.filter((tag) => tag !== option)
-                            : [...prevTags, option]
-                        );
-                      }}
-                      className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary 
-                        ${tags.includes(option) ? "btn-primary" : "btn-outline"
-                        }`}
-                    >
-                      {option}
-                    </button>
-                  ))}
+
+                  {options.map((option) => {
+                    // 선택 상태 확인
+                    let isSelected = false;
+                    if (key === "gender") {
+                      isSelected = gender === option;
+                    } else if (key === "level") {
+                      isSelected = level === option;
+                    } else {
+                      isSelected = tags.includes(option);
+                    }
+
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => handleTagSelection(key, option)}
+                        className={`btn md:btn-sm btn-xs my-1 btn-outline text-gray-400 rounded-full border-1 hover:bg-primary hover:border-primary 
+                          ${isSelected ? "btn-primary" : "btn-outline"}`}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -701,7 +789,9 @@ function UserDetailPage() {
       >
         <div className="flex flex-col items-center justify-center gap-4">
           <svg
-            className="text-success w-24 h-24"
+
+            className="text-success w-12 h-12"
+
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
