@@ -114,13 +114,13 @@ function UserReservedLightningList({
   // };
 
   // 완료 처리 핸들러 추가
-  const handleJoinLightningComplete = () => {
-    const modal = document.getElementById(
-      "join-complete-modal"
-    ) as HTMLDialogElement;
-    modal?.close();
-    // 필요시 데이터 리프레시 로직 추가
-  };
+  // const handleJoinLightningComplete = () => {
+  //   const modal = document.getElementById(
+  //     "join-complete-modal"
+  //   ) as HTMLDialogElement;
+  //   modal?.close();
+  //   // 필요시 데이터 리프레시 로직 추가
+  // };
 
   // 번개 상세 정보 가져오기
   const fetchLightningDetail = async (lightningId: number) => {
@@ -238,7 +238,9 @@ function UserReservedLightningList({
                         <button
                           className="btn btn-outline btn-primary md:w-[150px] w-full no-animation"
                           onClick={() => {
-                            fetchLightningDetail(lightning.lightning.lightningId);
+                            fetchLightningDetail(
+                              lightning.lightning.lightningId
+                            );
                             setModalOpen(true); // 모달을 열도록 상태 변경
                           }}
                         >
@@ -274,7 +276,9 @@ function UserReservedLightningList({
             height="300px"
           />
           <div className="flex flex-col gap-2 px-10 py-3 bg-primary bg-opacity-80 text-white">
-            <div className="text-xl font-semibold">{completedLightning?.routeTitle}</div>
+            <div className="text-xl font-semibold">
+              {completedLightning?.routeTitle}
+            </div>
           </div>
           <div className="gap-4 p-12">
             <div className="grid grid-cols-2 gap-4 mb-8">
@@ -297,15 +301,14 @@ function UserReservedLightningList({
                   </svg>
                   <span className="label-text text-lg">시작시간</span>
                 </label>
-                
+
                 <div className="px-3">
                   {completedLightning?.eventDate
-                  ? DateFormat(completedLightning?.eventDate)
+                    ? DateFormat(completedLightning?.eventDate)
                     : completedLightning?.eventDate}
                 </div>
               </div>
               <div className="flex flex-col text-lg">
-
                 <label className="label flex justify-start font-bold">
                   <svg
                     data-slot="icon"
@@ -323,7 +326,7 @@ function UserReservedLightningList({
                   </svg>
                   <span className="label-text text-lg">소요시간</span>
                 </label>
-                
+
                 <div className="px-3">{completedLightning?.duration}</div>
               </div>
               <div className="flex flex-col text-lg">
@@ -356,26 +359,29 @@ function UserReservedLightningList({
                   </svg>
                   <span className="label-text text-lg">참여자</span>
                 </label>
-                <div className="px-3">{completedLightning?.currentParticipants}</div>
+                <div className="px-3">
+                  {completedLightning?.currentParticipants}
+                </div>
               </div>
             </div>
             <div className="flex flex-row">
-              <span className="font-semibold text-primary"> {completedLightning?.joinDate
-                ? DateFormat(completedLightning?.joinDate)
-                : completedLightning?.joinDate} </span> <span>에 번개에 참여하셨습니다!</span>
+              <span className="font-semibold text-primary">
+                {" "}
+                {completedLightning?.joinDate
+                  ? DateFormat(completedLightning?.joinDate)
+                  : completedLightning?.joinDate}{" "}
+              </span>{" "}
+              <span>에 번개에 참여하셨습니다!</span>
             </div>
 
-                <div className="modal-action mt-5">
-                  <label htmlFor="modal" className="btn">
-                    닫기
-                  </label>
-              </div>
-            
+            <div className="modal-action mt-5">
+              <label htmlFor="modal" className="btn">
+                닫기
+              </label>
+            </div>
           </div>
         </div>
       </div>
-
-
     </div>
   );
 }

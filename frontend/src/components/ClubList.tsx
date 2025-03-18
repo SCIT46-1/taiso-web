@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import clubService, {
-  ClubListResponse,
-  IClubList,
-} from "../services/clubService";
+import clubService, { IClubList } from "../services/clubService";
 import ClubCard from "./ClubCard";
 
 function ClubList() {
