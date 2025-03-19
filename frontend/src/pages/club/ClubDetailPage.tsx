@@ -848,10 +848,8 @@ function ClubDetailPage() {
       clubLightningList.content.length === 0
     ) {
       return (
-        <div className="card bg-base-100 shadow-md rounded-lg border border-base-300">
-          <div className="card-body">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="card-title">클럽 전용 번개</h2>
+          <div className="px-3">
+            <div className="flex justify-end items-center">
               {canCreatePost() && (
                 <button
                   className="btn btn-primary btn-sm mr-2"
@@ -865,7 +863,6 @@ function ClubDetailPage() {
               <p>등록된 클럽 전용 번개가 없습니다.</p>
             </div>
           </div>
-        </div>
       );
     }
 
