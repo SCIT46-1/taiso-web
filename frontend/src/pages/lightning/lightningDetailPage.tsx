@@ -48,7 +48,7 @@ function WeatherDisplay({
   }
 
   return (
-    <div className="rounded-lg p-2">
+    <div className="rounded-lg">
       {/* Hourly Forecast */}
       {hourlyForecasts.length > 0 && (
         <div>
@@ -116,6 +116,7 @@ function LightningDetailPage() {
   const [bookmarkLoading, setBookmarkLoading] = useState<boolean>(false);
   const [completedLightning, setCompletedLightning] =
     useState<CompletedLightningResponse | null>(null);
+  const [isModalOpen, setModalOpen] = useState(false);
 
   // 날씨 데이터 캐시
   const weatherCache = useRef<{
@@ -180,12 +181,12 @@ function LightningDetailPage() {
     setLoadingJoin(true);
     try {
       await lightningService.joinLightning(Number(lightningId));
-      const completedData = await lightningService.getCompletedLightnings(
-        Number(lightningId)
-      );
+      const completedData = await lightningService.getCompletedLightnings(Number(lightningId));
       setCompletedLightning(completedData);
+
+      // 성공적으로 참여했을 때 처음 모달을 다시 띄우기
       closeModal("join-modal");
-      showModal("join-complete-modal");
+      setModalOpen(true);
     } catch (error) {
       console.error("참여 실패:", error);
       closeModal("join-modal");
@@ -453,22 +454,14 @@ function LightningDetailPage() {
 
       {/* 하단 좌측 영역 */}
       <div className="flex flex-col gap-4">
-        <div className="rounded-lg shadow-md border border-base-300">
-          <div className="collapse collapse-arrow">
-            <input type="checkbox" defaultChecked />
-            <div className="collapse-title text-xl font-medium flex items-center">
-              <span className="ml-1 text-lg font-semibold">간략 번개</span>
-            </div>
-            <div className="collapse-content">
-              <div className="flex flex-col p-2">
-                <LightningSummaryInfo
-                  gender={lightningDetail?.gender || ""}
-                  level={lightningDetail?.level || ""}
-                  recruitType={lightningDetail?.recruitType || ""}
-                  bikeType={lightningDetail?.bikeType || ""}
-                />
-              </div>
-            </div>
+        <div className="rounded-lg shadow-md border border-base-300 px-4 py-2">
+          <div className="flex flex-col mt-2 flex gap-4 mb-2">
+            <LightningSummaryInfo
+              gender={lightningDetail?.gender || ""}
+              level={lightningDetail?.level || ""}
+              recruitType={lightningDetail?.recruitType || ""}
+              bikeType={lightningDetail?.bikeType || ""}
+            />
           </div>
         </div>
 
@@ -479,7 +472,7 @@ function LightningDetailPage() {
               <div className="collapse collapse-arrow">
                 <input type="checkbox" />
                 <div className="collapse-title text-xl font-medium flex items-center">
-                  <span className="ml-1 text-lg font-semibold">날씨 정보</span>
+                  <span className="ml-1 text-lg font-semibold">당일 시간대별 날씨</span>
                   {weatherLoading ? (
                     <span className="loading loading-dots loading-sm ml-2"></span>
                   ) : (
@@ -489,7 +482,7 @@ function LightningDetailPage() {
                   )}
                 </div>
                 <div className="collapse-content">
-                  <div className="text-lg font-semibold -mt-1 mb-2 ml-1">
+                  {/* <div className="text-lg font-semibold -mt-1 mb-2 ml-1">
                     {lightningDetail?.eventDate
                       ? new Date(lightningDetail.eventDate).toLocaleDateString(
                         "ko-KR",
@@ -499,7 +492,7 @@ function LightningDetailPage() {
                         }
                       )
                       : ""}
-                  </div>
+                  </div> */}
                   <WeatherDisplay
                     weatherInfo={weatherInfo}
                     hourlyForecasts={hourlyForecasts}
@@ -517,7 +510,7 @@ function LightningDetailPage() {
             <h2 className="text-2xl font-bold mb-2">
               {lightningDetail?.title}
             </h2>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-col gap-1 mb-2">
               {lightningDetail?.lightningTag &&
                 lightningDetail.lightningTag.map((tag, index) => (
                   <span
@@ -527,17 +520,56 @@ function LightningDetailPage() {
                     {tag}
                   </span>
                 ))}
-            </div>
-            <div className="divider -mt-1 -mb-[0.5px]"></div>
+          </div>
+          <div className="divider -mt-1 -mb-[0.5px]"></div>
             <UserProfileCard
               userProfileId={lightningDetail?.creator.userId}
               userProfileImg={lightningDetail?.creator.creatorProfileImg || ""}
               userProfileName={lightningDetail?.creator.creatorNickname || ""}
               userRole="creator"
             />
-            <p className="mt-2">{lightningDetail?.description}</p>
-            <div className="mt-2 font-bold">주의사항</div>
-            <p>주의사항 내용을 여기에 작성합니다.</p>
+            <p className="mt-2 mb-10">{lightningDetail?.description}</p>
+            <div className="divider -mt-1 -mb-[0.5px]"></div>
+            <div className="text-xl my-2 font-bold p-1">주의사항</div>
+            <div className="space-y-4">
+              <p>
+                🚴‍♂️함께하는 라이딩에서는 서로를 배려하는 마음이 가장 중요합니다. <br />
+                안전수칙을 지키고, 초보자도 즐겁게 참여할 수 있도록 배려해주세요!😊
+              </p>
+              <div>
+                <h3 className="font-bold">1. 라이딩 전 체크사항</h3>
+                <ul className="list-none pl-0">
+                  <li className="before:content-['✔'] before:mr-2"><strong>안전 장비 착용</strong> | 헬멧, 장갑, 야간시는 전조등/후미등 필수!</li>
+                  <li className="before:content-['✔'] before:mr-2"><strong>자전거 점검</strong> | 타이어 공기압, 브레이크, 체인 상태 체크.</li>
+                  <li className="before:content-['✔'] before:mr-2"><strong>경로 & 일정 확인</strong> | 출발 전 라이딩 코스와 예상 도착 시간 숙지.</li>
+                  <li className="before:content-['✔'] before:mr-2"><strong>비상 연락망 공유</strong> | 사고나 낙오 시 연락할 수 있도록 연락처 공유.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-bold">2. 라이딩 중 주의사항</h3>
+                <ul className="list-none pl-0">
+                  <li className="before:content-['✔'] before:mr-2"><strong>한 줄 주행 유지</strong> | 좁은 도로에서 가로로 나란히 타지 않기.</li>
+                  <li className="before:content-['✔'] before:mr-2"><strong>급정거 & 급출발 금지</strong> | 갑작스러운 속도 변화는 사고 위험 증가.</li>
+                  <li className="before:content-['✔'] before:mr-2"><strong>수신호 사용</strong> | 방향 변경, 정지 시 미리 손으로 신호 보내기.</li>
+                  <li className="before:content-['✔'] before:mr-2"><strong>도로 교통법 준수</strong> | 신호등, 일방통행, 횡단보도 규칙 준수.</li>
+                  <li className="before:content-['✔'] before:mr-2"><strong>소통하며 라이딩</strong> | 앞사람과 적당한 거리 유지 & 필요 시 구두로 신호 전달.</li>
+                  <li className="before:content-['✔'] before:mr-2"><strong>뒤처지는 멤버 배려</strong> | 속도가 느린 사람도 함께할 수 있도록 조절.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-bold">3. 그룹 라이딩 주의사항</h3>
+                <ul className="list-none pl-0">
+                  <li className="before:content-['✔'] before:mr-2"><strong>리더 또는 가이드 지정</strong> | 경로 안내 및 속도 조절할 사람 정하기.</li>
+                  <li>✔ <strong>초보자 배려</strong> | 첫 라이딩이거나 경험이 적은 멤버가 있으면 속도를 조절하자.</li>
+                  <li>✔ <strong>함께 출발 & 함께 도착</strong> | 중간에 낙오자가 생기지 않도록 확인.</li>
+                  <li>✔ <strong>휴식 & 수분 보충 고려</strong> | 정해진 구간에서 쉬면서 체력 관리.</li>
+                  <li>✔ <strong>비상 상황 대비</strong> | 펑크, 부상 발생 시 대응할 방법 공유하기.</li>
+                </ul>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
@@ -673,7 +705,7 @@ function LightningDetailPage() {
             !currentMemberStatus &&
             lightningDetail?.status === "모집" && (
               <button
-                className="btn w-full"
+                className="btn btn-primary w-full"
                 onClick={() => showModal("accept-modal")}
               >
                 신청하기
@@ -753,16 +785,16 @@ function LightningDetailPage() {
               {lightningDetail?.member
                 .filter((member) => member.participantStatus === "신청대기")
                 .map((member, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2">
+                  <div key={index} className="flex items-center gap-2">
                     <UserProfileCard
                       userProfileId={member.lightningUserId}
                       userProfileImg={member.memberProfileImg || ""}
                       userProfileName={member.memberNickname || ""}
                       userRole="member"
                     />
-                    <div className="flex gap-2 ml-auto items-center">
+                    <div className="flex flex-col gap-2 ml-auto items-center">
                       <button
-                        className="btn btn-sm"
+                        className="btn btn-success btn-sm text-white"
                         disabled={
                           loadingParticipantActions[member.lightningUserId]
                             ?.accept
@@ -777,7 +809,7 @@ function LightningDetailPage() {
                           : "수락하기"}
                       </button>
                       <button
-                        className="btn btn-sm"
+                        className="btn btn-error btn-sm text-white"
                         disabled={
                           loadingParticipantActions[member.lightningUserId]
                             ?.reject
@@ -840,13 +872,13 @@ function LightningDetailPage() {
           )}
           {!isCreator && lightningDetail?.recruitType === "수락형" && (
             <div className="w-full mt-4">
-              <h3 className="font-bold mb-2 ml-2">신청 대기 중인 참가자</h3>
+              <h3 className="font-bold mb-2 ml-2">신청 대기자</h3>
               {lightningDetail?.member
                 .filter((member) => member.participantStatus === "신청대기")
                 .map((member, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-2 p-2 justify-between"
+                    className="flex items-center gap-2 justify-between"
                   >
                     <UserProfileCard
                       userProfileId={member.lightningUserId}
@@ -856,7 +888,7 @@ function LightningDetailPage() {
                     />
                     <div className="flex flex-col">
                       <div className="text-sm text-gray-500">
-                        상태: {member.participantStatus}
+                        {member.participantStatus}
                       </div>
                     </div>
                   </div>
@@ -1106,10 +1138,12 @@ function LightningDetailPage() {
       >
         <>
           <p>번개에 참여하시겠습니까?</p>
-          <p className="text-red-500">
+          <p className="text-red-500 mt-2">
             본 번개는 수락형 번개로,
+            <br/>
+            신청 이후 생성자가 수락해야지만
             <br />
-            신청 이후 생성자가 수락해야지만 참여할 수 있습니다.
+            참여할 수 있습니다.
           </p>
         </>
       </GlobalModal>
@@ -1211,7 +1245,133 @@ function LightningDetailPage() {
         </div>
         <p>번개에 참여하셨습니다!</p>
       </GlobalModal>
+
+
+      {/* 예약확인 모달 */}
+      <input
+        type="checkbox"
+        id="modal"
+        className="modal-toggle"
+        checked={isModalOpen} // 모달 상태에 따라 체크박스 상태를 업데이트
+        onChange={() => setModalOpen(!isModalOpen)} // 버튼 클릭 시 상태 변경
+      />
+      <div className="modal" role="dialog">
+        <div className="modal-box max-w-2xl p-0">
+          <KakaolocationMap
+            lat={lightningDetail?.latitude}
+            lng={lightningDetail?.longitude}
+            width="672px"
+            height="300px"
+          />
+          <div className="flex flex-col gap-2 px-10 py-3 bg-primary bg-opacity-80 text-white">
+            <div className="text-xl font-semibold">
+              {completedLightning?.routeTitle}
+            </div>
+          </div>
+          <div className="gap-4 p-12">
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="flex flex-col text-lg">
+                <label className="label flex justify-start font-bold">
+                  <svg
+                    data-slot="icon"
+                    fill="grey"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path d="M5.25 12a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H6a.75.75 0 0 1-.75-.75V12ZM6 13.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V14a.75.75 0 0 0-.75-.75H6ZM7.25 12a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H8a.75.75 0 0 1-.75-.75V12ZM8 13.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V14a.75.75 0 0 0-.75-.75H8ZM9.25 10a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H10a.75.75 0 0 1-.75-.75V10ZM10 11.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V12a.75.75 0 0 0-.75-.75H10ZM9.25 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H10a.75.75 0 0 1-.75-.75V14ZM12 9.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V10a.75.75 0 0 0-.75-.75H12ZM11.25 12a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H12a.75.75 0 0 1-.75-.75V12ZM12 13.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V14a.75.75 0 0 0-.75-.75H12ZM13.25 10a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H14a.75.75 0 0 1-.75-.75V10ZM14 11.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V12a.75.75 0 0 0-.75-.75H14Z" />
+                    <path
+                      clipRule="evenodd"
+                      fillRule="evenodd"
+                      d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z"
+                    />
+                  </svg>
+                  <span className="label-text text-lg">시작시간</span>
+                </label>
+
+                <div className="px-3">
+                  {completedLightning?.eventDate
+                    ? DateFormat(completedLightning?.eventDate)
+                    : completedLightning?.eventDate}
+                </div>
+              </div>
+              <div className="flex flex-col text-lg">
+                <label className="label flex justify-start font-bold">
+                  <svg
+                    data-slot="icon"
+                    fill="grey"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      clipRule="evenodd"
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
+                    />
+                  </svg>
+                  <span className="label-text text-lg">소요시간</span>
+                </label>
+
+                <div className="px-3">{completedLightning?.duration}</div>
+              </div>
+              <div className="flex flex-col text-lg">
+                <label className="label flex justify-start font-bold">
+                  <svg
+                    data-slot="icon"
+                    fill="grey"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path d="M7 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM14.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 7 18a9.953 9.953 0 0 1-5.385-1.572ZM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 0 0-1.588-3.755 4.502 4.502 0 0 1 5.874 2.636.818.818 0 0 1-.36.98A7.465 7.465 0 0 1 14.5 16Z" />
+                  </svg>
+                  <span className="label-text text-lg">정원</span>
+                </label>
+                <div className="px-3">{completedLightning?.capacity}</div>
+              </div>
+              <div className="flex flex-col text-lg">
+                <label className="label flex justify-start font-bold">
+                  <svg
+                    data-slot="icon"
+                    fill="grey"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                  >
+                    <path d="M7 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM14.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 7 18a9.953 9.953 0 0 1-5.385-1.572ZM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 0 0-1.588-3.755 4.502 4.502 0 0 1 5.874 2.636.818.818 0 0 1-.36.98A7.465 7.465 0 0 1 14.5 16Z" />
+                  </svg>
+                  <span className="label-text text-lg">참여자</span>
+                </label>
+                <div className="px-3">
+                  {completedLightning?.currentParticipants}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-row">
+              <span className="font-semibold text-primary">
+                {" "}
+                {completedLightning?.joinDate
+                  ? DateFormat(completedLightning?.joinDate)
+                  : completedLightning?.joinDate}{" "}
+              </span>{" "}
+              <span>에 번개에 참여하셨습니다!</span>
+            </div>
+
+            <div className="modal-action mt-5">
+              <label htmlFor="modal" className="btn">
+                  닫기
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
   );
 }
 

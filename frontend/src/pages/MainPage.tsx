@@ -18,12 +18,10 @@ function MainPage() {
         />
       </div>
         {!isAuthenticated && (
-        <div className="text-center text-sm text-white bg-primary bg-opacity-80 p-3 px-8 w-full my-3">
-          <Link to="/auth/landing" className=" font-semibold text-lg">
+          <Link to="/auth/landing" className="block font-semibold text-lg text-center text-white bg-primary bg-opacity-80 p-3 px-8 w-full my-3">
             <span className="text-white font-semibold text-lg hover:underline">로그인 하고</span>{" "}
             번개에 참여해보세요!
           </Link>
-        </div>
         )}
       <div className="flex flex-col mt-8 px-14">
         <div className="text-xl font-bold ml-3">
