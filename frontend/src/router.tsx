@@ -2,6 +2,7 @@ import { lazy, Suspense, ComponentType, FC } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import UserClubPage from "./pages/user/UserClubPage";
 import StravaSuccessPage from "./pages/strava/StravaSuccessPage";
+import OAuthCallback from "./components/OAuthCallback";
 
 // 로딩 컴포넌트를 래핑하는 헬퍼 함수
 const Loadable = <P extends object>(Component: ComponentType<P>): FC<P> => {
@@ -23,9 +24,7 @@ const ProtectedRoute = Loadable(lazy(() => import("./ProtectedRoute")));
 const LoginPage = Loadable(lazy(() => import("./pages/auth/LoginPage")));
 const RegisterPage = Loadable(lazy(() => import("./pages/auth/RegisterPage")));
 const LandingPage = Loadable(lazy(() => import("./pages/auth/LandingPage")));
-const OAuthCallback = Loadable(
-  lazy(() => import("./components/OAuthCallback"))
-);
+
 const RoutePage = Loadable(lazy(() => import("./pages/RoutePage")));
 const ClubPage = Loadable(lazy(() => import("./pages/ClubPage")));
 const RouteDetailPage = Loadable(

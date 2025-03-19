@@ -3,11 +3,18 @@ import React, { useEffect, useRef } from "react";
 interface KakaoMapProps {
   lat: number | undefined;
   lng: number | undefined;
-  width?: string;  // 선택적 props
+  width?: string; // 선택적 props
   height?: string; // 선택적 props
+  isLoadingLocation: boolean;
 }
 
-const KakaolocationMap: React.FC<KakaoMapProps> = ({ lat, lng, width, height }) => {
+const KakaolocationMap: React.FC<KakaoMapProps> = ({
+  lat,
+  lng,
+  width,
+  height,
+  isLoadingLocation,
+}) => {
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,10 +48,16 @@ const KakaolocationMap: React.FC<KakaoMapProps> = ({ lat, lng, width, height }) 
     <div
       ref={mapRef}
       style={{
-        width: width || "300px",  // width가 전달되지 않으면 기본값 적용
+        width: width || "300px", // width가 전달되지 않으면 기본값 적용
         height: height || "250px", // height가 전달되지 않으면 기본값 적용
       }}
-    />
+    >
+      {isLoadingLocation && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-10">
+          <span className="loading loading-dots loading-lg"></span>
+        </div>
+      )}
+    </div>
   );
 };
 
