@@ -1,4 +1,4 @@
 app:
   cors:
     allowed-origins:
-      - https://your-exact-frontend-domain.com # 정확한 URL로 설정 (끝에 슬래시 유무 주의)
+      - https://taiso.site # 정확한 프론트엔드 도메인
