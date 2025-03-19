@@ -1,4 +1,0 @@
-app:
-  cors:
-    allowed-origins:
-      - https://taiso.site # 정확한 프론트엔드 도메인
