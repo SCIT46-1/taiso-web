@@ -76,7 +76,7 @@ public class StravaLinkController {
         String authorizationUrl = "https://www.strava.com/oauth/authorize" +
                 "?client_id=" + clientId +
                 "&response_type=code" +
-                "&redirect_uri=" + redirectUri +
+                "&redirect_uri=" + "https://taiso.site/api/strava/link/callback" +
                 "&approval_prompt=auto" +
                 "&scope=activity:read";
         return ResponseEntity.ok(authorizationUrl);
@@ -100,7 +100,7 @@ public class StravaLinkController {
 
         // 프론트엔드 리다이렉트 URI가 없으면 기본값 사용
         if (frontendRedirectUri == null || frontendRedirectUri.isEmpty()) {
-            frontendRedirectUri = "http://localhost:3000/strava-success"; // 기본 리다이렉트 URL 설정
+            frontendRedirectUri = "https://taiso.site/strava-success"; // 기본 리다이렉트 URL 설정
         }
 
         try {
