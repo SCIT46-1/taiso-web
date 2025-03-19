@@ -8,7 +8,7 @@ function LandingPage() {
   const encodedRedirectPath = encodeURIComponent(fromPath);
   const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${
     import.meta.env.VITE_KAKAO_CLIENT_ID
-  }&redirect_uri=http://taiso.site/oauth/callback&response_type=code&state=${encodedRedirectPath}`;
+  }&redirect_uri=https://taiso.site/oauth/callback&response_type=code&state=${encodedRedirectPath}`;
 
   const handleKakaoLogin = () => {
     window.location.href = KAKAO_AUTH_URL;
