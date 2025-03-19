@@ -12,7 +12,7 @@ function LightningSummaryInfo({
   bikeType,
 }: LightningSummaryInfoProps) {
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-4 gap-2">
       <div className="flex items-center gap-3">
         <svg
           xmlns="http://www.w3.org/2000/svg"
