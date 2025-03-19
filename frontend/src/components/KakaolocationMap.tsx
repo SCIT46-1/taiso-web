@@ -5,7 +5,6 @@ interface KakaoMapProps {
   lng: number | undefined;
   width?: string; // 선택적 props
   height?: string; // 선택적 props
-  isLoadingLocation: boolean;
 }
 
 const KakaolocationMap: React.FC<KakaoMapProps> = ({
@@ -13,7 +12,6 @@ const KakaolocationMap: React.FC<KakaoMapProps> = ({
   lng,
   width,
   height,
-  isLoadingLocation,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
 
@@ -51,13 +49,7 @@ const KakaolocationMap: React.FC<KakaoMapProps> = ({
         width: width || "300px", // width가 전달되지 않으면 기본값 적용
         height: height || "250px", // height가 전달되지 않으면 기본값 적용
       }}
-    >
-      {isLoadingLocation && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-10">
-          <span className="loading loading-dots loading-lg"></span>
-        </div>
-      )}
-    </div>
+    />
   );
 };
 

@@ -11,13 +11,11 @@ interface RoutePoint {
 interface KakaoMapRouteProps {
   routePoints: RoutePoint[];
   selectedPoint?: RoutePoint | null;
-  isLoading: boolean;
 }
 
 const KakaoMapRoute: React.FC<KakaoMapRouteProps> = ({
   routePoints,
   selectedPoint = null,
-  isLoading,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
@@ -136,19 +134,11 @@ const KakaoMapRoute: React.FC<KakaoMapRouteProps> = ({
   }, [selectedPoint]);
 
   return (
-    <div className="map-container">
-      {isLoading ? (
-        <div className="flex justify-center items-center h-full">
-          <span className="loading loading-dots loading-lg"></span>
-        </div>
-      ) : (
-        <div
-          ref={mapRef}
-          className="rounded-2xl shadow-lg"
-          style={{ width: "100%", height: "400px" }}
-        />
-      )}
-    </div>
+    <div
+      ref={mapRef}
+      className="rounded-2xl shadow-lg"
+      style={{ width: "100%", height: "400px" }}
+    />
   );
 };
 
