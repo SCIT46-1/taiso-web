@@ -125,7 +125,7 @@ public class AuthService {
         params.add("grant_type", "authorization_code");
         params.add("client_id", kakaoProperties.getClientId());
         System.out.println("리다이렉트 uri : " + kakaoProperties.getRedirectUri());
-        params.add("redirect_uri", kakaoProperties.getRedirectUri());
+        params.add("redirect_uri", "https://taiso.site/oauth/callback");
         params.add("code", code);
 
         HttpHeaders headers = new HttpHeaders();
