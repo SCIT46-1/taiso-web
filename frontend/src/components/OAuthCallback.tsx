@@ -7,29 +7,29 @@ import { useAuthStore } from "../stores/useAuthStore";
 const OAuthCallback: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  //전역 상태 관리 라이브러리 사용
   const { setUser } = useAuthStore();
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const code = query.get("code");
-    // state 파라미터 가져오기 및 디코딩
+    // state 파라미터: 리다이렉트 경로가 있다면 가져오고 없으면 기본값 "/"
     const encodedRedirectPath = query.get("state");
-    console.log("OAuthCallback - Encoded redirect path:", encodedRedirectPath);
-
-    // state가 있으면 디코딩, 없으면 기본 경로 사용
     const redirectPath = encodedRedirectPath
       ? decodeURIComponent(encodedRedirectPath)
       : "/";
 
-    console.log("OAuthCallback - Decoded redirect path:", redirectPath);
-
     if (code) {
-      console.log("OAuthCallback - Kakao login with code:", code);
       authService
         .kakaoLogin(code)
         .then((result) => {
-          console.log("OAuthCallback - Kakao login successful");
+          // 로그인 성공 후 URL에서 쿼리 파라미터를 제거하여 재요청을 방지
+          window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+          );
+
+          // 사용자 정보 전역 상태에 저장
           setUser(
             {
               email: result.userEmail,
@@ -38,17 +38,22 @@ const OAuthCallback: React.FC = () => {
             },
             true
           );
-          console.log("OAuthCallback - result.isNewUser:", result.newUser);
+
+          // 신규 가입이면 온보딩 페이지로, 아니라면 이전 경로(혹은 기본 경로)로 이동
           if (result.newUser) {
             navigate("/user-onboarding");
           } else {
-            console.log("OAuthCallback - Redirecting to:", redirectPath);
             navigate(redirectPath);
           }
         })
         .catch((error) => {
           console.error("OAuthCallback - Kakao login error:", error);
+          // 에러 발생 시 로그인 페이지 등으로 리다이렉션
+          navigate("/login");
         });
+    } else {
+      // URL에 인증 코드가 없는 경우, 홈 또는 로그인 페이지로 리다이렉션
+      navigate("/");
     }
   }, [location, navigate, setUser]);
 
