@@ -14,15 +14,8 @@ function LandingPage() {
     window.location.href = KAKAO_AUTH_URL;
   };
 
-  const isPageLoading = false; // Replace with actual isPageLoading logic
-
   return (
     <div className="flex flex-col items-center justify-center sm:mt-14 mt-20">
-      {isPageLoading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
-          <span className="loading loading-dots loading-lg"></span>
-        </div>
-      )}
       <div className="text-3xl font-bold mb-6 mt-10">
         자전거 번개와 함께, taiso
       </div>
