@@ -685,7 +685,7 @@ function ClubDetailPage() {
                     <div className="w-10 h-10 rounded-full">
                       {member.userProfileImage ? (
                         <ImageWithSkeleton
-                          src={`https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${member.userProfileImage}`}
+                          src={`https://taiso-web-gpx-file-space-korea.s3.ap-northeast-2.amazonaws.com/${member.userProfileImage}`}
                           alt={member.userNickname}
                         />
                       ) : (
@@ -1057,7 +1057,7 @@ function ClubDetailPage() {
                             <div className="w-10 h-10 rounded-full">
                               {member.userProfileImage ? (
                                 <ImageWithSkeleton
-                                  src={`https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${member.userProfileImage}`}
+                                  src={`https://taiso-web-gpx-file-space-korea.s3.ap-northeast-2.amazonaws.com/${member.userProfileImage}`}
                                   alt={member.userNickname}
                                 />
                               ) : (

@@ -309,7 +309,7 @@ function UserDetailPage() {
         <img
           src={
             userDetail?.backgroundImg !== null
-              ? `https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${userDetail?.backgroundImg}`
+              ? `https://taiso-web-gpx-file-space-korea.s3.ap-northeast-2.amazonaws.com/${userDetail?.backgroundImg}`
               : "/backgroundDefault.png"
           }
           alt="background"
@@ -318,7 +318,7 @@ function UserDetailPage() {
         <img
           src={
             userDetail?.profileImg !== null
-              ? `https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${userDetail?.profileImg}`
+              ? `https://taiso-web-gpx-file-space-korea.s3.ap-northeast-2.amazonaws.com/${userDetail?.profileImg}`
               : "/userDefault.png"
           }
           alt="profile"
