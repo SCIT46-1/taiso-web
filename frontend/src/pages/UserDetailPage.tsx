@@ -278,7 +278,11 @@ function UserDetailPage() {
 
   // 로딩 중일 때 처리
   if (isLoading) {
-    return <div className="font-semibold">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
   }
 
   // 모달 동작

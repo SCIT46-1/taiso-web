@@ -21,7 +21,11 @@ function UserProfileCard({
     <Link to={`/users/${userProfileId}`} className=" w-fit">
       <div className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-xl transition-colors">
         <img
-          src={userProfileImg ? userProfileImg : "/userDefault.png"}
+          src={
+            userProfileImg
+              ? `https://taiso-web-gpx-file-space-korea.s3.ap-northeast-2.amazonaws.com/${userProfileImg}`
+              : "/userDefault.png"
+          }
           alt={userProfileName}
           className="size-8 rounded-full object-cover"
         />

@@ -162,8 +162,8 @@ function LightningDetailPage() {
   const currentMemberStatus = useMemo(() => {
     return lightningDetail && user
       ? lightningDetail.member.find(
-        (member) => member.lightningUserId === user.userId
-      ) || null
+          (member) => member.lightningUserId === user.userId
+        ) || null
       : null;
   }, [lightningDetail, user]);
 
@@ -181,7 +181,9 @@ function LightningDetailPage() {
     setLoadingJoin(true);
     try {
       await lightningService.joinLightning(Number(lightningId));
-      const completedData = await lightningService.getCompletedLightnings(Number(lightningId));
+      const completedData = await lightningService.getCompletedLightnings(
+        Number(lightningId)
+      );
       setCompletedLightning(completedData);
 
       // 성공적으로 참여했을 때 처음 모달을 다시 띄우기
@@ -440,7 +442,11 @@ function LightningDetailPage() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
   }
 
   return (
@@ -472,7 +478,9 @@ function LightningDetailPage() {
               <div className="collapse collapse-arrow">
                 <input type="checkbox" />
                 <div className="collapse-title text-xl font-medium flex items-center">
-                  <span className="ml-1 text-lg font-semibold">당일 시간대별 날씨</span>
+                  <span className="ml-1 text-lg font-semibold">
+                    당일 시간대별 날씨
+                  </span>
                   {weatherLoading ? (
                     <span className="loading loading-dots loading-sm ml-2"></span>
                   ) : (
@@ -520,8 +528,8 @@ function LightningDetailPage() {
                     {tag}
                   </span>
                 ))}
-          </div>
-          <div className="divider -mt-1 -mb-[0.5px]"></div>
+            </div>
+            <div className="divider -mt-1 -mb-[0.5px]"></div>
             <UserProfileCard
               userProfileId={lightningDetail?.creator.userId}
               userProfileImg={lightningDetail?.creator.creatorProfileImg || ""}
@@ -533,42 +541,88 @@ function LightningDetailPage() {
             <div className="text-xl my-2 font-bold p-1">주의사항</div>
             <div className="space-y-4">
               <p>
-                🚴‍♂️함께하는 라이딩에서는 서로를 배려하는 마음이 가장 중요합니다. <br />
-                안전수칙을 지키고, 초보자도 즐겁게 참여할 수 있도록 배려해주세요!😊
+                🚴‍♂️함께하는 라이딩에서는 서로를 배려하는 마음이 가장 중요합니다.{" "}
+                <br />
+                안전수칙을 지키고, 초보자도 즐겁게 참여할 수 있도록
+                배려해주세요!😊
               </p>
               <div>
                 <h3 className="font-bold">1. 라이딩 전 체크사항</h3>
                 <ul className="list-none pl-0">
-                  <li className="before:content-['✔'] before:mr-2"><strong>안전 장비 착용</strong> | 헬멧, 장갑, 야간시는 전조등/후미등 필수!</li>
-                  <li className="before:content-['✔'] before:mr-2"><strong>자전거 점검</strong> | 타이어 공기압, 브레이크, 체인 상태 체크.</li>
-                  <li className="before:content-['✔'] before:mr-2"><strong>경로 & 일정 확인</strong> | 출발 전 라이딩 코스와 예상 도착 시간 숙지.</li>
-                  <li className="before:content-['✔'] before:mr-2"><strong>비상 연락망 공유</strong> | 사고나 낙오 시 연락할 수 있도록 연락처 공유.</li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>안전 장비 착용</strong> | 헬멧, 장갑, 야간시는
+                    전조등/후미등 필수!
+                  </li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>자전거 점검</strong> | 타이어 공기압, 브레이크, 체인
+                    상태 체크.
+                  </li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>경로 & 일정 확인</strong> | 출발 전 라이딩 코스와
+                    예상 도착 시간 숙지.
+                  </li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>비상 연락망 공유</strong> | 사고나 낙오 시 연락할 수
+                    있도록 연락처 공유.
+                  </li>
                 </ul>
               </div>
 
               <div>
                 <h3 className="font-bold">2. 라이딩 중 주의사항</h3>
                 <ul className="list-none pl-0">
-                  <li className="before:content-['✔'] before:mr-2"><strong>한 줄 주행 유지</strong> | 좁은 도로에서 가로로 나란히 타지 않기.</li>
-                  <li className="before:content-['✔'] before:mr-2"><strong>급정거 & 급출발 금지</strong> | 갑작스러운 속도 변화는 사고 위험 증가.</li>
-                  <li className="before:content-['✔'] before:mr-2"><strong>수신호 사용</strong> | 방향 변경, 정지 시 미리 손으로 신호 보내기.</li>
-                  <li className="before:content-['✔'] before:mr-2"><strong>도로 교통법 준수</strong> | 신호등, 일방통행, 횡단보도 규칙 준수.</li>
-                  <li className="before:content-['✔'] before:mr-2"><strong>소통하며 라이딩</strong> | 앞사람과 적당한 거리 유지 & 필요 시 구두로 신호 전달.</li>
-                  <li className="before:content-['✔'] before:mr-2"><strong>뒤처지는 멤버 배려</strong> | 속도가 느린 사람도 함께할 수 있도록 조절.</li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>한 줄 주행 유지</strong> | 좁은 도로에서 가로로
+                    나란히 타지 않기.
+                  </li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>급정거 & 급출발 금지</strong> | 갑작스러운 속도
+                    변화는 사고 위험 증가.
+                  </li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>수신호 사용</strong> | 방향 변경, 정지 시 미리
+                    손으로 신호 보내기.
+                  </li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>도로 교통법 준수</strong> | 신호등, 일방통행,
+                    횡단보도 규칙 준수.
+                  </li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>소통하며 라이딩</strong> | 앞사람과 적당한 거리 유지
+                    & 필요 시 구두로 신호 전달.
+                  </li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>뒤처지는 멤버 배려</strong> | 속도가 느린 사람도
+                    함께할 수 있도록 조절.
+                  </li>
                 </ul>
               </div>
 
               <div>
                 <h3 className="font-bold">3. 그룹 라이딩 주의사항</h3>
                 <ul className="list-none pl-0">
-                  <li className="before:content-['✔'] before:mr-2"><strong>리더 또는 가이드 지정</strong> | 경로 안내 및 속도 조절할 사람 정하기.</li>
-                  <li>✔ <strong>초보자 배려</strong> | 첫 라이딩이거나 경험이 적은 멤버가 있으면 속도를 조절하자.</li>
-                  <li>✔ <strong>함께 출발 & 함께 도착</strong> | 중간에 낙오자가 생기지 않도록 확인.</li>
-                  <li>✔ <strong>휴식 & 수분 보충 고려</strong> | 정해진 구간에서 쉬면서 체력 관리.</li>
-                  <li>✔ <strong>비상 상황 대비</strong> | 펑크, 부상 발생 시 대응할 방법 공유하기.</li>
+                  <li className="before:content-['✔'] before:mr-2">
+                    <strong>리더 또는 가이드 지정</strong> | 경로 안내 및 속도
+                    조절할 사람 정하기.
+                  </li>
+                  <li>
+                    ✔ <strong>초보자 배려</strong> | 첫 라이딩이거나 경험이 적은
+                    멤버가 있으면 속도를 조절하자.
+                  </li>
+                  <li>
+                    ✔ <strong>함께 출발 & 함께 도착</strong> | 중간에 낙오자가
+                    생기지 않도록 확인.
+                  </li>
+                  <li>
+                    ✔ <strong>휴식 & 수분 보충 고려</strong> | 정해진 구간에서
+                    쉬면서 체력 관리.
+                  </li>
+                  <li>
+                    ✔ <strong>비상 상황 대비</strong> | 펑크, 부상 발생 시
+                    대응할 방법 공유하기.
+                  </li>
                 </ul>
               </div>
-
             </div>
           </div>
         </div>
@@ -624,22 +678,23 @@ function LightningDetailPage() {
             <div className="font-semibold text-lg my-1">
               {lightningDetail?.eventDate
                 ? new Date(lightningDetail.eventDate).toLocaleString("ko-KR", {
-                  month: "long",
-                  day: "numeric",
-                  weekday: "long",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
+                    month: "long",
+                    day: "numeric",
+                    weekday: "long",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
                 : ""}
             </div>
             <div className="flex gap-1 text-m text-gray-500 mb-4">
               <p className="font-semibold">
                 {lightningDetail?.duration
                   ? lightningDetail.duration >= 60
-                    ? `${Math.floor(lightningDetail.duration / 60)}시간${lightningDetail.duration % 60 > 0
-                      ? ` ${lightningDetail.duration % 60}분`
-                      : ""
-                    }`
+                    ? `${Math.floor(lightningDetail.duration / 60)}시간${
+                        lightningDetail.duration % 60 > 0
+                          ? ` ${lightningDetail.duration % 60}분`
+                          : ""
+                      }`
                     : `${lightningDetail.duration}분`
                   : ""}
               </p>
@@ -837,14 +892,14 @@ function LightningDetailPage() {
               )}
               {(lightningDetail?.status === "마감" ||
                 lightningDetail?.status === "강제마감") && (
-                  <button
-                    className="btn mt-4 w-full"
-                    disabled={loadingLightningEnd}
-                    onClick={() => showModal("lightning-end-modal")}
-                  >
-                    {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
-                  </button>
-                )}
+                <button
+                  className="btn mt-4 w-full"
+                  disabled={loadingLightningEnd}
+                  onClick={() => showModal("lightning-end-modal")}
+                >
+                  {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
+                </button>
+              )}
             </div>
           )}
           {isCreator && lightningDetail?.recruitType === "참가형" && (
@@ -860,14 +915,14 @@ function LightningDetailPage() {
               )}
               {(lightningDetail?.status === "마감" ||
                 lightningDetail?.status === "강제마감") && (
-                  <button
-                    className="btn mt-4 w-full"
-                    disabled={loadingLightningEnd}
-                    onClick={() => showModal("lightning-end-modal")}
-                  >
-                    {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
-                  </button>
-                )}
+                <button
+                  className="btn mt-4 w-full"
+                  disabled={loadingLightningEnd}
+                  onClick={() => showModal("lightning-end-modal")}
+                >
+                  {loadingLightningEnd ? "종료 중..." : "번개 종료하기"}
+                </button>
+              )}
             </div>
           )}
           {!isCreator && lightningDetail?.recruitType === "수락형" && (
@@ -896,10 +951,10 @@ function LightningDetailPage() {
               {lightningDetail?.member.filter(
                 (member) => member.participantStatus === "신청대기"
               ).length === 0 && (
-                  <div className="text-center py-2 text-gray-500">
-                    신청 대기 중인 참가자가 없습니다
-                  </div>
-                )}
+                <div className="text-center py-2 text-gray-500">
+                  신청 대기 중인 참가자가 없습니다
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -969,10 +1024,11 @@ function LightningDetailPage() {
               </svg>
               {lightningDetail?.duration
                 ? lightningDetail.duration >= 60
-                  ? `${Math.floor(lightningDetail.duration / 60)}시간${lightningDetail.duration % 60 > 0
-                    ? ` ${lightningDetail.duration % 60}분`
-                    : ""
-                  }`
+                  ? `${Math.floor(lightningDetail.duration / 60)}시간${
+                      lightningDetail.duration % 60 > 0
+                        ? ` ${lightningDetail.duration % 60}분`
+                        : ""
+                    }`
                   : `${lightningDetail.duration}분`
                 : ""}
             </div>
@@ -1140,7 +1196,7 @@ function LightningDetailPage() {
           <p>번개에 참여하시겠습니까?</p>
           <p className="text-red-500 mt-2">
             본 번개는 수락형 번개로,
-            <br/>
+            <br />
             신청 이후 생성자가 수락해야지만
             <br />
             참여할 수 있습니다.
@@ -1203,10 +1259,11 @@ function LightningDetailPage() {
             </svg>
             {lightningDetail?.duration
               ? lightningDetail.duration >= 60
-                ? `${Math.floor(lightningDetail.duration / 60)}시간${lightningDetail.duration % 60 > 0
-                  ? ` ${lightningDetail.duration % 60}분`
-                  : ""
-                }`
+                ? `${Math.floor(lightningDetail.duration / 60)}시간${
+                    lightningDetail.duration % 60 > 0
+                      ? ` ${lightningDetail.duration % 60}분`
+                      : ""
+                  }`
                 : `${lightningDetail.duration}분`
               : ""}
           </div>
@@ -1245,7 +1302,6 @@ function LightningDetailPage() {
         </div>
         <p>번개에 참여하셨습니다!</p>
       </GlobalModal>
-
 
       {/* 예약확인 모달 */}
       <input
@@ -1364,14 +1420,13 @@ function LightningDetailPage() {
 
             <div className="modal-action mt-5">
               <label htmlFor="modal" className="btn">
-                  닫기
+                닫기
               </label>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   );
 }
 

@@ -1241,7 +1241,7 @@ function ClubDetailPage() {
               <div className="w-48 md:w-48 flex-shrink-0">
                 {clubDetail.clubProfileImageId ? (
                   <ImageWithSkeleton
-                    src={`https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${clubDetail.clubProfileImageId}`}
+                    src={`https://taiso-web-gpx-file-space-korea.s3.ap-northeast-2.amazonaws.com/${clubDetail.clubProfileImageId}`}
                     alt={clubDetail.clubName}
                     className="rounded-lg"
                   />
