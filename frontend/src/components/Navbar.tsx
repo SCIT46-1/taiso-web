@@ -19,7 +19,7 @@ function Navbar() {
       try {
         const profileImg = await userDetailService.getUserDetailProfileImg();
         setProfileImg(
-          "https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/" +
+          "https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/" +
             profileImg
         );
         setImageError(false);

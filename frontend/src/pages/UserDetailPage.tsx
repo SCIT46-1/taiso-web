@@ -172,7 +172,6 @@ function UserDetailPage() {
     setBackgroundImgPreview(null);
   };
 
-
   // 태그 선택 처리 함수 추가
   const handleTagSelection = (key: string, option: string) => {
     switch (key) {
@@ -232,7 +231,6 @@ function UserDetailPage() {
       }
 
       setIsLoading(false);
-
 
       // 편집 모달 닫은 후 약간의 지연을 준 다음 성공 모달을 표시
       closeModal("profile-edit-modal");
@@ -311,7 +309,7 @@ function UserDetailPage() {
         <img
           src={
             userDetail?.backgroundImg !== null
-              ? `https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.backgroundImg}`
+              ? `https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${userDetail?.backgroundImg}`
               : "/backgroundDefault.png"
           }
           alt="background"
@@ -320,7 +318,7 @@ function UserDetailPage() {
         <img
           src={
             userDetail?.profileImg !== null
-              ? `https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${userDetail?.profileImg}`
+              ? `https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${userDetail?.profileImg}`
               : "/userDefault.png"
           }
           alt="profile"
@@ -732,7 +730,6 @@ function UserDetailPage() {
               <div key={key} className="mb-4">
                 <p className="text-sm font-semibold text-gray-600">{title}</p>
                 <div className="flex gap-2 flex-wrap">
-
                   {options.map((option) => {
                     // 선택 상태 확인
                     let isSelected = false;
@@ -789,9 +786,7 @@ function UserDetailPage() {
       >
         <div className="flex flex-col items-center justify-center gap-4">
           <svg
-
             className="text-success w-12 h-12"
-
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

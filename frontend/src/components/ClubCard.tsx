@@ -99,7 +99,7 @@ function ClubCard({
                 <div className="h-24 w-24 rounded-2xl bg-gray-200"></div>
               ) : (
                 <img
-                  src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${club.clubProfileImageId}`}
+                  src={`https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${club.clubProfileImageId}`}
                   alt={club.clubName}
                   className="h-24 w-24 rounded-2xl"
                 />

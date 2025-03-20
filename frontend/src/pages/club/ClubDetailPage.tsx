@@ -611,7 +611,9 @@ function ClubDetailPage() {
         );
       case "탈퇴":
         return (
-          <span className="badge badge-error badge-sm py-2 !text-white">탈퇴</span>
+          <span className="badge badge-error badge-sm py-2 !text-white">
+            탈퇴
+          </span>
         );
       default:
         return null;
@@ -683,7 +685,7 @@ function ClubDetailPage() {
                     <div className="w-10 h-10 rounded-full">
                       {member.userProfileImage ? (
                         <ImageWithSkeleton
-                          src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${member.userProfileImage}`}
+                          src={`https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${member.userProfileImage}`}
                           alt={member.userNickname}
                         />
                       ) : (
@@ -761,10 +763,7 @@ function ClubDetailPage() {
           </button>
           {selectedPost.canEdit && (
             <div className="flex gap-2">
-              <button
-                className="btn btn-gray btn-sm"
-                onClick={handleEditClick}
-              >
+              <button className="btn btn-gray btn-sm" onClick={handleEditClick}>
                 수정
               </button>
               {selectedPost.canDelete && (
@@ -779,7 +778,6 @@ function ClubDetailPage() {
           )}
         </div>
         <div className="card-body p-6 border border-gray-300 rounded-lg shadow-md">
-          
           <h2 className="text-xl font-semibold mb-1">
             {selectedPost.isNotice && (
               <span className="badge badge-primary mr-2">공지</span>
@@ -848,21 +846,21 @@ function ClubDetailPage() {
       clubLightningList.content.length === 0
     ) {
       return (
-          <div className="px-3">
-            <div className="flex justify-end items-center">
-              {canCreatePost() && (
-                <button
-                  className="btn btn-primary btn-sm mr-2"
-                  onClick={handleCreateLightningClick}
-                >
-                  번개 만들기
-                </button>
-              )}
-            </div>
-            <div className="text-center py-8">
-              <p>등록된 클럽 전용 번개가 없습니다.</p>
-            </div>
+        <div className="px-3">
+          <div className="flex justify-end items-center">
+            {canCreatePost() && (
+              <button
+                className="btn btn-primary btn-sm mr-2"
+                onClick={handleCreateLightningClick}
+              >
+                번개 만들기
+              </button>
+            )}
           </div>
+          <div className="text-center py-8">
+            <p>등록된 클럽 전용 번개가 없습니다.</p>
+          </div>
+        </div>
       );
     }
 
@@ -886,7 +884,10 @@ function ClubDetailPage() {
                   to={`/lightning/${lightning.lightningId}`}
                   className="flex-1 group"
                 >
-                  <div className="bg-base-100 w-full md:flex block items-center" style={{ height: '150px' }}>
+                  <div
+                    className="bg-base-100 w-full md:flex block items-center"
+                    style={{ height: "150px" }}
+                  >
                     <figure className="size-40 flex items-center justify-center md:ml-4 mx-auto md:mx-0 relative overflow-hidden md:my-0">
                       <ImageWithSkeleton
                         src={lightning.routeImgId}
@@ -1056,7 +1057,7 @@ function ClubDetailPage() {
                             <div className="w-10 h-10 rounded-full">
                               {member.userProfileImage ? (
                                 <ImageWithSkeleton
-                                  src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${member.userProfileImage}`}
+                                  src={`https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${member.userProfileImage}`}
                                   alt={member.userNickname}
                                 />
                               ) : (
@@ -1240,7 +1241,7 @@ function ClubDetailPage() {
               <div className="w-48 md:w-48 flex-shrink-0">
                 {clubDetail.clubProfileImageId ? (
                   <ImageWithSkeleton
-                    src={`https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${clubDetail.clubProfileImageId}`}
+                    src={`https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${clubDetail.clubProfileImageId}`}
                     alt={clubDetail.clubName}
                     className="rounded-lg"
                   />

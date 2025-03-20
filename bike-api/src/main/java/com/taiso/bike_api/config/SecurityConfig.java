@@ -3,7 +3,6 @@ package com.taiso.bike_api.config;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,114 +26,72 @@ import com.taiso.bike_api.security.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
-
 @Configuration
 @EnableWebSecurity  
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    // JwtTokenProvider 주입
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    @Autowired
-    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
-
-    @Value("${app.cors.allowed-origins}")
-    private String[] allowedOrigins;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     
-    /**
-     * SecurityFilterChain 빈을 등록하여 스프링 시큐리티 설정을 구성합니다.
-     *
-     * - CSRF : REST API를 사용할 경우 stateless 하게 구성하기 위해 비활성화
-     * - SessionManagement : 세션을 사용하지 않고, stateless 방식 적용 (예, JWT 기반)
-     * - URL 권한 설정 : 인증 없이 접근할 수 있는 엔드포인트와 인증이 필요한 엔드포인트를 분리
-     * - H2 Console 접근 : 개발 시 H2 콘솔을 iframe 내에서 볼 수 있도록 설정
-     */
+    @Autowired
+    private CorsProperties corsProperties;
 
-         @Bean
-         public JwtAuthenticationFilter jwtAuthenticationFilter() {
-             return new JwtAuthenticationFilter(jwtTokenProvider);
-         }
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenProvider);
+    }
     
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // CORS 설정
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // CSRF 비활성화 (REST API인 경우, 상태 비저장 방식 사용 시 주의)
             .csrf(csrf -> csrf.disable())
-            
-            // Stateless 세션 정책 설정
-            .sessionManagement(session -> 
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            
-            // URL 접근 권한 설정
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // OPTIONS 메서드는 모든 경로에 대해 허용 (preflight 요청 허용)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // 인증 없이 접근 가능한 URL (예: 인증 관련 엔드포인트, H2 콘솔)
-                //TODO: 권한 관련 수정 필요
-                        .requestMatchers("/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**",
-                                "/api/auth/kakao", "/api/lightnings/", "/api/routes/**", "/api/lightnings/{lightningId}", "/api/lightnings", "/api/clubs"
-                                , "api/clubs/{clubId}", "/api/users/{userId}", "/api/lightnings/main")
-                        .permitAll()
-
-                // 그 외 모든 요청은 인증 필요
+                .requestMatchers(
+                    "/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**",
+                    "/api/auth/kakao", "/api/lightnings/", "/api/routes/**", "/api/lightnings/{lightningId}", 
+                    "/api/lightnings", "/api/clubs", "api/clubs/{clubId}", "/api/users/{userId}", "/api/lightnings/main"
+                ).permitAll()
                 .anyRequest().authenticated()
-                );
-
-            
-         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
-        // 인증 예외 처리
+            );
+        
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        
         http.exceptionHandling(exceptionHandling -> exceptionHandling
             .authenticationEntryPoint(jwtAuthenticationEntryPoint)
             .accessDeniedHandler(jwtAccessDeniedHandler)
         );
-         
-        // H2 콘솔 사용을 위한 추가 설정 (iframe 내 접근 허용)
-        http.headers(headers -> 
-            headers.frameOptions(frameOptions -> frameOptions.sameOrigin())
-        );
-
+        
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
         return http.build();
     }
-
-    /**
-     * 패스워드 암호화용 PasswordEncoder 빈 등록 (BCrypt 사용)
-     */
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    /**
-     * 인증 관리자 빈 등록
-     */
+    
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
         return authConfiguration.getAuthenticationManager();
     }
-
-    @Bean
-CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList(allowedOrigins)); // 환경 변수 사용
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
-    configuration.setAllowedHeaders(Arrays.asList("*"));
-    configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
-    configuration.setAllowCredentials(true);
-    configuration.setMaxAge(3600L);
     
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", configuration);
-    return source;
-}
-
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(corsProperties.getAllowedOrigins());
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

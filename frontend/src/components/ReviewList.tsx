@@ -61,7 +61,7 @@ function ReviewList({ userId }: ReviewListProps) {
                 <img
                   src={
                     review.reviewerProfileImg
-                      ? `https://taiso-web-gpx-file-space.s3.ap-southeast-2.amazonaws.com/${review.reviewerProfileImg}`
+                      ? `https://taiso-web-gpx-file-space-korea.s3.ap-southeast-2.amazonaws.com/${review.reviewerProfileImg}`
                       : "/userDefault.png"
                   }
                   alt={review.reviewerNickname}
