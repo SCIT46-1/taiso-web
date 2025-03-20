@@ -196,13 +196,6 @@ function ReviewModal({ lightning, modalId }: ReviewModalProps) {
             <p className="text-center mb-2">
               리뷰가 성공적으로 등록되었습니다.
             </p>
-            <p className="text-sm text-gray-500 mb-6">
-              선택하신 평가:{" "}
-              {
-                reviewTagOptions.find((option) => option.value === selectedTag)
-                  ?.label
-              }
-            </p>
             <div className="flex gap-3">
               <button
                 className="btn btn-primary btn-sm no-animation"
@@ -297,7 +290,9 @@ function ReviewModal({ lightning, modalId }: ReviewModalProps) {
                 </svg>
               </div>
             </div>
-            <h3 className="font-bold text-lg mb-4 text-center">리뷰 삭제 완료</h3>
+            <h3 className="font-bold text-lg mb-4 text-center">
+              리뷰 삭제 완료
+            </h3>
             <p className="text-center mb-6">
               리뷰가 성공적으로 삭제되었습니다.
             </p>
@@ -378,7 +373,7 @@ function ReviewModal({ lightning, modalId }: ReviewModalProps) {
                         <div className="flex items-center gap-2">
                           {user.userDetailDTO.reviewedProfileImg ? (
                             <img
-                              src={user.userDetailDTO.reviewedProfileImg}
+                              src={`https://taiso-web-gpx-file-space-korea.s3.ap-northeast-2.amazonaws.com/${user.userDetailDTO.reviewedProfileImg}`}
                               alt={user.userDetailDTO.reviewedNickname}
                               className="w-10 h-10 rounded-full object-cover"
                             />
