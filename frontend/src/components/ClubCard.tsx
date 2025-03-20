@@ -107,7 +107,7 @@ function ClubCard({
               <div className="flex flex-col p-2 ml-2">
                 <div className="flex flex-col">
                   <div className="text-lg font-semibold">{club.clubName}</div>
-                  <div className="text-sm text-gray-500 mt-1 max-w-[300px] truncate">
+                  <div className="text-sm text-gray-500 mt-1 max-w-[300px] truncate overflow-hidden">
                     {club.clubShortDescription}
                   </div>
                   <div className="text-sm text-gray-500 flex items-center gap-1 mt-2">
