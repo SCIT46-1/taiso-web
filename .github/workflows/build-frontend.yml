@@ -1,0 +1,80 @@
+name: Build Frontend
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  build:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: taiso-web/frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+		
+      - name: Get latest Git tag (or use default)
+        id: get_version
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        run: npm run build
+          
+      - name: Archive build output
+        run: |
+          cd dist
+          zip -r ../frontend-dist.zip .
+          cd ..
+
+      - name: Check if release exists
+        id: check_release
+        continue-on-error: true
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.VERSION }})
+          if [[ "$STATUS" == "404" ]]; then
+            echo "CREATE_RELEASE=true" >> $GITHUB_ENV
+          else
+            echo "CREATE_RELEASE=false" >> $GITHUB_ENV
+          fi
+          
+      - name: Create GitHub Release (if not exists)
+        if: env.CREATE_RELEASE == 'true'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
+          draft: false
+          prerelease: false
+
+      - name: Upload frontend build to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: frontend-dist.zip
+          asset_name: frontend/frontend-dist.zip
+          asset_content_type: application/zip
+
+      - name: Notify on failure
+        if: ${{ always() && failure() }}
+        run: echo "::warning::Build failed! Please check the logs for more details."
