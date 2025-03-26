@@ -567,8 +567,8 @@ function UserDetailPage() {
                 </div>
                 <div className="text-xl font-bold text-gray-800">
                   {typeof userDetail?.userStravaKm === "number"
-                    ? userDetail.userStravaKm.toFixed(1)
-                    : "0.0"}{" "}
+                    ? userDetail.userStravaKm.toFixed(2)
+                    : "0.00"}
                   <span className="text-xs text-gray-500 ml-1">km</span>
                 </div>
               </div>

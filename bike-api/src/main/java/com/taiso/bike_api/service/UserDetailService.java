@@ -189,6 +189,13 @@ public class UserDetailService {
         }
         UserDetailEntity userDetail = temp.get();
 
+        Optional<UserEntity> temp2 = userRepository.findById(userId);
+        // 데이터가 존재하지 않으면 예외 던지기
+        if(!temp2.isPresent()) {
+            throw new NoSuchElementException("존재하지 않는 데이터");
+        }
+        UserEntity user2 = temp2.get();
+
         //이메일로 유저 찾기
         Optional<UserEntity> tempUser = userRepository.findByEmail(userEmail);
         if(!tempUser.isPresent()) {
@@ -208,14 +215,14 @@ public class UserDetailService {
 
         boolean isStravaConnected = userRepository.existsByUserIdAndStravaIdIsNull(userId);
 
-        Integer userStravaDataCount = userStravaDataRepository.countByUser(user);
+        Integer userStravaDataCount = userStravaDataRepository.countByUser(user2);
 
-        Integer userStravaKm = userStravaDataRepository.findByUser(user)
+        Integer userStravaKm = userStravaDataRepository.findByUser(user2)
                 .stream()
                 .mapToInt(data -> data.getDistance() != null ? data.getDistance().intValue() : 0)
                 .sum();
 
-        Integer userStravaElevation = userStravaDataRepository.findByUser(user)
+        Integer userStravaElevation = userStravaDataRepository.findByUser(user2)
                 .stream()
                 .mapToInt(data -> data.getElevation() != null ? data.getElevation().intValue() : 0)
                 .sum();
